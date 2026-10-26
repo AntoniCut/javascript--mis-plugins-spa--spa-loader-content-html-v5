@@ -1,7 +1,7 @@
 /*
-    *  --------------------------------------------  *
-    *  -----  /gulpfile.js  --  /gulpfile.js  -----  *
-    *  --------------------------------------------  *
+    *  -------------------------------------------  *
+    *  -----  gulpfile.js  --  /gulpfile.js  -----  *
+    *  -------------------------------------------  *
 */
 
 import gulp from "gulp";
@@ -12,6 +12,9 @@ import { exec } from 'node:child_process';
 import { Transform } from 'stream';
 import fs from 'fs';
 import path from 'node:path';
+
+//  -----  convertir png a avif  -----
+import sharp from 'sharp';
 
 import { deleteAsync } from "del";
 
@@ -46,6 +49,9 @@ const paths = {
     root: {
         assetsDir: path.join('assets'),
         assets: path.posix.join('assets', '**/*'),
+
+        /** - `png de captura en assets/img/clase-*` */
+        claseImagesPng: path.posix.join('assets', 'img', 'clase-*', '*.png'),
     },
 
     src: {
@@ -158,6 +164,250 @@ const validateFiles = (taskName) => new Transform({
  * @returns {boolean}
  */
 const existsDir = (dirPath) => fs.existsSync(dirPath);
+
+
+
+/*
+    *  -----------------------------------  *
+    *  -----  png de captura a avif  -----  *
+    *  -----------------------------------  *
+*/
+
+
+
+/**
+ * ----------------------------------
+ * -----  type `ImageAvifSize`  -----
+ * ----------------------------------
+ * - Tamaños AVIF generados por cada PNG.
+ * @typedef {Object} ImageAvifSize
+ * @property {number} width - Ancho máximo de salida.
+ * @property {number} height - Alto máximo de salida.
+ */
+
+
+
+/**
+ * --------------------------------
+ * -----  `AVIF_VARIANTS {}`  -----
+ * --------------------------------
+ * @type {ImageAvifSize[]} - `tamaños avif generados por cada png` */
+const AVIF_VARIANTS = [
+    { width: 280, height: 247 },
+    { width: 560, height: 494 },
+];
+
+
+
+/**
+ * -------------------------------------
+ * -----  `listClasePngSources()`  -----
+ * -------------------------------------
+ * - Lista los PNG de captura en assets/img/clase-*, sin los AVIF ya generados.
+ * @return {string[]} - `Rutas de los PNG de origen`.
+ */
+const listClasePngSources = () => {
+
+    /** - `carpeta de imágenes` */
+    const imgRoot = path.join('assets', 'img');
+
+    //  -----  si no hay carpeta de imágenes, no hay capturas  -----
+    if (!fs.existsSync(imgRoot))
+        //  -----  devolver una lista vacía  -----
+        return [];
+
+    /** - `carpetas clase-*` */
+    const classDirs = fs.readdirSync(imgRoot, { withFileTypes: true })
+        .filter((entry) => entry.isDirectory() && entry.name.startsWith('clase-'));
+
+    /** @type {string[]} - `png de captura encontrados` */
+    const files = [];
+
+    //  -----  recorrer cada carpeta de clase  -----
+    for (const classDir of classDirs) {
+
+        /** - `ruta de la carpeta de clase` */
+        const dirPath = path.join(imgRoot, classDir.name);
+
+        /** - `nombres de archivo de la carpeta` */
+        const names = fs.readdirSync(dirPath);
+
+        //  -----  recorrer los archivos de la clase  -----
+        for (const name of names) {
+
+            //  -----  si no es png, saltarlo  -----
+            if (!name.toLowerCase().endsWith('.png'))
+                //  -----  pasar al siguiente archivo  -----
+                continue;
+
+            /** - `nombre sin la extensión png` */
+            const base = name.slice(0, -4);
+
+            //  -----  si ya es un derivado de tamaño, saltarlo  -----
+            if (/-280x247$/.test(base) || /-560x494$/.test(base))
+                //  -----  pasar al siguiente archivo  -----
+                continue;
+
+            //  -----  guardar el png de captura  -----
+            files.push(path.join(dirPath, name));
+
+        }
+
+    }
+
+    //  -----  devolver los png de captura  -----
+    return files;
+
+};
+
+
+
+/**
+ * --------------------------------------
+ * -----  `getImageStem(fileName)`  -----
+ * --------------------------------------
+ * - Quita la extensión y el sufijo de tamaño del nombre del PNG.
+ * @param {string} fileName - Nombre del archivo PNG.
+ * @return {string} - `Nombre base para el AVIF`.
+ */
+const getImageStem = (fileName) => {
+
+    /** - `nombre sin la extensión png` */
+    const base = fileName.replace(/\.png$/i, '');
+
+    /** - `nombre sin el sufijo de ancho y alto` */
+    const stripped = base.replace(/-\d+x\d+$/, '');
+
+    //  -----  devolver el nombre base, o el nombre sin extensión si el sufijo lo vació  -----
+    return stripped || base;
+
+};
+
+
+
+/**
+ * ------------------------------------------------------
+ * -----  `shouldWriteAvif(inputPath, outputPath)`  -----
+ * ------------------------------------------------------
+ * - Regenera el AVIF si no existe o si el PNG es más nuevo.
+ * @param {string} inputPath - PNG de origen.
+ * @param {string} outputPath - AVIF de salida.
+ * @return {boolean} - `'true' si hay que escribir el AVIF`.
+ */
+const shouldWriteAvif = (inputPath, outputPath) => {
+
+    //  -----  si el avif no existe, hay que crearlo  -----
+    if (!fs.existsSync(outputPath))
+        //  -----  escribir el avif  -----
+        return true;
+
+    /** - `fecha del png` */
+    const inputStat = fs.statSync(inputPath);
+
+    /** - `fecha del avif` */
+    const outputStat = fs.statSync(outputPath);
+
+    //  -----  escribir el avif solo si el png es más nuevo  -----
+    return inputStat.mtimeMs > outputStat.mtimeMs;
+
+};
+
+
+
+/**
+ * --------------------------------------------------------------------
+ * -----  `writeAvifImage(inputPath, outputPath, width, height)`  -----
+ * --------------------------------------------------------------------
+ * - Encaja el PNG completo en el recuadro, sin recortar, y lo escribe como AVIF.
+ *
+ * `@async`
+ * @param {string} inputPath - PNG de origen.
+ * @param {string} outputPath - Ruta del AVIF de salida.
+ * @param {number} width - Ancho máximo de salida.
+ * @param {number} height - Alto máximo de salida.
+ * @return {Promise<void>} - `Termina cuando el AVIF está escrito`.
+ */
+const writeAvifImage = async (inputPath, outputPath, width, height) => {
+
+    //  -----  redimensionar el png y escribir el avif  -----
+    await sharp(inputPath)
+        .resize(width, height, {
+            fit: 'inside',
+            withoutEnlargement: true,
+        })
+        .avif({ quality: 55 })
+        .toFile(outputPath);
+};
+
+
+
+/**
+ * -------------------------------
+ * -----  `convertImages()`  -----
+ * -------------------------------
+ * - Genera dos AVIF por cada PNG de captura en clase-*.
+ *
+ * `@async`
+ * @return {Promise<void>} - `Termina cuando todos los AVIF pendientes están escritos`.
+ */
+export const convertImages = async () => {
+
+    /** - `png de captura` */
+    const sources = listClasePngSources();
+
+    //  -----  si no hay capturas, salir  -----
+    if (sources.length === 0) {
+
+        //  -----  avisar de que no hay png  -----
+        console.log('ℹ️  No hay PNG en assets/img/clase-*');
+
+        //  -----  terminar la tarea  -----
+        return;
+    }
+
+
+    //  -----  recorrer cada png de captura  -----
+    for (const inputPath of sources) {
+
+        /** - `carpeta del png` */
+        const destDir = path.dirname(inputPath);
+
+        /** - `nombre base del avif` */
+        const stem = getImageStem(path.basename(inputPath));
+
+        //  -----  generar cada tamaño  -----
+        for (const size of AVIF_VARIANTS) {
+
+            /** - `ruta del avif de este tamaño` */
+            const avifPath = path.join(
+                destDir,
+                `${stem}-${size.width}x${size.height}.avif`
+            );
+
+            //  -----  si el avif ya está al día, saltarlo  -----
+            if (!shouldWriteAvif(inputPath, avifPath)) {
+
+                //  -----  pasar al siguiente tamaño  -----
+                continue;
+
+            }
+
+            //  -----  escribir el avif  -----
+            await writeAvifImage(inputPath, avifPath, size.width, size.height);
+
+            //  -----  confirmar el archivo escrito  -----
+            console.log(`✅  ${avifPath}`);
+
+        }
+
+    }
+
+};
+
+
+
+//  -----  nombre visible de la tarea de imágenes  -----
+convertImages.displayName = 'convertImages';
 
 
 
