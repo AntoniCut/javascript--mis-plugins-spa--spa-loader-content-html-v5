@@ -1,6 +1,6 @@
 # SPEC 01 — Scripts de package.json
 
-> **Estado:** Aprobado
+> **Estado:** Implementada
 > **Depende de:** —
 > **Fecha:** 2026-10-26
 > **Objetivo:** Dejar en SPA-V5 el script `convert-images` del package.json de jQuery SPA v5, con la tarea Gulp que lo ejecuta, sin cambiar los scripts que ya coinciden.
