@@ -187,12 +187,33 @@ export const cleanApp = () => deleteAsync(['app']);
 
 
 /**
+ * ------------------------------------
+ * -----  `cleanMarkdownShiki()`  -----
+ * ------------------------------------
+ * - Elimina src/markdown-shiki/ para no dejar html de rutas borradas.
+ * @return {Promise<string[]>} - Rutas eliminadas.
+ */
+export const cleanMarkdownShiki = () => deleteAsync([paths.src.markdownShikiDir]);
+
+
+
+/**
+ * --------------------------
+ * -----  `resetDev()`  -----
+ * --------------------------
+ * - Vacía app/ y src/markdown-shiki/ antes de volver a copiar.
+ */
+export const resetDev = parallel(cleanApp, cleanMarkdownShiki);
+
+
+
+/**
  * -----------------------
  * -----  `clean()`  -----
  * -----------------------
- * - Elimina en paralelo dist/ y app/.
+ * - Elimina en paralelo dist/, app/ y src/markdown-shiki/.
  */
-export const clean = parallel(cleanDist, cleanApp);
+export const clean = parallel(cleanDist, cleanApp, cleanMarkdownShiki);
 
 
 
@@ -394,6 +415,16 @@ const copyAll = series(
 
 
 
+/**
+ * -------------------------
+ * -----  `refresh()`  -----
+ * -------------------------
+ * - Vacía los destinos y vuelve a copiar y compilar src/ hacia app/, sin quedar a la escucha.
+ */
+export const refresh = series(resetDev, copyAll);
+
+
+
 /*
     ---------------------------------
     -----  👀  --  DEV / WATCH  -----
@@ -429,13 +460,29 @@ const watchTask = () => {
 watchTask.displayName = 'watch';
 
 
+
+/**
+ * --------------------------
+ * -----  `watchSrc()`  -----
+ * --------------------------
+ * - Solo observa src/. El vaciado y la copia inicial van en refresh y en dev.
+ */
+export const watchSrc = () => watchTask();
+
+
+
+//  -----  nombre visible de watchSrc  -----
+watchSrc.displayName = 'watchSrc';
+
+
+
 /**
  * ---------------------
  * -----  `dev()`  -----
  * ---------------------
- * - Genera app/ completa desde src/ y queda escuchando cambios en tiempo real.
+ * - Vacía los destinos, genera app/ y queda escuchando. El servidor se levanta con pnpm run server.
  */
-export const dev = series(copyAll, watchTask);
+export const dev = series(resetDev, copyAll, watchTask);
 
 
 /** Observa únicamente los archivos SCSS y recompila estilos. */
@@ -549,7 +596,7 @@ export function addTsNoCheck(cb) {
     ---------------------------
     -----  🚀  --  BUILD  -----
     ---------------------------
-    1. Limpia dist/ y app/
+    1. Limpia dist/, app/ y src/markdown-shiki/
     2. Copia y compila src/ → app/
     3. Minifica app/ → dist/
 */
@@ -560,12 +607,12 @@ export function addTsNoCheck(cb) {
  * -----  `build()`  -----
  * -----------------------
  * Genera el build de producción en tres pasos:
- * 1. Limpia dist/ y app/.
+ * 1. Limpia dist/, app/ y src/markdown-shiki/.
  * 2. Copia y compila src/ → app/.
  * 3. Minifica app/ → dist/.
  */
 export const build = series(
-    parallel(cleanDist, cleanApp),
+    parallel(cleanDist, cleanApp, cleanMarkdownShiki),
     copyAll,
     parallel(
         minifyAllJs,
