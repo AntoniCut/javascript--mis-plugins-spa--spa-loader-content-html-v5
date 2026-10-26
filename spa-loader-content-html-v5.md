@@ -86,7 +86,8 @@ construye `configOptionsSpa` e invoca al plugin:
 // src/spa/spa.js
 import { spaLoaderContentHtml } from "../plugins/spa-loader-content-html/v5/spa-loader-content-html.js";
 
-const base = '/mis-plugins-spa/spa-loader-content-html-v5';
+// base pública del sitio: SITE_BASE del .env (ver src/config/site-base.js)
+import { base } from "../config/site-base.js";
 
 const configOptionsSpa = {
     routeManifest,                 // importado de routes/route-manifest.js

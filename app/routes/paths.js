@@ -4,8 +4,11 @@
     *  -------------------------------------------------  */
 
 
-/** @type {string} `-----  Base del proyecto  -----` */
-export const base = '/mis-plugins-spa/spa-loader-content-html-v5';
+import { base } from '../config/site-base.js';
+
+
+/** - `base del proyecto: se reexporta desde src/config/site-base.js` */
+export { base };
 
 
 /** - `path para las rutas del curso de TypeScript` */

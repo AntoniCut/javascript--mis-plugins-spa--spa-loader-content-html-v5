@@ -7,14 +7,16 @@
 
 import 'dotenv/config';
 
+import { base } from '../src/config/site-base.js';
+
 import express from 'express';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
 
-/** - Prefijo URL que usa el base href del proyecto. */
-const DEV_ROUTE_BASE = '/mis-plugins-spa/spa-loader-content-html-v5';
+/** - Prefijo URL que usa el base href del proyecto (SITE_BASE del .env). */
+const DEV_ROUTE_BASE = base;
 
 /** - Puerto público para previsualizar el build de producción. */
 const PREVIEW_SERVER_PORT = Number(process.env.PREVIEW_SERVER_PORT || 4173);
