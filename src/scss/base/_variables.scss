@@ -4,8 +4,8 @@
     *  -------------------------------------------------------------------------  *
 */
 
-//  -----  base del proyecto  -----
-$base: '/mis-plugins-spa/spa-loader-content-html-v5';
+//  -----  base del proyecto: la función site-base() la registra gulpfile.js desde SITE_BASE  -----
+$base: site-base();
 
 
 //  -----  Fuentes  -----
