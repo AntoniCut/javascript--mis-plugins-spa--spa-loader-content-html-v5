@@ -17,6 +17,7 @@ con renderizado de código fuente resaltado mediante Shiki (tema `dark-plus`).
 | `pnpm build` | Limpia `dist/`, `app/` y el HTML de Shiki, regenera `app/` y minifica a `dist/`. |
 | `pnpm preview` | Sirve `dist/` en local y abre el navegador. |
 | `pnpm code-highlight` | Compila el SCSS y regenera los bloques HTML resaltados con Shiki. |
+| `pnpm convert-images` | Convierte las capturas PNG de `assets/img/clase-*` a AVIF. |
 | `pnpm add:ts-nocheck` | Añade `// @ts-nocheck` a los JS de desarrollo. |
 
 ## MarkdownShiki
