@@ -52,6 +52,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-shiki": "^0.9.0",
     "sass": "^1.97.3",
+    "sharp": "^0.34.5",
     "shiki": "^4.1.0"
   }
 }
