@@ -5,17 +5,34 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "predev": "node predev.js",
-    "dev": "concurrently -k -n watch,serve -c yellow,cyan \"pnpm run dev:watch\" \"pnpm run serve:dev\"",
-    "dev:watch": "CHOKIDAR_USEPOLLING=true CHOKIDAR_INTERVAL=350 gulp dev",
-    "serve:dev": "CHOKIDAR_USEPOLLING=true CHOKIDAR_INTERVAL=350 node server/dev-server.js",
+    "dev": "pnpm run refresh && concurrently -k -n watch,serve -c yellow,cyan \"pnpm run dev:watch\" \"pnpm run serve:dev\"",
+    "dev:watch": "gulp watchSrc",
+    "reset": "gulp resetDev",
+    "refresh": "gulp refresh",
+    "serve:dev": "node server/dev-server.js",
     "stop:dev": "node server/stop-dev-server.js",
     "server": "pnpm run serve:dev",
+    "code-highlight": "gulp styles && node generate-markdown-shiki.js",
+    "convert-images": "gulp convertImages",
     "build": "gulp build",
     "preview": "node server/preview-server.js --open",
     "add:ts-nocheck": "cross-env NODE_ENV=development node addTsNoCheck.js",
-    "code-highlight": "gulp styles && node generate-markdown-shiki.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "scriptsDoc": {
+    "dev": "Resetea app/ y src/markdown-shiki/, regenera todo desde src/ y arranca watch + servidor de desarrollo.",
+    "dev:watch": "Solo observa cambios en src/ y sincroniza app/. No resetea ni levanta el servidor.",
+    "reset": "Vacía app/ y src/markdown-shiki/. No vuelve a copiar ni compilar.",
+    "refresh": "Vacía app/ y src/markdown-shiki/ y vuelve a copiar/compilar src/ → app/, sin quedar a la escucha.",
+    "serve:dev": "Levanta el servidor de desarrollo (Express + BrowserSync) sobre app/ ya generado.",
+    "stop:dev": "Cierra el servidor de desarrollo si sigue en marcha.",
+    "server": "Alias de serve:dev.",
+    "code-highlight": "Compila el SCSS y genera los bloques HTML de Shiki en src/markdown-shiki/ a partir de las rutas. Las entradas -css leen app/css/.",
+    "convert-images": "Convierte las capturas PNG de assets/img/clase-* a AVIF.",
+    "build": "Limpia dist/, app/ y markdown-shiki, regenera app/ y minifica a dist/ para producción.",
+    "preview": "Sirve dist/ en local y abre el navegador.",
+    "add:ts-nocheck": "Añade // @ts-nocheck a los JS de desarrollo que lo necesiten.",
+    "test": "Marcador: aún no hay tests."
   },
   "keywords": [],
   "author": "",
@@ -37,6 +54,7 @@
     "markdown-it": "^14.1.0",
     "markdown-it-shiki": "^0.9.0",
     "sass": "^1.97.3",
+    "sharp": "^0.34.5",
     "shiki": "^4.1.0"
   }
 }
