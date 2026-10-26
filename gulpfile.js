@@ -700,6 +700,7 @@ const watchTask = () => {
         [paths.src.scripts,       copyScripts],
         [paths.src.main,          copyMain],
         [paths.src.scssAll,       series(styles, generateShiki, copyMarkdownShiki)],
+        [paths.root.claseImagesPng, convertImages],
     ];
 
     for (const [glob, task] of watchers) {
