@@ -7,6 +7,8 @@
 
 import 'dotenv/config';
 
+import { base } from '../src/config/site-base.js';
+
 import browserSync from 'browser-sync';
 import express from 'express';
 import { spawn } from 'node:child_process';
@@ -16,8 +18,8 @@ import path from 'node:path';
 
 
 
-/** - Prefijo URL que usa el base href del proyecto. */
-const DEV_ROUTE_BASE = '/mis-plugins-spa/spa-loader-content-html-v5';
+/** - Prefijo URL que usa el base href del proyecto (SITE_BASE del .env). */
+const DEV_ROUTE_BASE = base;
 
 /** - Puerto público del servidor de desarrollo. */
 const DEV_SERVER_PORT = Number(process.env.DEV_SERVER_PORT || 3000);
@@ -56,6 +58,28 @@ app.disable('x-powered-by');
 
 
 /**
+ * ---------------------------------
+ * -----  `sendSpaEntry(res)`  -----
+ * ---------------------------------
+ * - Responde con index.html sustituyendo el marcador %SITE_BASE% por la base del .env.
+ * @param {import('express').Response} res
+ */
+
+const sendSpaEntry = (res) => {
+
+    /** - Contenido de index.html con el marcador sin resolver */
+    const template = fs.readFileSync(SPA_ENTRY_FILE, 'utf-8');
+
+    /** - Contenido de index.html con la base real */
+    const html = template.replaceAll('%SITE_BASE%', base);
+
+    //  -----  responder con el HTML ya resuelto  -----
+    res.type('html').send(html);
+};
+
+
+
+/**
  * --------------------------------------------------
  * -----  `redirectRootToBase(req, res, next)`  -----
  * --------------------------------------------------
@@ -68,7 +92,7 @@ app.disable('x-powered-by');
 const redirectRootToBase = (req, res, next) => {
 
     //  -----  Redirige la raíz y /index.html a la base de la SPA  -----
-    if (req.path === '/' || req.path === '/index.html') {
+    if (req.path === '/' || req.path === '/index.html' || req.path === `${DEV_ROUTE_BASE}/index.html`) {
         res.redirect(302, `${DEV_ROUTE_BASE}/`);
         return;
     }
@@ -107,7 +131,7 @@ const serveSpaFallback = (req, res, next) => {
 
     //  -----  Si la ruta relativa es vacía, servir el archivo de entrada de la SPA  -----
     if (relativePath === '') {
-        res.sendFile(SPA_ENTRY_FILE);
+        sendSpaEntry(res);
         return;
     }
 
@@ -122,7 +146,7 @@ const serveSpaFallback = (req, res, next) => {
 
     //  -----  Si la ruta no tiene extensión y el archivo no existe, hacer fallback a index.html  -----
     if (!hasFileExtension && !fileExists) {
-        res.sendFile(SPA_ENTRY_FILE);
+        sendSpaEntry(res);
         return;
     }
 

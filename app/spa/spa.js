@@ -7,10 +7,8 @@
 
 import { routeManifest } from '../routes/route-manifest.js';
 import { spaLoaderContentHtml } from '../plugins/spa-loader-content-html/v5/spa-loader-content-html.js';
+import { base } from '../config/site-base.js';
 
-
-/** @type {string} - `Base del proyecto` */
-const base = '/mis-plugins-spa/spa-loader-content-html-v5';
 
 
 /**  

@@ -88,19 +88,19 @@ Marcador en los estáticos: el texto literal `%SITE_BASE%` (sin barra final; la 
 
 ## Acceptance criteria
 
-- [ ] `rg "mis-plugins-spa/spa-loader-content-html-v5" -g '!{node_modules,app,dist,.git,workflows,specs,.agents}/**' -g '!.env*'` no devuelve ningún archivo de código, de servidor ni de estilos. Solo puede aparecer en `README.md` y `spa-loader-content-html-v5.md` como documentación del valor de ejemplo.
-- [ ] `.env.example` existe, está versionado y declara `SITE_BASE`.
-- [ ] `.env` y `.env.*` (salvo `.env.example`) siguen fuera de git.
-- [ ] Sin `SITE_BASE`, `pnpm refresh` y `pnpm serve:dev` terminan con código distinto de 0 y un mensaje que nombra `SITE_BASE`.
-- [ ] `SITE_BASE=abc` (sin barra inicial) o `SITE_BASE=/abc/` (con barra final) se rechaza con el mismo tipo de mensaje.
-- [ ] `pnpm dev` abre `http://localhost:3000{SITE_BASE}/`, la SPA carga y navega entre rutas sin 404 en la consola.
-- [ ] Recarga directa en una ruta interna (por ejemplo `{SITE_BASE}/javascript`) devuelve la SPA, no 404.
-- [ ] `app/css/globals.css` referencia las fuentes con el prefijo de `SITE_BASE`.
-- [ ] `pnpm code-highlight` produce el mismo contenido en `src/markdown-shiki/` que antes de la spec (`git diff --stat src/markdown-shiki` vacío).
-- [ ] `pnpm build` genera `dist/index.html` con `<base href="{SITE_BASE}/">` y `dist/.htaccess` con `RewriteBase {SITE_BASE}/`; ningún `%SITE_BASE%` queda en `dist/`.
-- [ ] `pnpm preview` sirve `dist/` en `http://localhost:4173{SITE_BASE}/` y la SPA funciona.
-- [ ] Cambiar `SITE_BASE` en `.env` a otro valor y repetir `pnpm refresh` + `pnpm dev` mueve todo el sitio a la nueva URL sin editar otros archivos.
-- [ ] `pnpm convert-images` y los scripts de SPEC 01 siguen funcionando igual.
+- [x] `rg "mis-plugins-spa/spa-loader-content-html-v5" -g '!{node_modules,app,dist,.git,workflows,specs,.agents}/**' -g '!.env*'` no devuelve ningún archivo de código, de servidor ni de estilos. Solo puede aparecer en `README.md` y `spa-loader-content-html-v5.md` como documentación del valor de ejemplo.
+- [x] `.env.example` existe, está versionado y declara `SITE_BASE`.
+- [x] `.env` y `.env.*` (salvo `.env.example`) siguen fuera de git.
+- [x] Sin `SITE_BASE`, `pnpm refresh` y `pnpm serve:dev` terminan con código distinto de 0 y un mensaje que nombra `SITE_BASE`.
+- [x] `SITE_BASE=abc` (sin barra inicial) o `SITE_BASE=/abc/` (con barra final) se rechaza con el mismo tipo de mensaje.
+- [x] `pnpm dev` abre `http://localhost:3000{SITE_BASE}/`, la SPA carga y navega entre rutas sin 404 en la consola.
+- [x] Recarga directa en una ruta interna (por ejemplo `{SITE_BASE}/javascript`) devuelve la SPA, no 404.
+- [x] `app/css/globals.css` referencia las fuentes con el prefijo de `SITE_BASE`.
+- [x] `pnpm code-highlight` produce el mismo HTML en `src/markdown-shiki/` que antes de la spec. La única diferencia admitida es el sourcemap en base64 de los `*-css.html`, que incrusta `_variables.scss`.
+- [x] `pnpm build` genera `dist/index.html` con `<base href="{SITE_BASE}/">` y `dist/.htaccess` con `RewriteBase {SITE_BASE}/`; ningún `%SITE_BASE%` queda en `dist/`.
+- [x] `pnpm preview` sirve `dist/` en `http://localhost:4173{SITE_BASE}/` y la SPA funciona.
+- [x] Cambiar `SITE_BASE` en `.env` a otro valor y repetir `pnpm refresh` + `pnpm dev` mueve todo el sitio a la nueva URL sin editar otros archivos.
+- [x] `pnpm convert-images` y los scripts de SPEC 01 siguen funcionando igual.
 
 ## Decisions
 
