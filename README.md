@@ -20,6 +20,18 @@ con renderizado de código fuente resaltado mediante Shiki (tema `dark-plus`).
 | `pnpm convert-images` | Convierte las capturas PNG de `assets/img/clase-*` a AVIF. |
 | `pnpm add:ts-nocheck` | Añade `// @ts-nocheck` a los JS de desarrollo. |
 
+## Variables de entorno
+
+Copia `.env.example` a `.env` antes de arrancar. `SITE_BASE` es obligatoria.
+
+| Variable | Descripción |
+|---|---|
+| `SITE_BASE` | Base pública del sitio, por ejemplo `/mis-plugins-spa/spa-loader-content-html-v5`. Empieza por `/` y no termina en `/`. La leen los servidores, Gulp (Sass y build) y la SPA. |
+| `DEV_SERVER_PORT` | Puerto de `pnpm dev`. Por defecto `3000`. |
+| `PREVIEW_SERVER_PORT` | Puerto de `pnpm preview`. Por defecto `4173`. |
+
+`index.html` y `.htaccess` llevan el marcador `%SITE_BASE%`. El servidor de desarrollo lo sustituye al servir y `pnpm build` lo sustituye en `dist/index.html` y `dist/.htaccess`. En el navegador, `src/config/site-base.js` deduce la base de `<base href>`.
+
 ## MarkdownShiki
 
 El proyecto muestra código fuente resaltado en las vistas mediante un pipeline

@@ -4,6 +4,9 @@
     *  -------------------------------------------  *
 */
 
+//  -----  carga .env antes que cualquier módulo que lea SITE_BASE  -----
+import 'dotenv/config';
+
 import gulp from "gulp";
 
 import gulpSass from 'gulp-sass';
@@ -24,6 +27,7 @@ import htmlmin from "gulp-htmlmin";
 import plumber from "gulp-plumber";
 
 import { generateMarkdownShiki } from './generate-markdown-shiki.js';
+import { base } from './src/config/site-base.js';
 
 
 
@@ -32,6 +36,13 @@ const { src, dest, watch, series, parallel } = gulp;
 
 /** `-----  Instancia de Dart Sass para gulp-sass como motor de compilación -----` */
 const sass = gulpSass(dartSass);
+
+/** `-----  Opciones de Sass: registra site-base() para que los SCSS lean SITE_BASE  -----` */
+const sassOptions = {
+    functions: {
+        'site-base()': () => new dartSass.SassString(base),
+    },
+};
 
 
 /**
@@ -55,6 +66,9 @@ const paths = {
     },
 
     src: {
+
+        configDir: path.join('src', 'config'),
+        config:    path.posix.join('src', 'config', '**/*'),
 
         componentsDir: path.join('src', 'components'),
         components:    path.posix.join('src', 'components', '**/*'),
@@ -538,6 +552,9 @@ const createCopyTask = (name, opts) => {
 /** Copia src/components/ → app/components/. */
 export const copyComponents = createCopyTask('copyComponents', { glob: paths.src.components, checkPath: paths.src.componentsDir });
 
+/** Copia src/config/ → app/config/. */
+export const copyConfig = createCopyTask('copyConfig', { glob: paths.src.config, checkPath: paths.src.configDir });
+
 /** Copia src/effects/ → app/effects/. */
 export const copyEffects = createCopyTask('copyEffects', { glob: paths.src.effects, checkPath: paths.src.effectsDir });
 
@@ -593,7 +610,7 @@ export const css = () =>
         ? Promise.resolve()
         : src(paths.src.scssGlobals, { sourcemaps: true, allowEmpty: true })
             .pipe(safePipe())
-            .pipe(sass().on('error', sass.logError))
+            .pipe(sass(sassOptions).on('error', sass.logError))
             .pipe(validateFiles('css'))
             .pipe(dest(path.posix.join(paths.appRoot, 'css'), { sourcemaps: true }));
 
@@ -605,7 +622,7 @@ export const cssPages = () =>
         ? Promise.resolve()
         : src(paths.src.scssPages, { base: paths.src.scssPagesDir, sourcemaps: true, allowEmpty: true })
             .pipe(safePipe())
-            .pipe(sass().on('error', sass.logError))
+            .pipe(sass(sassOptions).on('error', sass.logError))
             .pipe(validateFiles('cssPages'))
             .pipe(dest(path.posix.join(paths.appRoot, 'css', 'pages'), { sourcemaps: true }));
 
@@ -643,6 +660,7 @@ generateShiki.displayName = 'generateShiki';
 //  buildSources: copias + compilación SCSS en paralelo (produce app/css/)
 const buildSources = parallel(
     copyComponents,
+    copyConfig,
     copyEffects,
     copyPages,
     copyPagesComponents,
@@ -690,6 +708,7 @@ const watchTask = () => {
     /** @type {Array<[string | string[], import('gulp').TaskFunction]>} */
     const watchers = [
         [paths.src.components,    copyComponents],
+        [paths.src.config,        copyConfig],
         [paths.src.effects,       copyEffects],
         [paths.src.markdownShiki, copyMarkdownShiki],
         [paths.src.pages,         copyPages],
@@ -750,13 +769,48 @@ export const watchStyles = () => watch(paths.src.scssAll, WATCH_OPTIONS, styles)
 */
 
 
+/**
+ * ---------------------------------
+ * -----  `replaceSiteBase()`  -----
+ * ---------------------------------
+ * - Crea un Transform que sustituye el marcador %SITE_BASE% por la base del .env.
+ * @returns {Transform}
+ */
+const replaceSiteBase = () => new Transform({
+    objectMode: true,
+    transform(file, _enc, cb) {
+
+        //  -----  solo procesa archivos con contenido  -----
+        if (file.isBuffer()) {
+
+            //  -----  reemplaza todas las apariciones del marcador  -----
+            file.contents = Buffer.from(file.contents.toString('utf-8').replaceAll('%SITE_BASE%', base));
+        }
+
+        //  -----  pasa el archivo al siguiente paso  -----
+        cb(null, file);
+    },
+});
+
+
 /** Minifica index.html raíz → dist/index.html. */
 export const minifyRootIndex = () =>
 
     src('index.html', { allowEmpty: true })
         .pipe(safePipe())
+        .pipe(replaceSiteBase())
         .pipe(htmlmin({ collapseWhitespace: true, removeComments: true }))
         .pipe(validateFiles('minifyRootIndex'))
+        .pipe(dest(paths.distRoot));
+
+
+/** Copia .htaccess raíz → dist/.htaccess con la base del .env. */
+export const htaccessToDist = () =>
+
+    src('.htaccess', { allowEmpty: true, dot: true })
+        .pipe(safePipe())
+        .pipe(replaceSiteBase())
+        .pipe(validateFiles('htaccessToDist'))
         .pipe(dest(paths.distRoot));
 
 
@@ -869,6 +923,7 @@ export const build = series(
         minifyAllJs,
         minifyAllCss,
         minifyRootIndex,
+        htaccessToDist,
         minifyHtml,
         copyStaticAssetsToDist,
         copyRootAssetsToDist

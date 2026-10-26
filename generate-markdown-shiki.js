@@ -27,7 +27,8 @@ import { codeToHtml } from 'shiki';
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { base } from './src/routes/paths.js';
+import 'dotenv/config';
+import { base } from './src/config/site-base.js';
 
 
 /** @typedef {import('./types/index.js').Route} Route */
