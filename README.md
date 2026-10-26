@@ -7,11 +7,18 @@ con renderizado de código fuente resaltado mediante Shiki (tema `dark-plus`).
 
 | Script | Descripción |
 |---|---|
-| `pnpm dev` | Entorno de desarrollo (watch + server con polling). |
-| `pnpm dev:watch` | Watch de Gulp sin polling. |
-| `pnpm build` | Build de producción. |
-| `pnpm code-highlight` | Regenera los bloques HTML resaltados con Shiki. |
-| `pnpm add:ts-nocheck` | Añade `// @ts-nocheck` a los archivos TS. |
+| `pnpm dev` | Vacía `app/` y `src/markdown-shiki/`, regenera `app/` y arranca watch + servidor. |
+| `pnpm dev:watch` | Solo observa `src/` y sincroniza `app/`. No resetea ni levanta el servidor. |
+| `pnpm reset` | Vacía `app/` y `src/markdown-shiki/`. No vuelve a copiar ni compilar. |
+| `pnpm refresh` | Vacía y vuelve a copiar/compilar `src/` → `app/`, sin quedar a la escucha. |
+| `pnpm serve:dev` | Levanta el servidor de desarrollo sobre `app/` ya generado. |
+| `pnpm stop:dev` | Cierra el servidor de desarrollo si sigue en marcha. |
+| `pnpm server` | Alias de `serve:dev`. |
+| `pnpm build` | Limpia `dist/`, `app/` y el HTML de Shiki, regenera `app/` y minifica a `dist/`. |
+| `pnpm preview` | Sirve `dist/` en local y abre el navegador. |
+| `pnpm code-highlight` | Compila el SCSS y regenera los bloques HTML resaltados con Shiki. |
+| `pnpm convert-images` | Convierte las capturas PNG de `assets/img/clase-*` a AVIF. |
+| `pnpm add:ts-nocheck` | Añade `// @ts-nocheck` a los JS de desarrollo. |
 
 ## MarkdownShiki
 
