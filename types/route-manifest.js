@@ -1,11 +1,11 @@
 /*
-    *  --------------------------------------------------------------  *
-    *  -----  /route-manifest.js  --  /types/route-manifest.js  -----  *
-    *  --------------------------------------------------------------  *
+    *  -------------------------------------------------------------  *
+    *  -----  route-manifest.js  --  /types/route-manifest.js  -----  *
+    *  -------------------------------------------------------------  *
 */
 
 
-//  ----------  Esto asegura que VS Code lo trate como modulo  ----------
+//  -----  marcar el archivo como módulo para que vs code lo trate como tal  -----
 export {};
 
 
@@ -13,9 +13,9 @@ export {};
  * -----------------------------
  * -----  `RouteManifest`  -----
  * -----------------------------
- * @typedef {Object} RouteManifest 
- * - Tipo para el manifiesto de rutas. 
- * - Solo contiene id, path y nombre de archivo (sin imports). 
+ * @typedef {Object} RouteManifest
+ * - Tipo para el manifiesto de rutas.
+ * - Solo contiene id, path y nombre de archivo (sin imports).
  * - Se usa para lazy loading: el modulo de cada ruta se importa dinamicamente bajo demanda.
  * @property {string} id - Identificador unico de la ruta (igual al data-id del enlace HTML).
  * @property {string} path - Path de la URL interna.

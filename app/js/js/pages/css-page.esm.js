@@ -1,39 +1,53 @@
 /*
-    *  -----  /css-page.esm.js  --  /src/scripts/js/pages/css-page.esm.js  -----
-    *
-    *  Script ESM (ES Modules) — Utilidades CSS3 exportadas como módulo nativo.
-    *  Renderiza contenido en css-demo.html tras la carga del plugin SPA V5.
+    *  ------------------------------------------------------------------------  *
+    *  -----  css-page.esm.js  --  /src/scripts/js/pages/css-page.esm.js  -----  *
+    *  ------------------------------------------------------------------------  *
+*/
+
+/*
+    Script ESM (ES Modules) — Utilidades CSS3 exportadas como módulo nativo.
+    Renderiza contenido en css-demo.html tras la carga del plugin SPA V5.
 */
 
 
 /**
- * -----  Características demo renderizadas por ESM  -----
+ * ---------------------------
+ * -----  `PageFeature`  -----
+ * ---------------------------
+ * - Características demo renderizadas por ESM.
  * @typedef {Object} PageFeature
- * @property {string} icon
- * @property {string} title
- * @property {string} text
+ * @property {string} icon - Icono de la tarjeta.
+ * @property {string} title - Título de la tarjeta.
+ * @property {string} text - Texto descriptivo de la tarjeta.
  */
 
 
 /**
- * -----  Detalle del evento spa:route-loaded  -----
+ * ---------------------------------
+ * -----  `RouteLoadedDetail`  -----
+ * ---------------------------------
+ * - Detalle del evento spa:route-loaded.
  * @typedef {Object} RouteLoadedDetail
- * @property {{ id?: string }} [route]
+ * @property {{ id?: string }} [route] - Ruta activa emitida por el plugin.
  */
 
 
-//*  -----  Constantes exportadas  -----
+/*
+    *  -----------------------------------  *
+    *  -----  Constantes exportadas  -----  *
+    *  -----------------------------------  *
+*/
 
-/** Versión del módulo */
+/** - `versión del módulo` */
 export const VERSION = '1.0.0';
 
-/** Nombre del plugin SPA */
+/** - `nombre del plugin SPA` */
 export const PLUGIN_NAME = 'spa-loader-content-html';
 
-/** Versión del plugin SPA usada en la demo */
+/** - `versión del plugin SPA usada en la demo` */
 export const PLUGIN_VERSION = '3.1';
 
-/** Etiquetas / conceptos renderizados por ESM */
+/** - `etiquetas / conceptos renderizados por ESM` */
 export const PAGE_TAGS = Object.freeze([
     "display",
     "flex",
@@ -48,7 +62,7 @@ export const PAGE_TAGS = Object.freeze([
     "@media"
 ]);
 
-/** Características demo renderizadas por ESM */
+/** - `características demo renderizadas por ESM` */
 export const PAGE_ESM_FEATURES = Object.freeze([
     {
         "icon": "🎨",
@@ -69,7 +83,11 @@ export const PAGE_ESM_FEATURES = Object.freeze([
 
 
 
-//*  -----  Funciones exportadas  -----
+/*
+    *  ----------------------------------  *
+    *  -----  Funciones exportadas  -----  *
+    *  ----------------------------------  *
+*/
 
 
 /**
@@ -78,41 +96,52 @@ export const PAGE_ESM_FEATURES = Object.freeze([
  * -----------------------------------------------------------
  * - Crea una tarjeta de feature para el grid del demo.
  * @param {PageFeature} feature - Característica a renderizar
- * @returns {HTMLElement} - Tarjeta de feature creada
+ * @return {HTMLElement} - Tarjeta de feature creada
  */
 export const createFeatureArticle = ({ icon, title, text }) => {
 
-    /** @type {HTMLArticleElement} - Tarjeta de feature creada */
+    /** @type {HTMLArticleElement} - `tarjeta de feature creada` */
     const article = document.createElement('article');
+
+    //  -----  asignar la clase css de la tarjeta  -----
     article.className = 'css-page__feature';
 
+    //  -----  escribir el markup interno de la tarjeta  -----
     article.innerHTML = `
         <span class="css-page__feature-icon" aria-hidden="true">${icon}</span>
         <h4 class="css-page__feature-title">${title}</h4>
         <p class="css-page__feature-text">${text}</p>
     `;
 
+    //  -----  devolver la tarjeta creada  -----
     return article;
 };
 
 
 
 /**
- * ---------------------------------------------
+ * ------------------------------------
  * -----  `createTagItem(label)`  -----
- * ---------------------------------------------
+ * ------------------------------------
  * - Crea un ítem de lista para tags o conceptos.
  * @param {string} label - Texto del ítem
- * @returns {HTMLLIElement} - Ítem de lista creado
+ * @return {HTMLLIElement} - Ítem de lista creado
  */
 export const createTagItem = (label) => {
 
-    /** @type {HTMLLIElement} - Ítem de lista creado */
+    /** @type {HTMLLIElement} - `ítem de lista creado` */
     const item = document.createElement('li');
+
+    //  -----  asignar la clase css del ítem  -----
     item.className = 'css-page__tag';
+
+    //  -----  escribir el texto del ítem  -----
     item.textContent = label;
+
+    //  -----  asignar el título del ítem  -----
     item.title = label;
 
+    //  -----  devolver el ítem de lista creado  -----
     return item;
 };
 
@@ -125,12 +154,16 @@ export const createTagItem = (label) => {
  * - Actualiza el mensaje de estado del bloque ESM.
  * @param {Element|null} statusEl - Elemento de estado
  * @param {string} message - Mensaje de estado
+ * @return {void}
  */
 export const setDemoStatus = (statusEl, message) => {
 
+    //  -----  si no hay elemento de estado, no hacer nada  -----
     if (!statusEl)
+        //  -----  salir de la función  -----
         return;
 
+    //  -----  escribir el mensaje en el elemento de estado  -----
     statusEl.textContent = message;
 };
 
@@ -141,17 +174,23 @@ export const setDemoStatus = (statusEl, message) => {
  * -----  `createRouteLoadedCard()`  -----
  * ---------------------------------------
  * - Tarjeta que escucha spa:route-loaded y muestra el id de la ruta activa.
- * @returns {HTMLElement} - Tarjeta de integración SPA creada
+ * @return {HTMLElement} - Tarjeta de integración SPA creada
  */
 const createRouteLoadedCard = () => {
 
-    /** @type {HTMLArticleElement} - Tarjeta de integración SPA creada */
+    /** @type {HTMLArticleElement} - `tarjeta de integración SPA creada` */
     const article = document.createElement('article');
+
+    //  -----  asignar la clase css de la tarjeta  -----
     article.className = 'css-page__feature';
 
-    /** @type {HTMLParagraphElement} - Salida de texto del evento */
+    /** @type {HTMLParagraphElement} - `salida de texto del evento` */
     const output = document.createElement('p');
+
+    //  -----  asignar la clase css de la salida de texto  -----
     output.className = 'css-page__feature-text';
+
+    //  -----  mostrar el texto de espera del evento  -----
     output.innerHTML = 'Esperando evento <code>spa:route-loaded</code>…';
 
 
@@ -161,117 +200,148 @@ const createRouteLoadedCard = () => {
      * ------------------------------------
      * - Actualiza la tarjeta con el id de la ruta emitida por el plugin.
      * @param {Event} event - Evento spa:route-loaded
+     * @return {void}
      */
     const onRouteLoaded = (event) => {
 
-        /** @type {RouteLoadedDetail} - Detalle del evento spa:route-loaded */
+        /** @type {RouteLoadedDetail} - `detalle del evento spa:route-loaded` */
         const detail = /** @type {CustomEvent<RouteLoadedDetail>} */ (event).detail;
 
-        /** @type {string} - Id de la ruta activa */
+        /** @type {string} - `id de la ruta activa` */
         const routeId = detail?.route?.id ?? 'desconocida';
 
+        //  -----  mostrar la ruta activa recibida en el evento  -----
         output.innerHTML = `Evento recibido: ruta activa <code>${routeId}</code>`;
     };
 
+    //  -----  escuchar el evento spa:route-loaded una sola vez  -----
     document.addEventListener('spa:route-loaded', onRouteLoaded, { once: true });
 
+    //  -----  escribir el markup interno de la tarjeta  -----
     article.innerHTML = `
         <span class="css-page__feature-icon" aria-hidden="true">📡</span>
         <h4 class="css-page__feature-title">Integración SPA</h4>
     `;
+
+    //  -----  añadir la salida de texto a la tarjeta  -----
     article.appendChild(output);
 
+    //  -----  devolver la tarjeta creada  -----
     return article;
 };
 
 
 
 /**
- * ------------------------------------
+ * -----------------------------------
  * -----  `renderPageDemoEsm()`  -----
- * ------------------------------------
+ * -----------------------------------
  * - Renderiza las tarjetas ESM en css-demo.html.
+ * @return {void}
  */
 export const renderPageDemoEsm = () => {
 
-    /** - Contenedor de las tarjetas ESM */
+    /** - `contenedor de las tarjetas ESM` */
     const target = document.querySelector('[data-css-demo-target="esm"]');
 
-    /** - Elemento de estado */
+    /** - `elemento de estado` */
     const status = document.querySelector('[data-css-demo-status="esm"]');
 
+    //  -----  si no existe el contenedor, avisar y salir  -----
     if (!target) {
+        //  -----  avisar en consola de que falta el contenedor  -----
         console.warn('⚠️ css-page.esm.js: contenedor [data-css-demo-target="esm"] no encontrado.');
+
+        //  -----  salir de la función  -----
         return;
     }
 
-    /** - Fragmento de documento para insertar las tarjetas ESM */
+    /** - `fragmento de documento para insertar las tarjetas ESM` */
     const fragment = document.createDocumentFragment();
 
+    //  -----  recorrer las características demo  -----
     PAGE_ESM_FEATURES.forEach((feature) => {
+        //  -----  añadir la tarjeta de cada característica al fragmento  -----
         fragment.appendChild(createFeatureArticle(feature));
     });
 
+    //  -----  añadir la tarjeta de integración spa al fragmento  -----
     fragment.appendChild(createRouteLoadedCard());
 
+    //  -----  sustituir el contenido del contenedor por el fragmento  -----
     target.replaceChildren(fragment);
 
+    //  -----  mostrar el mensaje de estado del renderizado  -----
     setDemoStatus(
         status,
         `Renderizado con css-page.esm.js (ESM) · ${PLUGIN_NAME} v${PLUGIN_VERSION} · v${VERSION} · ${new Date().toLocaleTimeString()}`
     );
 
+    //  -----  avisar en consola de que el módulo esm se ha renderizado  -----
     console.warn('-----  css-page.esm.js  -----  ES Module  -----');
+
+    //  -----  mostrar el número de tarjetas renderizadas  -----
     console.log('Tarjetas ESM:', PAGE_ESM_FEATURES.length + 1);
 };
 
 
 
 /**
- * ----------------------------------------
+ * --------------------------------
  * -----  `renderPageTags()`  -----
- * ----------------------------------------
+ * --------------------------------
  * - Renderiza tags o conceptos en la lista del demo.
+ * @return {void}
  */
 export const renderPageTags = () => {
 
-    /** - Contenedor de tags / conceptos */
+    /** - `contenedor de tags / conceptos` */
     const target = document.querySelector('[data-css-demo-target="tags"]');
 
+    //  -----  si no existe el contenedor, avisar y salir  -----
     if (!target) {
+        //  -----  avisar en consola de que falta el contenedor  -----
         console.warn('⚠️ css-page.esm.js: contenedor [data-css-demo-target="tags"] no encontrado.');
+
+        //  -----  salir de la función  -----
         return;
     }
 
-    /** - Fragmento de documento para insertar los ítems */
+    /** - `fragmento de documento para insertar los ítems` */
     const fragment = document.createDocumentFragment();
 
+    //  -----  recorrer los elementos de la lista  -----
     PAGE_TAGS.forEach((label) => {
+        //  -----  añadir el ítem de cada elemento al fragmento  -----
         fragment.appendChild(createTagItem(label));
     });
 
+    //  -----  sustituir el contenido del contenedor por el fragmento  -----
     target.replaceChildren(fragment);
 };
 
 
 /**
- * ------------------------
+ * -----------------------
  * -----  `mount()`  -----
- * ------------------------
+ * -----------------------
  * - `Punto de montaje del módulo, invocado por el plugin en cada navegación (exportFunctionName: 'mount').`
  * - `Al vivir el render dentro de una función (y NO en el nivel superior del módulo), el navegador puede`
  * - `cachear el módulo y descargarlo una sola vez; el plugin re-renderiza llamando a mount() en cada`
  * - `visita o retroceso del historial, sin re-descargar el archivo.`
- * @returns {void}
+ * @return {void}
  */
 export const mount = () => {
+    //  -----  renderizar las tarjetas del demo esm  -----
     renderPageDemoEsm();
+
+    //  -----  renderizar los tags del demo  -----
     renderPageTags();
 };
 
 
 
-//  -----  Export default  -----
+//  -----  export default  -----
 
 export default {
     VERSION,

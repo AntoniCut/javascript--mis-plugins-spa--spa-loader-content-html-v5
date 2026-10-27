@@ -1,40 +1,55 @@
 // @ts-nocheck
 /*
-    *  -----------------------------------------------------------------------------  *
-    *  -----  /astro-page.cjs.js  --  /src/scripts/js/pages/astro-page.cjs.js  -----  *
-    *  -----------------------------------------------------------------------------  *
-    *
-    *  Script CommonJS (IIFE) — Utilidades Astro para la página.
-    *  Renderiza contenido en astro-demo.html tras la carga del plugin SPA V5.
+    *  ----------------------------------------------------------------------------  *
+    *  -----  astro-page.cjs.js  --  /src/scripts/js/pages/astro-page.cjs.js  -----  *
+    *  ----------------------------------------------------------------------------  *
+*/
+
+/*
+    Script CommonJS (IIFE) — Utilidades Astro para la página.
+    Renderiza contenido en astro-demo.html tras la carga del plugin SPA V5.
 */
 
 
 /**
- * -----  Características demo renderizadas por CJS  -----
+ * ----------------------------
+ * -----  `AstroFeature`  -----
+ * ----------------------------
+ * - Característica demo renderizada por CJS.
  * @typedef {Object} AstroFeature
- * @property {string} icon
- * @property {string} title
- * @property {string} text
+ * @property {string} icon - Icono de la tarjeta.
+ * @property {string} title - Título de la tarjeta.
+ * @property {string} text - Texto descriptivo de la tarjeta.
  */
 
 
 
+//  -----  ejecutar el script como iife (commonjs clásico) al cargarse  -----
 (() => {
 
+    //  -----  dejar una línea en blanco en consola  -----
     console.log('\n');
+
+    //  -----  avisar en consola de que el script cjs se ha cargado  -----
     console.warn('-----  astro-page.cjs.js  -----  CommonJS (IIFE)  -----');
+
+    //  -----  dejar una línea en blanco en consola  -----
     console.log('\n');
 
 
-    //*  -----  Constantes  -----
+    /*
+        *  ------------------------  *
+        *  -----  Constantes  -----  *
+        *  ------------------------  *
+    */
 
-    /** Versión del script */
+    /** - `versión del script` */
     const VERSION = '1.0.0';
-    
-    /** Nombre del plugin SPA */
+
+    /** - `nombre del plugin SPA` */
     const PLUGIN = 'spa-loader-content-html v5';
 
-    /** @type {AstroFeature[]} - Características demo renderizadas por CJS */
+    /** @type {AstroFeature[]} - `características demo renderizadas por CJS` */
     const ASTRO_FEATURES = [
         {
             icon: '🏝️',
@@ -54,7 +69,11 @@
     ];
 
 
-    //*  -----  Utilidades DOM  -----
+    /*
+        *  ----------------------------  *
+        *  -----  Utilidades DOM  -----  *
+        *  ----------------------------  *
+    */
 
 
     /**
@@ -62,8 +81,8 @@
      * -----  `createText(text)`  -----
      * --------------------------------
      * - Crea un nodo de texto seguro.
-     * @param {string} text
-     * @returns {Text}
+     * @param {string} text - Texto del nodo.
+     * @return {Text} - Nodo de texto creado.
      */
 
     const createText = (text) => document.createTextNode(text);
@@ -74,31 +93,34 @@
      * -----------------------------------------------
      * -----  `createElement(tag, attrs, text)`  -----
      * -----------------------------------------------
-     * Crea un elemento con atributos y contenido opcional.
-     * @param {string} tag - Nombre del elemento
-     * @param {Record<string, string>} [attrs] - Atributos del elemento
-     * @param {string} [text] - Contenido del elemento
-     * @returns {HTMLElement} - Elemento creado
+     * - Crea un elemento con atributos y contenido opcional.
+     * @param {string} tag - Nombre del elemento.
+     * @param {Record<string, string>} [attrs] - Atributos del elemento.
+     * @param {string} [text] - Contenido del elemento.
+     * @return {HTMLElement} - Elemento creado
      */
 
     const createElement = (tag, attrs, text) => {
-        
-        /** - Elemento creado */
+
+        /** - `elemento creado` */
         const el = document.createElement(tag);
 
-        //  -----  Asignar atributos  -----
+        //  -----  asignar atributos  -----
         if (attrs) {
+            //  -----  recorrer cada atributo recibido  -----
             Object.keys(attrs).forEach((key) => {
+                //  -----  asignar el atributo al elemento  -----
                 el.setAttribute(key, attrs[key]);
             });
         }
 
-        //  -----  Agregar contenido  -----
+        //  -----  agregar contenido  -----
         if (text) {
+            //  -----  añadir el nodo de texto al elemento  -----
             el.appendChild(createText(text));
         }
 
-        //  -----  Retornar el elemento creado  -----
+        //  -----  retornar el elemento creado  -----
         return el;
     };
 
@@ -110,47 +132,51 @@
      * -----  `createFeatureCard(feature)`  -----
      * ------------------------------------------
      * - Crea una tarjeta de feature con el markup del componente Astro demo.
-     * @param {AstroFeature} feature - Característica a renderizar
-     * @returns {HTMLElement} - Tarjeta de feature creada
+     * @param {AstroFeature} feature - Característica a renderizar.
+     * @return {HTMLElement} - Tarjeta de feature creada
      */
 
     const createFeatureCard = (feature) => {
-        
-        /** - Tarjeta de feature creada */
+
+        /** - `tarjeta de feature creada` */
         const article = createElement('article', { class: 'astro-page__feature' });
 
-        //  -----  Agregar contenido  -----
+        //  -----  agregar contenido  -----
         article.appendChild(createElement('span', { class: 'astro-page__feature-icon', 'aria-hidden': 'true' }, feature.icon));
+
+        //  -----  añadir el título a la tarjeta  -----
         article.appendChild(createElement('h4', { class: 'astro-page__feature-title' }, feature.title));
+
+        //  -----  añadir el texto a la tarjeta  -----
         article.appendChild(createElement('p', { class: 'astro-page__feature-text' }, feature.text));
 
-        //  -----  Retornar la tarjeta de feature creada  -----
+        //  -----  retornar la tarjeta de feature creada  -----
         return article;
     };
 
 
 
     /**
-     * ------------------------------------------
+     * -----------------------------------------
      * -----  `createIslandCounterCard()`  -----
-     * ------------------------------------------
+     * -----------------------------------------
      * - Crea la tarjeta interactiva tipo “island” con contador.
-     * @returns {HTMLElement}- Tarjeta interactiva tipo “island” con contador creada
+     * @return {HTMLElement} - Tarjeta interactiva tipo “island” con contador creada.
      */
 
     const createIslandCounterCard = () => {
-        
-        /** - Contador de clicks */
+
+        /** - `contador de clicks` */
         let count = 0;
-        
-        
-        /** @type {HTMLArticleElement} - Tarjeta interactiva tipo “island” con contador creada */
+
+
+        /** @type {HTMLArticleElement} - `tarjeta interactiva tipo “island” con contador creada` */
         const article = createElement('article', { class: 'astro-page__feature' });
-        
-        /** @type {HTMLStrongElement} - Salida de texto */
+
+        /** @type {HTMLStrongElement} - `salida de texto del contador` */
         const output = createElement('strong', { class: 'astro-page__feature-title' }, '0');
-        
-        /** @type {HTMLButtonElement} - Botón de incremento */
+
+        /** @type {HTMLButtonElement} - `botón de incremento` */
         const button = createElement('button', {
             type: 'button',
             class: 'astro-page__concept',
@@ -158,29 +184,41 @@
         }, 'client:load — Click');
 
 
-        //  -----  Agregar evento de click  -----
+        //  -----  agregar evento de click  -----
         button.addEventListener('click', () => {
+            //  -----  sumar uno al contador  -----
             count += 1;
+
+            //  -----  mostrar el valor del contador en la salida  -----
             output.textContent = String(count);
         });
 
-        
-        //  -----  Agregar contenido  -----
+
+        //  -----  agregar contenido  -----
         article.appendChild(createElement('span', { class: 'astro-page__feature-icon', 'aria-hidden': 'true' }, '🧩'));
+
+        //  -----  añadir el título a la tarjeta interactiva  -----
         article.appendChild(createElement('h4', { class: 'astro-page__feature-title' }, 'Isla interactiva CJS'));
+
+        //  -----  añadir el texto a la tarjeta interactiva  -----
         article.appendChild(createElement('p', { class: 'astro-page__feature-text' }, 'Simula client:load con un contador hidratado por el script clásico.'));
 
-        /** @type {HTMLParagraphElement} - Línea de texto de clicks */
+        /** @type {HTMLParagraphElement} - `línea de texto de clicks` */
         const clicksLine = createElement('p', { class: 'astro-page__feature-text' });
-        
-        //  -----  Agregar contenido  -----
+
+        //  -----  agregar contenido  -----
         clicksLine.appendChild(createText('Clicks: '));
+
+        //  -----  añadir la salida del contador a la línea de texto  -----
         clicksLine.appendChild(output);
 
+        //  -----  añadir la línea de clicks a la tarjeta  -----
         article.appendChild(clicksLine);
+
+        //  -----  añadir el botón a la tarjeta  -----
         article.appendChild(button);
 
-        //  -----  Retornar la tarjeta interactiva tipo “island” con contador creada  -----
+        //  -----  retornar la tarjeta interactiva tipo “island” con contador creada  -----
         return article;
     };
 
@@ -191,16 +229,18 @@
      * -----  `setStatus(statusEl, message)`  -----
      * --------------------------------------------
      * - Actualiza el mensaje de estado del bloque CJS.
-     * @param {Element|null} statusEl - Elemento de estado
-     * @param {string} message - Mensaje de estado
+     * @param {Element|null} statusEl - Elemento de estado.
+     * @param {string} message - Mensaje de estado.
+     * @return {void}
      */
     const setStatus = (statusEl, message) => {
-        
-        //  ----- Si el elemento de estado no existe, retornar  -----
-        if (!statusEl) 
+
+        //  -----  si el elemento de estado no existe, retornar  -----
+        if (!statusEl)
+            //  -----  salir de la función  -----
             return;
-        
-        //  -----  Actualizar el contenido del elemento de estado  -----
+
+        //  -----  actualizar el contenido del elemento de estado  -----
         statusEl.textContent = message;
     }
 
@@ -210,53 +250,62 @@
      * ------------------------------------
      * -----  `renderAstroDemoCjs()`  -----
      * ------------------------------------
-     * - Renderiza las tarjetas CJS en astro-demo.html.
+     * - Renderiza las tarjetas CJS en el demo de la página.
+     * @return {void}
      */
 
     const renderAstroDemoCjs = () => {
 
-        /** - Contenedor de las tarjetas CJS */
+        /** - `contenedor de las tarjetas CJS` */
         const target = document.querySelector('[data-astro-demo-target="cjs"]');
 
-        /** - Elemento de estado */
+        /** - `elemento de estado` */
         const status = document.querySelector('[data-astro-demo-status="cjs"]');
 
-        //  -----  Si el contenedor de las tarjetas CJS no existe, retornar  -----
+        //  -----  si el contenedor de las tarjetas CJS no existe, retornar  -----
         if (!target) {
+            //  -----  avisar en consola de que falta el contenedor  -----
             console.warn('⚠️ astro-page.cjs.js: contenedor [data-astro-demo-target="cjs"] no encontrado.');
+
+            //  -----  salir de la función  -----
             return;
         }
 
 
-        /** - Fragmento de documento para insertar las tarjetas CJS */
+        /** - `fragmento de documento para insertar las tarjetas CJS` */
         const fragment = document.createDocumentFragment();
 
-        //  -----  Agregar las tarjetas de características  -----
+        //  -----  agregar las tarjetas de características  -----
         ASTRO_FEATURES.forEach((feature) => {
+            //  -----  añadir la tarjeta de cada característica al fragmento  -----
             fragment.appendChild(createFeatureCard(feature));
         });
 
-        //  -----  Agregar la tarjeta interactiva tipo “island” con contador  -----
+        //  -----  agregar la tarjeta interactiva tipo “island” con contador  -----
         fragment.appendChild(createIslandCounterCard());
 
-        //  -----  Reemplazar el contenido del contenedor de las tarjetas CJS  -----
+        //  -----  reemplazar el contenido del contenedor de las tarjetas CJS  -----
         target.replaceChildren(fragment);
 
-        //  -----  Actualizar el mensaje de estado  -----
+        //  -----  actualizar el mensaje de estado  -----
         setStatus(
             status,
             `Renderizado con astro-page.cjs.js (IIFE) · ${PLUGIN} · v${VERSION} · ${new Date().toLocaleTimeString()}`
         );
 
+        //  -----  avisar en consola de que el dom se ha renderizado  -----
         console.log('-----  astro-page.cjs.js — DOM renderizado en astro-demo  -----');
+
+        //  -----  mostrar el número de tarjetas renderizadas  -----
         console.log('Tarjetas CJS:', ASTRO_FEATURES.length + 1);
 
     };
 
 
-    //  -----  Renderizar las tarjetas CJS  -----
+    //  -----  renderizar las tarjetas CJS  -----
     renderAstroDemoCjs();
 
+    //  -----  dejar una línea en blanco en consola  -----
     console.log('\n');
 
 })();

@@ -1,7 +1,7 @@
 /*
-    *  -----------------------------------------------------------------------------------------------------------------  *
-    *  -----  /spa-loader-content-html.js  --  /src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js  -----  *
-    *  -----------------------------------------------------------------------------------------------------------------  *
+    *  ----------------------------------------------------------------------------------------------------------------  *
+    *  -----  spa-loader-content-html.js  --  /src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js  -----  *
+    *  ----------------------------------------------------------------------------------------------------------------  *
 */
 
 
@@ -13,9 +13,9 @@
 
 
 /**
- * ------------------------------------------------------------ 
- * ----------  `spaLoaderContentHtml(options = {})`  ----------
- * ------------------------------------------------------------
+ * --------------------------------------------------
+ * -----  `spaLoaderContentHtml(options = {})`  -----
+ * --------------------------------------------------
  *
  * - `Plugin para cargar contenido HTML dinámicamente en una SPA`
  *
@@ -108,14 +108,17 @@ export const spaLoaderContentHtml = (options = {}) => {
      * ----------------------
      * - `Función de inicialización del plugin (con lazy loading de rutas)`
      * @async
-     * @returns {Promise<void>} - No devuelve nada, pero inicializa el plugin y configura el estado inicial.
+     * @return {Promise<void>} - No devuelve nada, pero inicializa el plugin y configura el estado inicial.
      */
 
     const init = async () => {
 
+        //  -----  dejar una línea en blanco en consola  -----
         console.log('\n');
+
+        //  -----  avisar en consola de que el plugin se ha cargado  -----
         console.log("%c ✅ Plugin SPA cargado correctamente - spa-loader-content-html.js - Version 5", "background:#2ecc71; color:white; padding:4px;");
-        
+
         /*
         console.log("%c Fondo rojo", "background:#e74c3c; color:white; padding:4px;");
         console.log("%c Fondo verde", "background:#2ecc71; color:white; padding:4px;");
@@ -125,29 +128,35 @@ export const spaLoaderContentHtml = (options = {}) => {
         console.log("%c Negro", "background:#000; color:#0f0; padding:4px;");
         */
 
-        //  -----  Configurar listener para navegación (antes de la carga inicial para capturar clics durante la carga)  -----
+        //  -----  configurar listener para navegación (antes de la carga inicial para capturar clics durante la carga)  -----
         setupEventListeners();
 
-        //  -----  Buscar la entrada del manifest que corresponde a la URL actual  -----
+        //  -----  buscar la entrada del manifest que corresponde a la URL actual  -----
         const entry = findManifestEntryByPath(window.location.pathname);
 
-        //  -----  Si se encuentra una entrada en el manifest, cargar la ruta correspondiente  -----
+        //  -----  si se encuentra una entrada en el manifest, cargar la ruta correspondiente  -----
         if (entry) {
 
+            //  -----  intentar importar la ruta de la entrada del manifest  -----
             try {
 
-                //  -----  Importar dinámicamente el módulo de ruta y cargar su contenido  -----
+                //  -----  importar dinámicamente el módulo de ruta y cargar su contenido  -----
                 const route = await loadRouteModule(entry.file);
 
+                //  -----  si se importó la ruta, cargar su contenido  -----
                 if (route)
+                    //  -----  cargar el contenido de la ruta  -----
                     loadContent(route);
+
+                //  -----  si no se pudo importar la ruta, cargar la ruta 404  -----
                 else
+                    //  -----  cargar la ruta 404 por el fallo de importación  -----
                     await loadNotFoundRoute('init');
 
-                /** Pathname inicial normalizado */
+                /** - `pathname inicial normalizado` */
                 const initialPathname = buildPathname(route?.path || entry.path || '');
 
-                //  -----  Reemplazar el estado del historial con la ruta inicial para evitar duplicados en el historial  -----
+                //  -----  reemplazar el estado del historial con la ruta inicial para evitar duplicados en el historial  -----
                 history.replaceState(
                     {
                         id: route?.id || entry.id,
@@ -160,16 +169,18 @@ export const spaLoaderContentHtml = (options = {}) => {
                 );
 
             } catch (e) {
+//  -----  si falla la carga inicial, cargar la ruta 404  -----
 
+                //  -----  cargar la ruta 404  -----
                 await loadNotFoundRoute('init');
             }
 
         } else {
 
-            //  -----  Si no hay entrada en el manifest, intentar cargar la ruta 404  -----
+            //  -----  si no hay entrada en el manifest, intentar cargar la ruta 404  -----
             await loadNotFoundRoute('init');
 
-            //  -----  Reemplazar el estado del historial con la ruta inicial para evitar duplicados en el historial  -----
+            //  -----  reemplazar el estado del historial con la ruta inicial para evitar duplicados en el historial  -----
             history.replaceState(
                 {
                     id: null,
@@ -195,26 +206,29 @@ export const spaLoaderContentHtml = (options = {}) => {
      * -----------------------------------
      * -----  `normalize(raw = '')`  -----
      * -----------------------------------
-      - Normaliza una ruta (quita base y slashes de inicio/fin)
+     * - Normaliza una ruta (quita base y slashes de inicio/fin)
      * @param {string} raw - `Ruta sin normalizar`
-     * @returns {string} - `Ruta normalizada`
+     * @return {string} - `Ruta normalizada`
      */
 
     const normalize = (raw = '') => {
 
 
-        /** Ruta base configurada para la SPA. */
+        /** - `ruta base configurada para la SPA.` */
         const base = settings.base || '';
 
-        /** Ruta recibida convertida a string para aplicar normalizacion. */
+        /** - `ruta recibida convertida a string para aplicar normalizacion.` */
         let path = String(raw || '');
 
+        //  -----  si la ruta empieza por la base, quitarla  -----
         if (base && path.startsWith(base))
+            //  -----  quitar la base del principio de la ruta  -----
             path = path.slice(base.length);
 
         //  -----  quitar leading/trailing slash  -----
         path = path.replace(/^\/|\/$/g, '');
 
+        //  -----  devolver la ruta normalizada  -----
         return path;
 
     }
@@ -227,25 +241,27 @@ export const spaLoaderContentHtml = (options = {}) => {
      * ---------------------------------------------
      * - Construye pathname absoluto para pushState, normalizado con base
      * @param {string} routePath - Ruta de la ruta (path) para construir el pathname
-     * @returns {string} - Pathname absoluto normalizado para usar en pushState y comparación de rutas
+     * @return {string} - Pathname absoluto normalizado para usar en pushState y comparación de rutas
      */
 
     const buildPathname = (routePath = '') => {
 
-        /** Ruta base configurada para la SPA. */
+        /** - `ruta base configurada para la SPA.` */
         const base = (settings.base || '').replace(/\/$/, '');
 
-        /** Ruta de entrada normalizada con slash inicial para construir pathname. */
+        /** - `ruta de entrada normalizada con slash inicial para construir pathname.` */
         const trimmed = routePath ? `/${String(routePath).replace(/^\/|\/$/g, '')}` : '';
 
-        //  -----  Construir pathname absoluto usando URL para normalizar correctamente,           -----
+        //  -----  construir pathname absoluto usando URL para normalizar correctamente,  -----
         //  -----  con fallback básico si falla (por ejemplo, en rutas con caracteres especiales)  -----
         try {
+            //  -----  devolver el pathname construido con url  -----
             return new URL(base + trimmed, location.origin).pathname;
 
-        } 
-        
+        }
+
         catch (e) {
+            //  -----  si url falla, devolver el pathname del fallback básico  -----
             return (base + trimmed).replace(/\/\/+/g, '/');
         }
 
@@ -266,18 +282,19 @@ export const spaLoaderContentHtml = (options = {}) => {
      * ---------------------------------------------------------
      * - Busca una entrada en el manifest por pathname normalizado.
      * @param {string} rawPathname - Pathname sin normalizar (por ejemplo, window.location.pathname)
-     * @returns {{ 
-            * id: string, 
-            * path: string, 
-            * file: string 
+     * @return {{
+            * id: string,
+            * path: string,
+            * file: string
         * }|undefined} - Entrada del manifest o undefined
      */
 
     const findManifestEntryByPath = (rawPathname = '') => {
 
-        /** Ruta normalizada para comparar con las entradas del manifest. */
+        /** - `ruta normalizada para comparar con las entradas del manifest.` */
         const normalized = normalize(rawPathname);
 
+        //  -----  devolver la entrada cuyo path normalizado coincide  -----
         return settings.routeManifest?.find(entry => normalize(entry.path) === normalized);
 
     };
@@ -285,16 +302,17 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * -------------------------------------------
+     * -----------------------------------------
      * -----  `findManifestEntryById(id)`  -----
-     * -------------------------------------------
+     * -----------------------------------------
      * - Busca una entrada en el manifest por id.
      * @param {string} id - Identificador de la ruta (ej: 'inferirTipos')
-    * @returns {RouteManifest | undefined} - Entrada del manifest o undefined
+    * @return {RouteManifest | undefined} - Entrada del manifest o undefined
      */
 
     const findManifestEntryById = (id) => {
 
+        //  -----  devolver la entrada cuyo id coincide  -----
         return settings.routeManifest?.find(entry => entry.id === id);
 
     };
@@ -302,27 +320,32 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * ----------------------------------------
+     * -------------------------------------
      * -----  `loadRouteModule(file)`  -----
-     * ----------------------------------------
+     * -------------------------------------
      * @async
      * - Importa dinámicamente un módulo de ruta y lo cachea para futuras navegaciones.
      * @param {string} file - Nombre del archivo de ruta sin extensión (ej: 'route-01-01-inferir-tipos')
-    * @returns {Promise<Route|undefined>} - Objeto de ruta importado o undefined si falla
+    * @return {Promise<Route|undefined>} - Objeto de ruta importado o undefined si falla
      */
 
     const loadRouteModule = async (file) => {
 
-        //  -----  Si ya está en cache, devolver directamente sin hacer import  -----
+        //  -----  si ya está en cache, devolver directamente sin hacer import  -----
         if (routeCache.has(file))
+            //  -----  devolver el módulo cacheado  -----
             return routeCache.get(file);
 
-        //  -----  Si el módulo ya falló anteriormente, no reintentar el import() para evitar ciclos de error repetidos  -----
+        //  -----  si el módulo ya falló anteriormente, no reintentar el import() para evitar ciclos de error repetidos  -----
         if (brokenRouteModules.has(file)) {
+            //  -----  avisar de que el módulo está roto y se omite  -----
             console.warn(`⚠️ Módulo de ruta previamente roto, se omite reimport: ${file}`);
+
+            //  -----  devolver undefined sin reintentar el import  -----
             return undefined;
         }
 
+        //  -----  intentar importar el módulo de ruta  -----
         try {
 
             /** - `URL completa del módulo de ruta para import()` */
@@ -334,20 +357,25 @@ export const spaLoaderContentHtml = (options = {}) => {
              /** @type {Route|undefined} - `Primer export del módulo` */
             const route = /** @type {Route|undefined} */ (Object.values(mod)[0]);
 
-            //  -----  Cachear para futuras navegaciones  -----
+            //  -----  cachear para futuras navegaciones  -----
             if (route)
+                //  -----  guardar la ruta en la caché  -----
                 routeCache.set(file, route);
 
+            //  -----  avisar de que la ruta se cargó dinámicamente  -----
             console.log(`📦 Ruta cargada dinámicamente: ${file}`);
 
+            //  -----  devolver la ruta importada  -----
             return route;
 
         } catch (e) {
+            //  -----  si el import falla, mostrar el error y registrar el módulo como roto  -----
             console.error(`❌ Error importando módulo de ruta: ${file}`, e);
 
-            //  -----  Registrar el módulo como roto para no reintentar import() en futuras navegaciones  -----
+            //  -----  registrar el módulo como roto para no reintentar import() en futuras navegaciones  -----
             brokenRouteModules.add(file);
 
+            //  -----  devolver undefined por el fallo de importación  -----
             return undefined;
         }
 
@@ -360,16 +388,16 @@ export const spaLoaderContentHtml = (options = {}) => {
      * -----  `findNotFoundRoute()`  -----
      * -----------------------------------
      * - Obtiene la entrada 404 del manifest.
-     * @returns {{ 
-            * id: string, 
-            * path: string, 
-            * file: string 
+     * @return {{
+            * id: string,
+            * path: string,
+            * file: string
         * }|undefined} - Entrada 404 del manifest o undefined.
      */
 
     const findNotFoundRoute = () => {
 
-        //  -----  Buscar en el manifest una entrada con id '404NotFoundPage' o path que contenga '404'  -----
+        //  -----  buscar en el manifest una entrada con id '404NotFoundPage' o path que contenga '404'  -----
         return settings.routeManifest?.find(entry =>
 
             entry?.id === '404NotFoundPage' ||
@@ -389,38 +417,45 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - Carga la ruta 404 dinámicamente desde el manifest.
      * @async
      * @param {'init'|'click'|'popstate'} source - Origen del intento de carga de ruta (para logging y eventos).
-     * @returns {Promise<void>} - No devuelve nada, pero carga la ruta 404 o notifica error si no está configurada, evitando bloqueos del loader.
+     * @return {Promise<void>} - No devuelve nada, pero carga la ruta 404 o notifica error si no está configurada, evitando bloqueos del loader.
      */
 
     const loadNotFoundRoute = async (source) => {
 
-        /** Entrada 404 encontrada en el manifest, si existe. */
+        /** - `entrada 404 encontrada en el manifest, si existe.` */
         const entry404 = findNotFoundRoute();
 
-        //  -----  Si no hay ruta 404 configurada, logueamos error y notificamos para evitar bloqueos del loader  -----
+        //  -----  si no hay ruta 404 configurada, logueamos error y notificamos para evitar bloqueos del loader  -----
         if (!entry404) {
 
+            //  -----  avisar de que no hay ruta 404 configurada  -----
             console.error(`No existe ruta 404 configurada (source: ${source}).`);
 
+            //  -----  notificar el error de carga  -----
             notifyRouteLoadError(undefined, new Error('No existe ruta 404 configurada.'), source);
 
+            //  -----  salir sin cargar ninguna ruta  -----
             return;
         }
 
+        //  -----  intentar importar la ruta 404  -----
         try {
 
-            //  -----  Importar dinámicamente el módulo de la ruta 404 y cargar su contenido  -----
+            //  -----  importar dinámicamente el módulo de la ruta 404 y cargar su contenido  -----
             const route = await loadRouteModule(entry404.file);
 
-            //  -----  Si se pudo importar la ruta 404, cargar su contenido  -----
+            //  -----  si se pudo importar la ruta 404, cargar su contenido  -----
             if (route)
+                //  -----  cargar el contenido de la ruta 404  -----
                 loadContent(route);
-            
-            //  -----  Si no se pudo importar la ruta 404, logueamos error y notificamos para evitar bloqueos del loader  -----
+
+            //  -----  si no se pudo importar la ruta 404, logueamos error y notificamos para evitar bloqueos del loader  -----
             else
+                //  -----  notificar que no se pudo importar la ruta 404  -----
                 notifyRouteLoadError(undefined, new Error('No se pudo importar la ruta 404.'), source);
 
         } catch (e) {
+//  -----  si falla el import de la ruta 404, notificar el error  -----
 
             notifyRouteLoadError(undefined, new Error('Error importando ruta 404.'), source);
         }
@@ -449,88 +484,93 @@ export const spaLoaderContentHtml = (options = {}) => {
      *     3) Cargar los scripts dinámicos DESPUÉS de la transición (necesitan el DOM ya mutado).
      * - Si el navegador no soporta View Transitions, la mutación se aplica directamente.
      * @param {Route} route - Ruta cuyo contenido se va a cargar.
-     * @returns {Promise<void>} - Promesa que se resuelve al terminar la carga; notifica error si falla.
+     * @return {Promise<void>} - Promesa que se resuelve al terminar la carga; notifica error si falla.
      */
 
     const loadContent = async (route) => {
 
-        //  -----  Guard de navegación: si ya hay una carga en curso, abortarla para evitar race conditions ante clics rápidos  -----
+        //  -----  guard de navegación: si ya hay una carga en curso, abortarla para evitar race conditions ante clics rápidos  -----
         if (isNavigating && activeNavigationAbort) {
+            //  -----  abortar la navegación en curso  -----
             activeNavigationAbort.abort();
         }
 
-        //  -----  Crear un nuevo AbortController para esta navegación y marcar como navegando  -----
+        //  -----  crear un nuevo AbortController para esta navegación y marcar como navegando  -----
         activeNavigationAbort = new AbortController();
         const signal = activeNavigationAbort.signal;
+
+        //  -----  marcar que hay una navegación en curso  -----
         isNavigating = true;
 
+        //  -----  intentar cargar el contenido de la ruta  -----
         try {
 
-            //  -----  Validación  -----
+            //  -----  validación  -----
             if (!route)
+                //  -----  lanzar un error por ruta inválida  -----
                 throw new Error('Ruta inválida');
 
-            //  ============================================================================================
-            //  -----  FASE 1: Precargar TODO el contenido asíncrono (fetch) FUERA de la View Transition   -----
-            //  -----  Así el callback de startViewTransition será síncrono y Chrome no aborta por timeout   -----
-            //  ============================================================================================
+            //  -----  FASE 1: Precargar TODO el contenido asíncrono (fetch) FUERA de la View Transition  -----
+            //  -----  así el callback de startViewTransition será síncrono y Chrome no aborta por timeout  -----
             const payload = await preloadRouteContent(route, signal);
 
-            //  ============================================================================================
-            //  -----  FASE 2: Mutar el DOM DENTRO de la View Transition (callback síncrono)               -----
-            //  -----  Las mutaciones (innerHTML, display, navbar, metadatos síncronos) son instantáneas    -----
-            //  ============================================================================================
+            //  -----  FASE 2: Mutar el DOM DENTRO de la View Transition (callback síncrono)  -----
+            //  -----  las mutaciones (innerHTML, display, navbar, metadatos síncronos) son instantáneas  -----
 
             /** - `Callback síncrono que aplica todo el contenido precargado de golpe al DOM` */
             const mutate = () => applyPreloadedContent(payload, route);
 
 
-            //  -----  Si el navegador soporta View Transitions, iniciar la View Transition  ----- 
-            //  -----  con el callback síncrono de mutación del DOM                          -----
+            //  -----  si el navegador soporta View Transitions, iniciar la View Transition  -----
+            //  -----  con el callback síncrono de mutación del DOM  -----
             if (document.startViewTransition) {
 
-                //  -----  Iniciar la View Transition con el callback síncrono de mutación del DOM  -----
+                //  -----  iniciar la View Transition con el callback síncrono de mutación del DOM  -----
                 const viewTransition = document.startViewTransition(() => mutate());
 
-                //  -----  Esperar SOLO a que el DOM quede mutado (updateCallbackDone), NO a que termine la animación (finished).  -----
-                //  -----  El DOM ya está listo al inicio de la transición, así que los scripts (FASE 3) pueden empezar a cargar   -----
-                //  -----  EN PARALELO con la animación (~300ms), en lugar de esperar a que termine. Capturamos rechazos           -----
-                //  -----  (ej. interrupción por nueva navegación) para que no salten como errores no capturados.                  -----
+                //  -----  esperar SOLO a que el DOM quede mutado (updateCallbackDone), NO a que termine la animación (finished).  -----
+                //  -----  el DOM ya está listo al inicio de la transición, así que los scripts (FASE 3) pueden empezar a cargar  -----
+                //  -----  EN PARALELO con la animación (~300ms), en lugar de esperar a que termine. Capturamos rechazos  -----
+                //  -----  (ej. interrupción por nueva navegación) para que no salten como errores no capturados.  -----
                 await viewTransition.updateCallbackDone.catch(() => { });
 
-                //  -----  Dejar que la animación termine en segundo plano sin bloquear la carga de scripts (se ignora su rechazo).  -----
+                //  -----  dejar que la animación termine en segundo plano sin bloquear la carga de scripts (se ignora su rechazo).  -----
                 viewTransition.finished.catch(() => { });
 
             } else {
 
-                //  -----  Sin soporte de View Transitions: mutar directamente el DOM  -----
+                //  -----  sin soporte de View Transitions: mutar directamente el DOM  -----
                 mutate();
             }
 
-            //  ============================================================================================
-            //  *-----  FASE 3: Cargar scripts asíncronos con el DOM ya mutado (en paralelo con la animación)  -----
-            //  -----  Los scripts necesitan el DOM ya mutado (contenedores inyectados) para funcionar        -----
-            //  ============================================================================================
+            //  -----  FASE 3: Cargar scripts asíncronos con el DOM ya mutado (en paralelo con la animación)  -----
+            //  -----  los scripts necesitan el DOM ya mutado (contenedores inyectados) para funcionar  -----
+            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado  -----
             await applyRouteMetaAsync(route);
 
-            //  -----  Notificar fin de carga de ruta para el loader inicial y listeners externos  -----
+            //  -----  notificar fin de carga de ruta para el loader inicial y listeners externos  -----
             notifyRouteLoaded(route);
 
         } catch (error) {
 
-            //  -----  Si la carga fue abortada por una nueva navegación, no notificar error: es una cancelación intencional  -----
+            //  -----  si la carga fue abortada por una nueva navegación, no notificar error: es una cancelación intencional  -----
             if (error instanceof DOMException && error.name === 'AbortError') {
+                //  -----  avisar de que la navegación fue abortada por otra nueva  -----
                 console.info(`⏭️ Navegación abortada por una nueva navegación: ${route?.id || '(sin id)'}`);
+
+                //  -----  salir sin notificar error  -----
                 return;
             }
 
-            //  -----  Notificar error de carga para desbloquear el loader y permitir fallback  -----
+            //  -----  notificar error de carga para desbloquear el loader y permitir fallback  -----
             notifyRouteLoadError(route, error, 'loadContent');
 
         } finally {
 
-            //  -----  Liberar el flag de navegación y el controller al terminar (o ser abortado)  -----
+            //  -----  liberar el flag de navegación y el controller al terminar (o ser abortado)  -----
             isNavigating = false;
+
+            //  -----  limpiar el controller de la navegación  -----
             activeNavigationAbort = null;
         }
 
@@ -550,13 +590,13 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const notifyRouteLoaded = (route) => {
 
-        //  -----  Notificar carga de ruta para listeners externos (como el loader)  -----
+        //  -----  notificar carga de ruta para listeners externos (como el loader)  -----
         document.dispatchEvent(
 
-            //  -----  Evento personalizado con detalles de la ruta cargada  -----
+            //  -----  evento personalizado con detalles de la ruta cargada  -----
             new CustomEvent('spa:route-loaded', {
 
-                //  -----  Detalles de la ruta cargada para que los listeners puedan usar esta información  -----
+                //  -----  detalles de la ruta cargada para que los listeners puedan usar esta información  -----
                 detail: {
                     id: route?.id || null,
                     path: route?.path || window.location.pathname
@@ -565,13 +605,13 @@ export const spaLoaderContentHtml = (options = {}) => {
         );
 
 
-        //  -----  Si esta es la primera ruta cargada, emitimos el evento específico para desbloquear el loader inicial  -----
+        //  -----  si esta es la primera ruta cargada, emitimos el evento específico para desbloquear el loader inicial  -----
         if (!browserWindow.__spaFirstRouteLoaded) {
 
-            //  -----  Marcar que la primera ruta ya se cargó para no emitir este evento de nuevo  -----
+            //  -----  marcar que la primera ruta ya se cargó para no emitir este evento de nuevo  -----
             browserWindow.__spaFirstRouteLoaded = true;
 
-            //  -----  Emitir evento personalizado indicando que la primera ruta se ha cargado (para que el loader inicial pueda desbloquearse)  -----
+            //  -----  emitir evento personalizado indicando que la primera ruta se ha cargado (para que el loader inicial pueda desbloquearse)  -----
             document.dispatchEvent(new CustomEvent('spa:first-route-loaded'));
         }
 
@@ -591,16 +631,17 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const notifyRouteLoadError = (route, error, source) => {
 
+        //  -----  mostrar el error de carga en consola  -----
         console.error('❌ Error cargando ruta SPA:', error);
 
-        //  -----  Emitir evento personalizado con detalles del error para que los listeners puedan manejarlo.  -----
-        //  -----   (por ejemplo, el loader puede mostrar un mensaje de error o desbloquearse con un fallback)  -----
+        //  -----  emitir evento personalizado con detalles del error para que los listeners puedan manejarlo.  -----
+        //  -----  (por ejemplo, el loader puede mostrar un mensaje de error o desbloquearse con un fallback)  -----
         document.dispatchEvent(
 
-            //  -----  Evento personalizado con detalles del error ocurrido durante la carga de la ruta  -----
+            //  -----  evento personalizado con detalles del error ocurrido durante la carga de la ruta  -----
             new CustomEvent('spa:route-load-error', {
 
-                //  -----  Detalles del error para que los listeners puedan usar esta información  -----
+                //  -----  detalles del error para que los listeners puedan usar esta información  -----
                 detail: {
                     id: route?.id || null,
                     path: route?.path || window.location.pathname,
@@ -610,13 +651,13 @@ export const spaLoaderContentHtml = (options = {}) => {
             })
         );
 
-        //  -----  Si el error ocurrió durante la carga inicial (source: 'init'), emitimos el evento de primera ruta cargada para desbloquear el loader con un fallback seguro  -----
+        //  -----  si el error ocurrió durante la carga inicial (source: 'init'), emitimos el evento de primera ruta cargada para desbloquear el loader con un fallback seguro  -----
         if (!browserWindow.__spaFirstRouteLoaded) {
 
-            //  -----  Marcar que la primera ruta ya se cargó para no emitir este evento de nuevo  -----
+            //  -----  marcar que la primera ruta ya se cargó para no emitir este evento de nuevo  -----
             browserWindow.__spaFirstRouteLoaded = true;
 
-            //  -----  Emitir evento personalizado indicando que la primera ruta se ha cargado (aunque haya sido con error) para que el loader inicial pueda desbloquearse  -----
+            //  -----  emitir evento personalizado indicando que la primera ruta se ha cargado (aunque haya sido con error) para que el loader inicial pueda desbloquearse  -----
             document.dispatchEvent(new CustomEvent('spa:first-route-loaded'));
         }
 
@@ -634,38 +675,41 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - `En caso de error devuelve un HTML con mensaje preciso (HTTP vs red) para inyectar después.`
      * @param {string} url - URL del archivo HTML a descargar.
      * @param {AbortSignal} [signal] - `Señal para abortar el fetch si una nueva navegación lo cancela.`
-     * @returns {Promise<string>} - HTML listo para inyectar (reescrito) o HTML de error.
+     * @return {Promise<string>} - HTML listo para inyectar (reescrito) o HTML de error.
      */
     const fetchHtmlContent = async (url, signal) => {
 
-        //  -----  Intentar cargar el contenido HTML con fetch y devolverlo como string (sin tocar el DOM)  -----
+        //  -----  intentar cargar el contenido HTML con fetch y devolverlo como string (sin tocar el DOM)  -----
         try {
 
             /** - `Respuesta del fetch` */
             const res = await fetch(url, { signal });
 
-            //  -----  Si la respuesta no es OK, lanzar error con código HTTP para distinguirlo de errores de red  -----
+            //  -----  si la respuesta no es OK, lanzar error con código HTTP para distinguirlo de errores de red  -----
             if (!res.ok)
+                //  -----  lanzar el error http  -----
                 throw new Error(`HTTP ${res.status} ${res.statusText}`);
 
             /** - `Contenido HTML como texto` */
             const html = await res.text();
 
-            //  -----  Reescribir URLs de recursos en el HTML inyectado para evitar roturas en SPA  -----
+            //  -----  reescribir URLs de recursos en el HTML inyectado para evitar roturas en SPA  -----
             return rewriteInjectedHtmlUrls(html, url);
 
         } catch (e) {
 
-            //  -----  Si el fetch fue abortado por una nueva navegación, propagar para cancelar toda la carga  -----
+            //  -----  si el fetch fue abortado por una nueva navegación, propagar para cancelar toda la carga  -----
             if (e instanceof DOMException && e.name === 'AbortError')
+                //  -----  propagar el abort para cancelar la carga  -----
                 throw e;
 
-            //  -----  Distinguir error HTTP (respuesta recibida con código de error) de error de red (sin respuesta)  -----
+            //  -----  distinguir error HTTP (respuesta recibida con código de error) de error de red (sin respuesta)  -----
             const isHttpError = e instanceof Error && /^HTTP \d/.test(e.message);
 
+            //  -----  mostrar el error de descarga en consola  -----
             console.error(`❌ Error al cargar ${url}:`, e);
 
-            //  -----  Devolver HTML de error (mensaje preciso) para inyectar en el contenedor en la fase de mutación  -----
+            //  -----  devolver HTML de error (mensaje preciso) para inyectar en el contenedor en la fase de mutación  -----
             return isHttpError
                 ? `<p>${e.message} — No se pudo cargar el contenido.</p>`
                 : `<p>Error de red: no se pudo conectar con ${url}.</p>`;
@@ -676,32 +720,32 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * ---------------------------------------------
+     * --------------------------------------------------
      * -----  `preloadRouteContent(route, signal)`  -----
-     * ---------------------------------------------
+     * --------------------------------------------------
      * @async
      * - `FASE 1 del flujo con View Transition: descarga (fetch) TODO el HTML asíncrono de la ruta`
      * - `SIN tocar el DOM, y devuelve un payload con el contenido listo para inyectar de golpe.`
      * - `Componentes del DOM (route.components), page components (route.pagesComponents) y Markdown Shiki (route.MarkdownShikiHtml).`
      * @param {Route} route - Ruta cuyo contenido se va a precargar.
      * @param {AbortSignal} [signal] - `Señal para abortar los fetchs si una nueva navegación los cancela.`
-     * @returns {Promise<{
+     * @return {Promise<{
      *   components: Array<{el: HTMLElement, html: string} | {el: HTMLElement, hide: true}>,
      *   hasComponents: boolean,
      *   pageComponents: Array<{target: string, html: string}>,
      *   markdownShiki: Array<{target: string, html: string}>
      * }>} - Payload con el contenido precargado.
      */
-    
+
     const preloadRouteContent = async (route, signal) => {
 
-        /** 
+        /**
          * @type {{
          *   components: Array<{el: HTMLElement, html: string} | {el: HTMLElement, hide: true}>,
          *   hasComponents: boolean,
          *   pageComponents: Array<{target: string, html: string}>,
          *   markdownShiki: Array<{target: string, html: string}>
-         * }} 
+         * }}
          */
         const payload = {
             components: [],
@@ -711,138 +755,168 @@ export const spaLoaderContentHtml = (options = {}) => {
         };
 
 
-        //  -----  Precargar componentes del DOM (route.components)  -----
-        //  -----  Sus contenedores (layoutHeader, layoutNavbar, layoutMain, layoutFooter) SÍ existen ya en el DOM,  -----
-        //  -----  así que se resuelve el elemento real para inyectar en la fase de mutación.                          -----
-        //  -----  Los fetch se lanzan EN PARALELO (Promise.all): no hay dependencia entre ellos en la fase de         -----
-        //  -----  descarga; el orden de dependencia solo importa al inyectar (applyPreloadedContent).                 -----
+        //  -----  precargar componentes del DOM (route.components)  -----
+        //  -----  sus contenedores (layoutHeader, layoutNavbar, layoutMain, layoutFooter) SÍ existen ya en el DOM,  -----
+        //  -----  así que se resuelve el elemento real para inyectar en la fase de mutación.  -----
+        //  -----  los fetch se lanzan EN PARALELO (Promise.all): no hay dependencia entre ellos en la fase de  -----
+        //  -----  descarga; el orden de dependencia solo importa al inyectar (applyPreloadedContent).  -----
         const preloadComponents = async () => {
 
+            //  -----  si la ruta no declara components, avisar y salir  -----
             if (!payload.hasComponents) {
+                //  -----  avisar de que la ruta no contiene components  -----
                 console.warn(`La ruta '${route.id}' no contiene 'components'`);
+
+                //  -----  salir de la precarga de componentes  -----
                 return;
             }
 
             /** @type {Promise<void>[]} - `Descargas de componentes principales en curso` */
             const tasks = [];
 
+            //  -----  recorrer cada componente de la ruta  -----
             for (const [selector, url] of Object.entries(route.components)) {
 
                 /** @type {HTMLElement|null} - `Contenedor (selector se trata como id sin #)` */
                 const el = document.getElementById(selector);
 
-                //  -----  Si el contenedor NO existe, avisar y omitir  -----
+                //  -----  si el contenedor NO existe, avisar y omitir  -----
                 if (!el) {
+                    //  -----  avisar de que falta el contenedor  -----
                     console.warn(`⚠️ Contenedor no encontrado para selector: #${selector} — se omite.`);
+
+                    //  -----  pasar al siguiente componente  -----
                     continue;
                 }
 
-                //  -----  Si no hay url → marcar para ocultar (sin fetch)  -----
+                //  -----  si no hay url → marcar para ocultar (sin fetch)  -----
                 if (!url) {
+                    //  -----  avisar de que la url del componente es undefined  -----
                     console.warn(`⏭️ Componente "${selector}" ignorado (url undefined). Se ocultará.`);
+
+                    //  -----  registrar el componente para ocultarlo  -----
                     payload.components.push({ el, hide: true });
+
+                    //  -----  pasar al siguiente componente  -----
                     continue;
                 }
 
-                //  -----  Precargar el HTML del componente (fetch + rewrite) sin tocar el DOM, en paralelo  -----
+                //  -----  precargar el HTML del componente (fetch + rewrite) sin tocar el DOM, en paralelo  -----
                 tasks.push(
                     fetchHtmlContent(url, signal).then((html) => { payload.components.push({ el, html }); })
                 );
             }
 
+            //  -----  esperar a que terminen todas las descargas  -----
             await Promise.all(tasks);
         };
 
 
-        //  -----  Precargar page components (route.pagesComponents)  -----
+        //  -----  precargar page components (route.pagesComponents)  -----
         //  -----  OJO: sus contenedores destino (p.ej. [data-component-page="htmlPage"]) viven DENTRO  -----
         //  -----  del HTML de los componentes principales, que aún NO se ha inyectado. Por eso aquí solo  -----
-        //  -----  hacemos fetch y guardamos el selector como string; el contenedor se resuelve en la      -----
-        //  -----  fase de mutación (applyPreloadedContent), tras inyectar los componentes principales.    -----
+        //  -----  hacemos fetch y guardamos el selector como string; el contenedor se resuelve en la  -----
+        //  -----  fase de mutación (applyPreloadedContent), tras inyectar los componentes principales.  -----
         const preloadPageComponents = async () => {
 
+            //  -----  si la ruta no declara pagesComponents, salir  -----
             if (!(route.pagesComponents && Array.isArray(route.pagesComponents)))
+                //  -----  salir de la precarga de page components  -----
                 return;
 
             /** @type {Promise<void>[]} - `Descargas de page components en curso` */
             const tasks = [];
 
+            //  -----  recorrer cada page component de la ruta  -----
             for (const entry of route.pagesComponents) {
 
-                /** @type {string|undefined} - URL del componente de página */
+                /** @type {string|undefined} - `URL del componente de página` */
                 const url = entry?.url;
 
-                /** @type {string|undefined} - Selector CSS del contenedor destino */
+                /** @type {string|undefined} - `selector CSS del contenedor destino` */
                 const target = entry?.target;
 
-                //  -----  Validación de la entrada: debe tener url y target  -----
+                //  -----  validación de la entrada: debe tener url y target  -----
                 if (!url || !target) {
+                    //  -----  avisar de que la entrada está incompleta  -----
                     console.warn('⚠️ Entrada pagesComponents incompleta (falta url o target). Se omite.');
+
+                    //  -----  pasar a la siguiente entrada  -----
                     continue;
                 }
 
-                //  -----  Precargar el HTML (fetch + rewrite) sin resolver ni tocar el contenedor, en paralelo  -----
+                //  -----  precargar el HTML (fetch + rewrite) sin resolver ni tocar el contenedor, en paralelo  -----
                 tasks.push(
                     fetchHtmlContent(url, signal).then((html) => { payload.pageComponents.push({ target, html }); })
                 );
             }
 
+            //  -----  esperar a que terminen todas las descargas  -----
             await Promise.all(tasks);
         };
 
 
-        //  -----  Precargar Markdown Shiki (route.MarkdownShikiHtml)  -----
+        //  -----  precargar Markdown Shiki (route.MarkdownShikiHtml)  -----
         //  -----  OJO: sus contenedores destino (p.ej. [data-shiki="codeHtml"]) viven DENTRO del HTML  -----
         //  -----  de los page components (o de los componentes principales), que aún NO se ha inyectado.  -----
-        //  -----  Aquí solo hacemos fetch y guardamos el selector; se resuelve en la fase de mutación,    -----
-        //  -----  tras inyectar componentes principales y page components.                                 -----
+        //  -----  aquí solo hacemos fetch y guardamos el selector; se resuelve en la fase de mutación,  -----
+        //  -----  tras inyectar componentes principales y page components.  -----
         const preloadMarkdownShiki = async () => {
 
+            //  -----  si la ruta no declara MarkdownShikiHtml, salir  -----
             if (!(route.MarkdownShikiHtml && Array.isArray(route.MarkdownShikiHtml)))
+                //  -----  salir de la precarga de markdown shiki  -----
                 return;
 
             /** @type {Promise<void>[]} - `Descargas de archivos Shiki en curso` */
             const tasks = [];
 
+            //  -----  recorrer cada entrada de shiki de la ruta  -----
             for (const entry of route.MarkdownShikiHtml) {
 
-                /** @type {string|undefined} - Nombre del archivo .html generado */
+                /** @type {string|undefined} - `nombre del archivo .html generado` */
                 const fileName = entry?.fileName;
 
-                /** @type {string|undefined} - URL (con base) de la carpeta donde se sirve el .html generado */
+                /** @type {string|undefined} - `URL (con base) de la carpeta donde se sirve el .html generado` */
                 const urlOutput = entry?.urlOutput;
 
-                /** @type {string|undefined} - Selector CSS del contenedor destino */
+                /** @type {string|undefined} - `selector CSS del contenedor destino` */
                 const target = entry?.target;
 
+                //  -----  si la entrada está incompleta, omitirla  -----
                 if (!fileName || !urlOutput || !target)
+                    //  -----  pasar a la siguiente entrada  -----
                     continue;
 
-                /** @type {string} - URL final del archivo Shiki a cargar */
+                /** @type {string} - `URL final del archivo Shiki a cargar` */
                 const url = `${urlOutput}/${fileName}`;
 
-                //  -----  Precargar el HTML del archivo Shiki (fetch) sin resolver ni tocar el contenedor, en paralelo  -----
+                //  -----  precargar el HTML del archivo Shiki (fetch) sin resolver ni tocar el contenedor, en paralelo  -----
                 tasks.push(
                     fetch(url, { signal })
                         .then((r) => r.text())
                         .then((html) => { payload.markdownShiki.push({ target, html }); })
                         .catch((e) => {
 
-                            //  -----  Si fue abortado por nueva navegación, propagar para cancelar la carga  -----
+                            //  -----  si fue abortado por nueva navegación, propagar para cancelar la carga  -----
+                            //  -----  si fue abortado por una nueva navegación, propagar el abort  -----
                             if (e instanceof DOMException && e.name === 'AbortError')
+                                //  -----  propagar el abort para cancelar la carga  -----
                                 throw e;
 
+                            //  -----  mostrar el error de carga del archivo shiki en consola  -----
                             console.error(`❌ Error cargando archivo Shiki: ${url}`, e);
                         })
                 );
             }
 
+            //  -----  esperar a que terminen todas las descargas  -----
             await Promise.all(tasks);
         };
 
 
-        //  -----  Ejecutar los tres grupos de precarga EN PARALELO: ninguno depende del otro para descargar.  -----
-        //  -----  Se mantiene la carga bajo demanda (solo se pide lo de ESTA ruta), pero sin esperas en serie.  -----
+        //  -----  ejecutar los tres grupos de precarga EN PARALELO: ninguno depende del otro para descargar.  -----
+        //  -----  se mantiene la carga bajo demanda (solo se pide lo de ESTA ruta), pero sin esperas en serie.  -----
         await Promise.all([
             preloadComponents(),
             preloadPageComponents(),
@@ -850,7 +924,7 @@ export const spaLoaderContentHtml = (options = {}) => {
         ]);
 
 
-        //  -----  Devolver el payload precargado  -----
+        //  -----  devolver el payload precargado  -----
         return payload;
 
     };
@@ -869,13 +943,13 @@ export const spaLoaderContentHtml = (options = {}) => {
      *     2) Page components (target p.ej. [data-component-page="htmlPage"]) → viven DENTRO del HTML de (1), se resuelven tras inyectar (1).
      *     3) Markdown Shiki (target p.ej. [data-shiki="codeHtml"]) → viven DENTRO del HTML de (2), se resuelven tras inyectar (2).
      * - `Ejecuta también los metadatos síncronos (título, favicon, pushState, headerTitle, estilos).`
-     * @param {{ 
-         * components: Array<{el: HTMLElement, html: string} | {el: HTMLElement, hide: true}>, 
-         * pageComponents: Array<{target: string, html: string}>, 
-         * markdownShiki: Array<{target: string, html: string}> 
+     * @param {{
+         * components: Array<{el: HTMLElement, html: string} | {el: HTMLElement, hide: true}>,
+         * pageComponents: Array<{target: string, html: string}>,
+         * markdownShiki: Array<{target: string, html: string}>
          * }} payload - Contenido precargado por preloadRouteContent.
      * @param {Route} route - Ruta cuyos metadatos síncronos se aplican.
-     * @returns {void}
+     * @return {void}
      */
 
     const applyPreloadedContent = (payload, route) => {
@@ -884,7 +958,7 @@ export const spaLoaderContentHtml = (options = {}) => {
          * - `Resuelve un selector a elemento del DOM.`
          * - `Acepta un selector CSS completo (empieza por '[', '.' o '#') o un id sin '#' (retrocompatibilidad).`
          * @param {string} target - Selector CSS o id sin '#'
-         * @returns {HTMLElement|null}
+         * @return {HTMLElement|null}
          */
         const resolveContainer = (target) =>
             (typeof target === 'string' && /^[.\[#]/.test(target))
@@ -893,24 +967,24 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
         //  -----  (1) Inyectar componentes principales (síncrono)  -----
-        //  -----  Sus contenedores son elementos del layout ya presentes en el DOM.  -----
+        //  -----  sus contenedores son elementos del layout ya presentes en el DOM.  -----
         for (const item of payload.components) {
 
-            
-            //  -----  Componente sin url → ocultar contenedor y limpiar  -----
+
+            //  -----  componente sin url → ocultar contenedor y limpiar  -----
             if ('hide' in item) {
                 item.el.style.display = 'none';
                 item.el.innerHTML = '';
                 continue;
             }
 
-            //  -----  Restaurar visibilidad y volcar el HTML precargado  -----
+            //  -----  restaurar visibilidad y volcar el HTML precargado  -----
             item.el.style.display = '';
             item.el.innerHTML = item.html;
         }
 
 
-        //  -----  Inicializar acciones del navbar (síncrono, protegido si no existe en la vista)  -----
+        //  -----  inicializar acciones del navbar (síncrono, protegido si no existe en la vista)  -----
         try {
 
             actionsNavbar();
@@ -922,7 +996,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
         //  -----  (2) Inyectar page components (síncrono)  -----
-        //  -----  Ahora los contenedores destino (que vivían dentro del HTML de los componentes) ya existen en el DOM.  -----
+        //  -----  ahora los contenedores destino (que vivían dentro del HTML de los componentes) ya existen en el DOM.  -----
         for (const { target, html } of payload.pageComponents) {
 
             /** @type {HTMLElement|null} - `Contenedor destino resuelto tras inyectar los componentes principales` */
@@ -939,7 +1013,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
         //  -----  (3) Inyectar Markdown Shiki (síncrono)  -----
-        //  -----  Ahora los contenedores [data-shiki="..."] (que vivían dentro del HTML de los page components) ya existen en el DOM.  -----
+        //  -----  ahora los contenedores [data-shiki="..."] (que vivían dentro del HTML de los page components) ya existen en el DOM.  -----
         for (const { target, html } of payload.markdownShiki) {
 
             /** @type {HTMLElement|null} - `Contenedor destino resuelto tras inyectar los page components` */
@@ -954,7 +1028,7 @@ export const spaLoaderContentHtml = (options = {}) => {
         }
 
 
-        //  -----  Aplicar metadatos síncronos (título, favicon, pushState, headerTitle, estilos)  -----
+        //  -----  aplicar metadatos síncronos (título, favicon, pushState, headerTitle, estilos)  -----
         applyRouteMetaSync(route);
 
     };
@@ -976,42 +1050,42 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - Soporta rutas relativas al archivo HTML fuente y rutas absolutas prefijadas con settings.base.
      * @param {string} value - Valor del atributo (src, href, poster, etc.)
      * @param {string} baseUrl - URL del archivo HTML inyectado
-     * @returns {string}
+     * @return {string}
      */
 
     const resolveInjectedAssetUrl = (value, baseUrl) => {
 
-        /** - Valor del atributo normalizado */
+        /** - `valor del atributo normalizado` */
         const raw = String(value || '').trim();
 
-        //  -----  Ignorar anchors, data URI, protocolos externos y especiales  -----
+        //  -----  ignorar anchors, data URI, protocolos externos y especiales  -----
         if (!raw || /^#|^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(raw) || /^(data|blob|mailto|tel|javascript):/i.test(raw))
             return value;
 
-        //  -----  Si es ruta absoluta desde raíz, prefijar base de la SPA (si aplica)  -----
+        //  -----  si es ruta absoluta desde raíz, prefijar base de la SPA (si aplica)  -----
         if (raw.startsWith('/')) {
 
-            /** - Base de la SPA normalizada */
+            /** - `base de la SPA normalizada` */
             const base = (settings.base || '').replace(/\/$/, '');
 
-            //  -----  Si no hay base, devolver la ruta tal cual  -----
+            //  -----  si no hay base, devolver la ruta tal cual  -----
             if (!base)
                 return raw;
 
-            //  -----  Si la ruta ya empieza con la base, devolver tal cual  -----
+            //  -----  si la ruta ya empieza con la base, devolver tal cual  -----
             if (raw === base || raw.startsWith(`${base}/`))
                 return raw;
 
-            //  -----  Prefijar base de la SPA a la ruta absoluta  -----
+            //  -----  prefijar base de la SPA a la ruta absoluta  -----
             return `${base}${raw}`;
 
         }
 
 
-        //  -----  Resolver rutas relativas contra la URL del HTML inyectado  -----
+        //  -----  resolver rutas relativas contra la URL del HTML inyectado  -----
         try {
 
-            /** - Resolver rutas relativas contra la URL del HTML inyectado */
+            /** - `resolver rutas relativas contra la URL del HTML inyectado` */
             const resolved = new URL(raw, new URL(baseUrl, window.location.origin));
 
             return `${resolved.pathname}${resolved.search}${resolved.hash}`;
@@ -1031,68 +1105,68 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - Reescribe URLs de recursos en HTML inyectado para evitar roturas en SPA.
      * @param {string} html - HTML crudo obtenido por fetch.
      * @param {string} sourceUrl - URL del archivo HTML origen.
-     * @returns {string} - HTML con URLs reescritas para src, href, poster y srcset.
+     * @return {string} - HTML con URLs reescritas para src, href, poster y srcset.
      */
 
     const rewriteInjectedHtmlUrls = (html, sourceUrl) => {
 
-        /** - contenedor temporal para manipular el HTML inyectado */
+        /** - `contenedor temporal para manipular el HTML inyectado` */
         const template = document.createElement('template');
 
-        //  -----  Asignar el HTML crudo al contenedor temporal  -----
+        //  -----  asignar el HTML crudo al contenedor temporal  -----
         template.innerHTML = html;
 
-        //  -----  Reescribir URLs de recursos en todos los elementos con src, href, poster o srcset  -----
+        //  -----  reescribir URLs de recursos en todos los elementos con src, href, poster o srcset  -----
         template.content.querySelectorAll('[src],[href],[poster],[srcset]').forEach((node) => {
 
-            //  -----  Reescribir src  -----
+            //  -----  reescribir src  -----
             if (node.hasAttribute('src')) {
                 const src = node.getAttribute('src');
                 if (src)
                     node.setAttribute('src', resolveInjectedAssetUrl(src, sourceUrl));
             }
 
-            //  -----  Reescribir href  -----
+            //  -----  reescribir href  -----
             if (node.hasAttribute('href')) {
                 const href = node.getAttribute('href');
                 if (href)
                     node.setAttribute('href', resolveInjectedAssetUrl(href, sourceUrl));
             }
 
-            //  -----  Reescribir poster  -----
+            //  -----  reescribir poster  -----
             if (node.hasAttribute('poster')) {
                 const poster = node.getAttribute('poster');
                 if (poster)
                     node.setAttribute('poster', resolveInjectedAssetUrl(poster, sourceUrl));
             }
 
-            //  -----  Reescribir srcset  -----
+            //  -----  reescribir srcset  -----
             if (node.hasAttribute('srcset')) {
 
-                /** - Obtener el atributo srcset */
+                /** - `obtener el atributo srcset` */
                 const srcset = node.getAttribute('srcset');
 
-                //  -----  Si srcset existe, reescribir cada URL dentro de él  -----
+                //  -----  si srcset existe, reescribir cada URL dentro de él  -----
                 if (srcset) {
 
-                    /** - Reescribir cada URL en el atributo srcset */
-                    const normalized = 
-                    
+                    /** - `reescribir cada URL en el atributo srcset` */
+                    const normalized =
+
                         srcset
-                        
+
                             .split(',')
-                        
+
                             .map((entry) => {
 
-                                /** - Reescribir cada URL en el atributo srcset */
+                                /** - `reescribir cada URL en el atributo srcset` */
                                 const value = entry.trim();
 
-                                //  -----  Ignorar entradas vacías  -----
+                                //  -----  ignorar entradas vacías  -----
                                 if (!value)
                                     return value;
 
 
-                                /** - Separar URL y descriptor */
+                                /** - `separar URL y descriptor` */
                                 const [srcCandidate, descriptor] = value.split(/\s+/, 2);
 
                                 const resolvedSrc = resolveInjectedAssetUrl(srcCandidate, sourceUrl);
@@ -1100,7 +1174,7 @@ export const spaLoaderContentHtml = (options = {}) => {
                                 return descriptor ? `${resolvedSrc} ${descriptor}` : resolvedSrc;
 
                             })
-                            
+
                             .join(', ');
 
                     node.setAttribute('srcset', normalized);
@@ -1108,7 +1182,7 @@ export const spaLoaderContentHtml = (options = {}) => {
             }
         });
 
-        //  -----  Devolver el HTML reescrito como string  -----
+        //  -----  devolver el HTML reescrito como string  -----
         return template.innerHTML;
     };
 
@@ -1127,23 +1201,23 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * ------------------------------------------
+     * -----------------------------------------
      * -----  `applyRouteMetaSync(route)`  -----
-     * ------------------------------------------
+     * -----------------------------------------
      * - `Aplica los metadatos SÍNCRONOS de la ruta (título, favicon, pushState, headerTitle, estilos).`
      * - `Pensada para ejecutarse DENTRO del callback síncrono de document.startViewTransition.`
      * - `NO incluye Markdown Shiki (se inyecta en la fase de mutación) ni scripts (carga async, fase 3).`
      * @param {Route} route - Ruta de la cual aplicar los metadatos síncronos en el DOM.
-     * @returns {void}
+     * @return {void}
      */
 
     const applyRouteMetaSync = (route) => {
 
-        //  -----  Actualizar título  -----
+        //  -----  actualizar título  -----
         if (route.pageTitle)
             document.title = route.pageTitle;
 
-        //  -----  Actualizar favicon  -----
+        //  -----  actualizar favicon  -----
         if (route.favicon)
             updateFavicon(route.favicon);
 
@@ -1154,10 +1228,10 @@ export const spaLoaderContentHtml = (options = {}) => {
         const newPathname = buildPathname(route.path || '');
 
 
-        //  -----  Evitar push duplicado  -----
+        //  -----  evitar push duplicado  -----
         if (!isPopNavigation && window.location.pathname !== newPathname) {
 
-            //  -----  Buscar el archivo de ruta en el manifest para guardarlo en el historial  -----
+            //  -----  buscar el archivo de ruta en el manifest para guardarlo en el historial  -----
             const manifestEntry = findManifestEntryById(route.id);
 
             //  -----  pushState con pathname normalizado, routeFile y favicon para actualización inmediata en popstate  -----
@@ -1168,14 +1242,14 @@ export const spaLoaderContentHtml = (options = {}) => {
             );
         }
 
-        //  -----  Resetear flag de navegación por popstate después de manejar la ruta  -----
+        //  -----  resetear flag de navegación por popstate después de manejar la ruta  -----
         isPopNavigation = false;
 
-        //  -----  Actualizar headerTitle en layout  -----
+        //  -----  actualizar headerTitle en layout  -----
         if (route.headerTitle)
             addTitleHeaderFooter(route.headerTitle);
 
-        //  -----  Cargar hoja de estilos CSS  -----
+        //  -----  cargar hoja de estilos CSS  -----
         if (route.styles)
             loadStylesheetsByPage(route.styles);
 
@@ -1184,21 +1258,21 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * -------------------------------------------
+     * ------------------------------------------
      * -----  `applyRouteMetaAsync(route)`  -----
-     * -------------------------------------------
+     * ------------------------------------------
      * @async
      * - `Carga los scripts dinámicos de la ruta de forma secuencial (FASE 3, después de la View Transition).`
      * - `Los scripts necesitan el DOM ya mutado (contenedores y page components inyectados) para funcionar.`
      * @param {Route} route - Ruta cuyos scripts se van a cargar.
-     * @returns {Promise<void>} - Promesa que se resuelve cuando todos los scripts se han cargado.
+     * @return {Promise<void>} - Promesa que se resuelve cuando todos los scripts se han cargado.
      */
     const applyRouteMetaAsync = async (route) => {
 
-        //  -----  Cargar scripts dinámicos  -----
+        //  -----  cargar scripts dinámicos  -----
         if (route.scripts) {
 
-            //  -----  Cargar cada script de la ruta de forma secuencial para respetar dependencias  -----
+            //  -----  cargar cada script de la ruta de forma secuencial para respetar dependencias  -----
             for (const s of route.scripts) {
                 await loadScripts(s);
             }
@@ -1230,7 +1304,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const updateFavicon = (favicon) => {
 
-        /**  - `URL absoluta del nuevo favicon` */
+        /** - `URL absoluta del nuevo favicon` */
         const newAbsolute = new URL(favicon, document.baseURI).href;
 
         /** - `URL del nuevo favicon con cache-busting` */
@@ -1239,40 +1313,40 @@ export const spaLoaderContentHtml = (options = {}) => {
         /** @type {HTMLLinkElement|null} - `Referencia al favicon existente` */
         const existing = /** @type {HTMLLinkElement|null} */ (document.querySelector('link[rel~="icon"]'));
 
-        //  -----  Si ya existe un favicon, actualizar su href in-place para evitar parpadeo, y eliminar duplicados si los hubiera  -----
+        //  -----  si ya existe un favicon, actualizar su href in-place para evitar parpadeo, y eliminar duplicados si los hubiera  -----
         if (existing) {
 
-            //  -----  Si el archivo es el mismo, no hacer nada para evitar parpadeo  -----
-            if (existing.href.split('?')[0] === newAbsolute) 
+            //  -----  si el archivo es el mismo, no hacer nada para evitar parpadeo  -----
+            if (existing.href.split('?')[0] === newAbsolute)
                 return;
 
-            //  -----  Actualizar href in-place evita el instante sin favicon que causa parpadeo  -----
+            //  -----  actualizar href in-place evita el instante sin favicon que causa parpadeo  -----
             existing.href = newHref;
 
-            //  -----  Eliminar duplicados si los hubiera  -----
+            //  -----  eliminar duplicados si los hubiera  -----
             document.querySelectorAll('link[rel~="icon"]').forEach(link => {
-                
-                if (link !== existing) 
+
+                if (link !== existing)
                     link.remove();
 
             });
 
-            //  -----  Salir de la función después de actualizar el favicon existente  -----
+            //  -----  salir de la función después de actualizar el favicon existente  -----
             return;
 
         }
 
-        //  -----  No existe ningún favicon: crear el elemento  -----
-        
+        //  -----  no existe ningún favicon: crear el elemento  -----
+
         /** @type {HTMLLinkElement} - `Nuevo elemento favicon` */
         const link = document.createElement('link');
-        
-        //  -----  Configurar atributos del nuevo favicon  -----
+
+        //  -----  configurar atributos del nuevo favicon  -----
         link.rel = 'icon';
         link.type = 'image/x-icon';
         link.href = newHref;
 
-        //  -----  Agregar el nuevo favicon al head del documento  -----
+        //  -----  agregar el nuevo favicon al head del documento  -----
         document.head.appendChild(link);
 
     }
@@ -1285,7 +1359,7 @@ export const spaLoaderContentHtml = (options = {}) => {
      * -------------------------------------------
      * - Agrega el título al header y footer de la página.
      * @param {string} title - Texto para mostrar en ambos lugares.
-     * @returns {void} - No retorna ningún valor.
+     * @return {void} - No retorna ningún valor.
      */
 
     const addTitleHeaderFooter = (title) => {
@@ -1293,14 +1367,14 @@ export const spaLoaderContentHtml = (options = {}) => {
         /** @type {HTMLElement|null} - `Referencia al título del header` */
         const headerTitle = document.querySelector('#layoutHeader #headerTitle');
 
-        //  -----  Si existe el elemento, actualizamos su contenido con el título de la ruta  -----
+        //  -----  si existe el elemento, actualizamos su contenido con el título de la ruta  -----
         if (headerTitle)
             headerTitle.innerHTML = title;
 
         /** @type {HTMLElement|null} - `Referencia al título del footer` */
         const footerTitle = document.querySelector('#layoutFooter #footerTitle');
 
-        //  -----  Si existe el elemento, actualizamos su contenido con el título de la ruta  -----
+        //  -----  si existe el elemento, actualizamos su contenido con el título de la ruta  -----
         if (footerTitle)
             footerTitle.innerHTML = title;
 
@@ -1321,7 +1395,7 @@ export const spaLoaderContentHtml = (options = {}) => {
      * -------------------------------
      * - `Función para manejar las acciones del navbar (abrir/cerrar menú móvil)`
      * -  Animaciones slideUp / slideDown para el menú.
-     * @returns {void} - No devuelve nada, pero configura los listeners para el navbar y maneja su estado y animaciones.
+     * @return {void} - No devuelve nada, pero configura los listeners para el navbar y maneja su estado y animaciones.
      */
 
     const actionsNavbar = () => {
@@ -1333,18 +1407,18 @@ export const spaLoaderContentHtml = (options = {}) => {
         /** @type {number} - `Duración de la animación de cierre del menú` */
         const CLOSE_DURATION = 360;
 
-        /** @type {HTMLElement|null} * - `Referencias a los elementos del navbar` */
+        /** @type {HTMLElement|null} - `Referencias a los elementos del navbar` */
         const navbar = document.querySelector('.navbar__container');
 
-        //  -----  Si no se encuentra el navbar, lanzamos un error para que se capture y se loguee en applyPreloadedContent sin romper el flujo global  -----
+        //  -----  si no se encuentra el navbar, lanzamos un error para que se capture y se loguee en applyPreloadedContent sin romper el flujo global  -----
         if (!navbar)
             throw new Error("❌ No se encontró el elemento .navbar__container");
 
 
-        /** @type {HTMLElement|null}  - `Referencias a los botones de abrir/cerrar menú` */
+        /** @type {HTMLElement|null} - `Referencias a los botones de abrir/cerrar menú` */
         const btnOpen = document.querySelector('.navbar__btn-open');
 
-        //  -----  Si no se encuentra el botón de abrir menú, lanzamos un error para que se capture y se loguee en applyPreloadedContent sin romper el flujo global  -----
+        //  -----  si no se encuentra el botón de abrir menú, lanzamos un error para que se capture y se loguee en applyPreloadedContent sin romper el flujo global  -----
         if (!btnOpen)
             throw new Error("❌ No se encontró el elemento .navbar__btn-open");
 
@@ -1352,12 +1426,12 @@ export const spaLoaderContentHtml = (options = {}) => {
         /** @type {HTMLElement|null} - `Referencias al botón de cerrar menú` */
         const btnClose = document.querySelector('.navbar__btn-close');
 
-        //  -----  Si no se encuentra el botón de cerrar menú, lanzamos un error para que se capture y se loguee en applyPreloadedContent sin romper el flujo global  -----
+        //  -----  si no se encuentra el botón de cerrar menú, lanzamos un error para que se capture y se loguee en applyPreloadedContent sin romper el flujo global  -----
         if (!btnClose)
             throw new Error("❌ No se encontró el elemento .navbar__btn-close");
 
 
-        //  -----  Estado inicial  -----
+        //  -----  estado inicial  -----
         navbar.style.display = "none";
         btnClose.style.display = "none";
 
@@ -1367,7 +1441,7 @@ export const spaLoaderContentHtml = (options = {}) => {
          * -----  `lockBodyScroll()`  -----
          * --------------------------------
          * - `Función para bloquear el scroll del body al abrir el menú móvil, evitando que el fondo se mueva mientras el menú está abierto`
-         * @returns {void} - No devuelve nada, pero aplica estilos para bloquear el scroll del body.
+         * @return {void} - No devuelve nada, pero aplica estilos para bloquear el scroll del body.
          */
 
         const lockBodyScroll = () => {
@@ -1381,7 +1455,7 @@ export const spaLoaderContentHtml = (options = {}) => {
          * -----  `unlockBodyScroll()`  -----
          * ----------------------------------
          * - `Función para desbloquear el scroll del body al cerrar el menú móvil, permitiendo que el fondo vuelva a moverse`
-         * @returns {void} - No devuelve nada, pero elimina los estilos que bloquean el scroll del body.
+         * @return {void} - No devuelve nada, pero elimina los estilos que bloquean el scroll del body.
          */
 
         const unlockBodyScroll = () => {
@@ -1389,23 +1463,23 @@ export const spaLoaderContentHtml = (options = {}) => {
         };
 
 
-        //*  -----  Evitar bindings duplicados: clonar botones y reemplazarlos -----
+        //  -----  evitar bindings duplicados: clonar botones y reemplazarlos  -----
 
         /** - `Nuevo botón open clonado` */
         const newBtnOpen = /** @type {HTMLElement} */ (btnOpen.cloneNode(true));
 
-        //  -----  Reemplazar el botón original por el nuevo clonado para eliminar listeners anteriores y evitar duplicados  -----
+        //  -----  reemplazar el botón original por el nuevo clonado para eliminar listeners anteriores y evitar duplicados  -----
         btnOpen.parentNode?.replaceChild(newBtnOpen, btnOpen);
 
 
         /** - `Nuevo botón close clonado` */
         const newBtnClose = /** @type {HTMLElement} */(btnClose.cloneNode(true));
 
-        //  -----  Reemplazar el botón original por el nuevo clonado para eliminar listeners anteriores y evitar duplicados  -----
+        //  -----  reemplazar el botón original por el nuevo clonado para eliminar listeners anteriores y evitar duplicados  -----
         btnClose.parentNode?.replaceChild(newBtnClose, btnClose);
 
 
-        //  -----  Abrir Menú  -----
+        //  -----  abrir Menú  -----
         newBtnOpen.addEventListener("click", (e) => {
 
             e.stopPropagation();
@@ -1413,16 +1487,16 @@ export const spaLoaderContentHtml = (options = {}) => {
             newBtnOpen.style.display = "none";
             newBtnClose.style.display = "flex";
 
-            //  -----  Bloquear scroll del body al abrir el menú para evitar que el fondo se mueva  -----
+            //  -----  bloquear scroll del body al abrir el menú para evitar que el fondo se mueva  -----
             lockBodyScroll();
 
-            //  -----  Usar animación slideDown para mostrar el navbar de forma suave  -----
+            //  -----  usar animación slideDown para mostrar el navbar de forma suave  -----
             slideDown(navbar, OPEN_DURATION);
 
         });
 
 
-        //  -----  Cerrar Menú  -----
+        //  -----  cerrar Menú  -----
         newBtnClose.addEventListener("click", (e) => {
 
             e.stopPropagation();
@@ -1430,40 +1504,36 @@ export const spaLoaderContentHtml = (options = {}) => {
             newBtnClose.style.display = "none";
             newBtnOpen.style.display = "flex";
 
-            //  -----  Usar animación slideUp para ocultar el navbar de forma suave  -----
+            //  -----  usar animación slideUp para ocultar el navbar de forma suave  -----
             slideUp(navbar, CLOSE_DURATION);
 
-            //  -----  Desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----
+            //  -----  desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----
             unlockBodyScroll();
 
         });
 
 
-        /*  
-            -----  Cerrar menú al hacer clic fuera del navbar  -----
-            - eliminamos listener anterior seguro creando uno que no se duplique:
-            - añadimos un namespace simple usando dataset
-        */
+        //  -----  cerrar el menú al hacer clic fuera del navbar, sin duplicar listeners y con un namespace simple en dataset  -----
         if (!document.body.dataset._spaClickBound) {
 
-            //  -----  Listener para cerrar el menú al hacer clic fuera del navbar, con protección contra errores por si el navbar no existe en alguna vista  -----
+            //  -----  listener para cerrar el menú al hacer clic fuera del navbar, con protección contra errores por si el navbar no existe en alguna vista  -----
             document.addEventListener("click", () => {
 
-                //  -----  Si el navbar no está visible, no hacemos nada  -----
+                //  -----  si el navbar no está visible, no hacemos nada  -----
                 try {
 
-                    //  -----  Si el navbar no está visible, no hacemos nada  -----
+                    //  -----  si el navbar no está visible, no hacemos nada  -----
                     slideUp(navbar, CLOSE_DURATION);
 
                     newBtnClose.style.display = "none";
                     newBtnOpen.style.display = "flex";
 
-                    //  -----  Desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----
+                    //  -----  desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----
                     unlockBodyScroll();
 
                 }
 
-                //  -----  Proteger contra errores si el navbar no existe en alguna vista, para evitar romper el flujo global del plugin  -----
+                //  -----  proteger contra errores si el navbar no existe en alguna vista, para evitar romper el flujo global del plugin  -----
                 catch (e) {
 
                     console.warn('⚠️ No se pudo cerrar el menú al hacer clic fuera (probablemente falta .navbar__container en la vista):', e);
@@ -1472,7 +1542,7 @@ export const spaLoaderContentHtml = (options = {}) => {
             });
 
 
-            //  -----  Marcar que el listener de clic para cerrar el menú ya está configurado para evitar duplicados  -----
+            //  -----  marcar que el listener de clic para cerrar el menú ya está configurado para evitar duplicados  -----
             document.body.dataset._spaClickBound = '1';
 
         }
@@ -1496,26 +1566,26 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - `Animación para desplegar un elemento con efecto slideDown`
      * @param {HTMLElement} element - Elemento a mostrar con efecto slideDown (debe estar inicialmente oculto con display: none)
      * @param {number} duration - Duración de la animación en milisegundos (opcional, por defecto 300ms)
-     * @return {void} - No devuelve nada, pero muestra el elemento con una animación de deslizamiento hacia abajo. 
+     * @return {void} - No devuelve nada, pero muestra el elemento con una animación de deslizamiento hacia abajo.
      */
 
     const slideDown = (element, duration = 300) => {
 
-        //  -----  Si el elemento ya es visible, no hacemos nada  -----
+        //  -----  si el elemento ya es visible, no hacemos nada  -----
         if (window.getComputedStyle(element).display !== 'none')
             return;
 
-        //  -----  Asegurar que el elemento tenga display para calcular su altura, restaurando su estado si estaba oculto  -----
+        //  -----  asegurar que el elemento tenga display para calcular su altura, restaurando su estado si estaba oculto  -----
         element.style.removeProperty('display');
 
-        /** - Òbtenemos el valor de display actual del elemento */
+        /** - `Òbtenemos el valor de display actual del elemento` */
         let display = window.getComputedStyle(element).display;
 
-        //  -----  Si el display es 'none', lo cambiamos a 'flex' para mostrarlo (puede ser otro valor según el diseño, pero 'flex' es común para contenedores)  -----
+        //  -----  si el display es 'none', lo cambiamos a 'flex' para mostrarlo (puede ser otro valor según el diseño, pero 'flex' es común para contenedores)  -----
         if (display === 'none')
             display = 'flex';
 
-        //  -----  Configurar estilos para la animación de slideDown  -----
+        //  -----  configurar estilos para la animación de slideDown  -----
         element.style.display = display;
         element.style.marginTop = '-100%';
         element.style.transitionProperty = 'margin-top';
@@ -1523,15 +1593,15 @@ export const spaLoaderContentHtml = (options = {}) => {
         element.style.transitionTimingFunction = 'cubic-bezier(0.22, 1, 0.36, 1)';
         element.style.willChange = 'margin-top';
 
-        //  -----  Forzar reflow para asegurar que los estilos se apliquen antes de iniciar la animación  -----
+        //  -----  forzar reflow para asegurar que los estilos se apliquen antes de iniciar la animación  -----
         element.offsetHeight;
 
-        //  -----  Iniciar animación de slideDown cambiando margin-top a 0  -----
+        //  -----  iniciar animación de slideDown cambiando margin-top a 0  -----
         requestAnimationFrame(() => {
             element.style.marginTop = '0';
         });
 
-        //  -----  Limpiar estilos de transición después de que termine la animación para restaurar el estado limpio del elemento  -----
+        //  -----  limpiar estilos de transición después de que termine la animación para restaurar el estado limpio del elemento  -----
         setTimeout(() => {
             element.style.removeProperty('transition-duration');
             element.style.removeProperty('transition-property');
@@ -1554,25 +1624,25 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const slideUp = (element, duration = 300) => {
 
-        //  -----  Si el elemento ya está oculto, no hacemos nada  -----
+        //  -----  si el elemento ya está oculto, no hacemos nada  -----
         if (window.getComputedStyle(element).display === 'none')
             return;
 
-        //  -----  Configurar estilos para la animación de slideUp  -----
+        //  -----  configurar estilos para la animación de slideUp  -----
         element.style.transitionProperty = 'margin-top';
         element.style.transitionDuration = duration + 'ms';
         element.style.transitionTimingFunction = 'cubic-bezier(0.4, 0, 1, 1)';
         element.style.willChange = 'margin-top';
 
-        //  -----  Forzar reflow para asegurar que los estilos se apliquen antes de iniciar la animación  -----
+        //  -----  forzar reflow para asegurar que los estilos se apliquen antes de iniciar la animación  -----
         element.offsetHeight;
 
-        //  -----  Iniciar animación de slideUp cambiando margin-top a -100% para ocultar el elemento  -----
+        //  -----  iniciar animación de slideUp cambiando margin-top a -100% para ocultar el elemento  -----
         requestAnimationFrame(() => {
             element.style.marginTop = '-100%';
         });
 
-        //  -----  Después de que termine la animación, ocultar el elemento y limpiar estilos de transición para restaurar el estado limpio del elemento  -----
+        //  -----  después de que termine la animación, ocultar el elemento y limpiar estilos de transición para restaurar el estado limpio del elemento  -----
         setTimeout(() => {
             element.style.display = 'none';
             element.style.removeProperty('transition-duration');
@@ -1597,11 +1667,11 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const slideToggle = (element, duration = 300) => {
 
-        //  -----  Si el elemento está oculto, lo mostramos con slideDown  -----
+        //  -----  si el elemento está oculto, lo mostramos con slideDown  -----
         if (window.getComputedStyle(element).display === 'none')
             slideDown(element, duration);
 
-        //  -----  Si el elemento está visible, lo ocultamos con slideUp  -----
+        //  -----  si el elemento está visible, lo ocultamos con slideUp  -----
         else
             slideUp(element, duration);
 
@@ -1629,20 +1699,20 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const loadStylesheetsByPage = (styles) => {
 
-        //  -----  Si no hay estilos, elimina los existentes y salir  -----
+        //  -----  si no hay estilos, elimina los existentes y salir  -----
         if (!styles || !Array.isArray(styles)) {
             document.querySelectorAll('link[data-page-style="true"]').forEach(l => l.remove());
             return;
         }
 
-        //  -----  Eliminar hojas de estilo antiguas  -----
+        //  -----  eliminar hojas de estilo antiguas  -----
         document.querySelectorAll('link[data-page-style="true"]').forEach(l => l.remove());
 
 
-        //  -----  Insertar nuevas hojas  -----
+        //  -----  insertar nuevas hojas  -----
         for (const style of styles) {
 
-            //  -----  Validar que el objeto de estilo tenga la propiedad href  -----
+            //  -----  validar que el objeto de estilo tenga la propiedad href  -----
             if (!style || !style.href)
                 continue;
 
@@ -1652,12 +1722,12 @@ export const spaLoaderContentHtml = (options = {}) => {
             /** - `Creamos Elemento link para la hoja de estilo` */
             const link = document.createElement('link');
 
-            //  -----  Configuramos el nuevo link para la hoja de estilo con cache bypass usando timestamp para asegurar que se actualice correctamente  -----
+            //  -----  configuramos el nuevo link para la hoja de estilo con cache bypass usando timestamp para asegurar que se actualice correctamente  -----
             link.rel = 'stylesheet';
             link.href = hrefWithTimestamp;
             link.dataset.pageStyle = "true";
 
-            //  -----  Añadir al head  -----
+            //  -----  añadir al head  -----
             document.head.appendChild(link);
 
         }
@@ -1677,13 +1747,13 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * ---------------------------------------------------
+     * ------------------------------------------------------
      * -----  `scriptSrcMatches(loadedSrc, targetSrc)`  -----
-     * ---------------------------------------------------
+     * ------------------------------------------------------
      * - Compara dos URLs de script ignorando querystring (cache-busting).
      * @param {string} loadedSrc - URL absoluta del script en el DOM.
      * @param {string} targetSrc - URL del script definida en la ruta.
-     * @returns {boolean}
+     * @return {boolean}
      */
 
     const scriptSrcMatches = (loadedSrc, targetSrc) => {
@@ -1703,23 +1773,23 @@ export const spaLoaderContentHtml = (options = {}) => {
      * -----------------------------------
      * - Comprueba si ya existe un script cargado (previene duplicados)
      * @param {string} src - URL del script a verificar (puede ser relativa o absoluta)
-     * @returns {boolean}  - Devuelve true si el script ya está cargado en el documento, o false si no lo está o si ocurre un error durante la verificación.
+     * @return {boolean}  - Devuelve true si el script ya está cargado en el documento, o false si no lo está o si ocurre un error durante la verificación.
      */
 
     const isScriptLoaded = (src) => {
 
-        //  -----  Validación básica de la URL del script  -----
+        //  -----  validación básica de la URL del script  -----
         try {
 
             /** @type {HTMLScriptElement[]} - `Lista de scripts actualmente cargados en el documento` */
             const list = Array.from(document.scripts);
 
-            //  -----  Verificar si alguno de los scripts cargados coincide con la URL dada (comparando sin querystring para evitar problemas con cache bypass)  -----
+            //  -----  verificar si alguno de los scripts cargados coincide con la URL dada (comparando sin querystring para evitar problemas con cache bypass)  -----
             return list.some(s => s.src && scriptSrcMatches(s.src, src));
 
         }
 
-        //  -----  Proteger contra errores en la verificación (por ejemplo, si src no es una cadena válida) para evitar romper el flujo global del plugin  -----
+        //  -----  proteger contra errores en la verificación (por ejemplo, si src no es una cadena válida) para evitar romper el flujo global del plugin  -----
         catch (e) {
             return false;
         }
@@ -1729,13 +1799,13 @@ export const spaLoaderContentHtml = (options = {}) => {
 
 
     /**
-     * --------------------------------------
+     * ----------------------------------------
      * -----  `removeLoadedScripts(src)`  -----
-     * --------------------------------------
+     * ----------------------------------------
      * - Elimina del DOM los `<script>` que coinciden con la URL dada.
      * - Permite re-ejecutar scripts clásicos (IIFE/CJS) al volver a una ruta SPA.
      * @param {string} src - URL del script a eliminar.
-     * @returns {void}
+     * @return {void}
      */
 
     const removeLoadedScripts = (src) => {
@@ -1749,7 +1819,7 @@ export const spaLoaderContentHtml = (options = {}) => {
         }
 
         catch (e) {
-            // no-op
+            //  -----  ignorar el error de verificación  -----
         }
 
     };
@@ -1761,64 +1831,64 @@ export const spaLoaderContentHtml = (options = {}) => {
      * -----  `loadScripts({ src, isModule = false, exportFunctionName = null })`  -----
      * ---------------------------------------------------------------------------------
      * - `Función para cargar scripts dinámicamente desde las rutas definidas en route.scripts`
-     * @param {{ 
-        * src: string, 
-        * isModule?: boolean, 
-        * exportFunctionName?: string|null 
+     * @param {{
+        * src: string,
+        * isModule?: boolean,
+        * exportFunctionName?: string|null
      * }} options - Objeto con las opciones para cargar el script:
      *    - `src`: URL del script a cargar (puede ser relativa o absoluta)
      *    - `isModule`: Indica si el script debe cargarse como módulo ES6 (opcional, por defecto false)
      *    - `exportFunctionName`: Si isModule es true, nombre de la función exportada a ejecutar después de importar el módulo (opcional, por defecto null)
-     * @returns {Promise<void>} - Promesa que se resuelve cuando el script se ha cargado (y ejecutado si es módulo), o se ha manejado un error para evitar bloqueos del loader.
+     * @return {Promise<void>} - Promesa que se resuelve cuando el script se ha cargado (y ejecutado si es módulo), o se ha manejado un error para evitar bloqueos del loader.
      */
 
     const loadScripts = async ({ src, isModule = false, exportFunctionName = null }) => {
 
 
-        //  -----  Validación básica de la URL del script  -----
+        //  -----  validación básica de la URL del script  -----
         try {
 
-            //  -----  Si no hay src, no hacemos nada  -----
+            //  -----  si no hay src, no hacemos nada  -----
             if (!src)
                 return;
 
-            //  -----  Scripts clásicos (IIFE/CJS): re-ejecutar al volver a la ruta (el DOM se reinyecta en Fase 2)  -----
+            //  -----  scripts clásicos (IIFE/CJS): re-ejecutar al volver a la ruta (el DOM se reinyecta en Fase 2)  -----
             if (!isModule && isScriptLoaded(src)) {
                 removeLoadedScripts(src);
                 console.log(`🔄 Script clásico re-ejecutado: ${src}`);
             }
 
-            //  -----  Evitar cargar el mismo script más de una vez para prevenir duplicados y posibles conflictos  -----
+            //  -----  evitar cargar el mismo script más de una vez para prevenir duplicados y posibles conflictos  -----
             else if (isScriptLoaded(src)) {
                 console.log(`🔁 Script ya cargado: ${src}`);
                 return;
             }
 
-            
+
             /** - `URL con cache-busting estable por sesión (permite reutilizar caché al revisitar la ruta)` */
             const urlWithCacheBypass = `${src}?v=${_sessionAssetKey}`;
 
 
-            //  -----  Cargar como módulo ES6 si isModule es true, usando import() dinámico  -----
+            //  -----  cargar como módulo ES6 si isModule es true, usando import() dinámico  -----
             if (isModule) {
 
-                //  -----  Estrategia de caché según el patrón del módulo:                                                    -----
-                //  -----  · CON exportFunctionName (patrón "mount"): el módulo NO renderiza en su nivel superior, sino que    -----
-                //  -----    expone una función de montaje. Usamos URL ESTABLE para que el navegador lo descargue y cachee     -----
-                //  -----    UNA sola vez; el re-render se consigue llamando a esa función en cada navegación (sin re-bajar).  -----
-                //  -----  · SIN exportFunctionName (patrón clásico): el módulo renderiza en su nivel superior, que solo se    -----
-                //  -----    ejecuta una vez por URL. Usamos URL ÚNICA por navegación para forzar la re-evaluación (re-render). -----
+                //  -----  estrategia de caché según el patrón del módulo:  -----
+                //  -----  · CON exportFunctionName (patrón "mount"): el módulo NO renderiza en su nivel superior, sino que  -----
+                //  -----  expone una función de montaje. Usamos URL ESTABLE para que el navegador lo descargue y cachee  -----
+                //  -----  UNA sola vez; el re-render se consigue llamando a esa función en cada navegación (sin re-bajar).  -----
+                //  -----  · SIN exportFunctionName (patrón clásico): el módulo renderiza en su nivel superior, que solo se  -----
+                //  -----  ejecuta una vez por URL. Usamos URL ÚNICA por navegación para forzar la re-evaluación (re-render).  -----
                 /** - `URL del módulo: estable si es "mountable" (cacheable), única por navegación si renderiza en top-level` */
                 const moduleUrl = exportFunctionName
                     ? `${src}?v=${_sessionAssetKey}`
                     : `${src}?m=${_sessionAssetKey}.${++_moduleReloadSeq}`;
 
-                /** @type {Record<string, unknown>} */
+                /** @type {Record<string, unknown>} - `módulo importado dinámicamente` */
                 const module = await import(moduleUrl);
 
                 console.log(`✅ Módulo importado: ${moduleUrl}`);
 
-                //  -----  Si se especificó exportFunctionName y es una función exportada del módulo, la ejecutamos (re-render en cada navegación)  -----
+                //  -----  si se especificó exportFunctionName y es una función exportada del módulo, la ejecutamos (re-render en cada navegación)  -----
                 const exported = exportFunctionName ? module[exportFunctionName] : undefined;
 
                 if (typeof exported === 'function') {
@@ -1829,35 +1899,35 @@ export const spaLoaderContentHtml = (options = {}) => {
             }
 
 
-            //  -----  Cargar como script normal  -----
+            //  -----  cargar como script normal  -----
             else {
 
-                //  -----  Cargar el script dinámicamente creando un elemento script y añadiéndolo al head,  ----- 
-                //  -----  con manejo de eventos onload y onerror para resolver la promesa correctamente     -----
+                //  -----  cargar el script dinámicamente creando un elemento script y añadiéndolo al head,  -----
+                //  -----  con manejo de eventos onload y onerror para resolver la promesa correctamente  -----
                 await new Promise((resolve) => {
 
 
                     /** - `Elemento script para cargar el JS` */
                     const script = document.createElement('script');
 
-                    //  -----  Configurar el nuevo script con cache bypass usando timestamp para asegurar que se actualice correctamente  -----
+                    //  -----  configurar el nuevo script con cache bypass usando timestamp para asegurar que se actualice correctamente  -----
                     script.src = urlWithCacheBypass;
                     script.async = true;
 
-                    //  -----  Evento onload para resolver la promesa cuando el script se haya cargado correctamente  -----
+                    //  -----  evento onload para resolver la promesa cuando el script se haya cargado correctamente  -----
                     script.onload = () => {
                         console.log(`✅ Script cargado: ${urlWithCacheBypass}`);
                         resolve(undefined);
                     };
 
-                    //  -----  Evento onerror para manejar errores de carga del script y resolver la promesa para evitar bloqueos del loader  -----
+                    //  -----  evento onerror para manejar errores de carga del script y resolver la promesa para evitar bloqueos del loader  -----
                     script.onerror = (e) => {
                         console.error(`❌ Error al cargar: ${urlWithCacheBypass}`, e);
-                        // no reject para no romper el flujo global
+                        //  -----  no rechazar para no romper el flujo global  -----
                         resolve(undefined);
                     };
 
-                    //  -----  Añadir el script al head para iniciar la carga  -----
+                    //  -----  añadir el script al head para iniciar la carga  -----
                     document.head.appendChild(script);
 
                 });
@@ -1866,14 +1936,14 @@ export const spaLoaderContentHtml = (options = {}) => {
 
         }
 
-        //  -----  Proteger contra errores en la carga del script para evitar romper el flujo global del plugin  -----
+        //  -----  proteger contra errores en la carga del script para evitar romper el flujo global del plugin  -----
         catch (e) {
             console.error(`❌ Error cargando el script: ${src}`, e);
         }
 
     };
 
-    
+
 
     /*
         *  ----------------------------------------------------------------  *
@@ -1900,32 +1970,32 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - `Configura los event listeners para la navegación SPA`
      *    Enlaces internos con data-id para identificar la ruta
      *    y evento popstate para manejar navegación atrás/adelante del navegador.
-     * @returns {void} - No devuelve nada, pero configura los listeners para manejar la navegación dentro de la SPA,
-     *    permitiendo que los enlaces internos carguen contenido sin recargar la página y que la navegación con los botones del navegador funcione correctamente. 
+     * @return {void} - No devuelve nada, pero configura los listeners para manejar la navegación dentro de la SPA,
+     *    permitiendo que los enlaces internos carguen contenido sin recargar la página y que la navegación con los botones del navegador funcione correctamente.
      */
 
     const setupEventListeners = () => {
 
 
-        //  -----  Manejo de clics en enlaces internos  -----
+        //  -----  manejo de clics en enlaces internos  -----
         document.addEventListener('click', (e) => {
 
 
             /** - `Elemento objetivo del evento click` */
             const target = e.target;
 
-            //  -----  Si el elemento clicado no es un HTMLElement, no hacemos nada  -----
+            //  -----  si el elemento clicado no es un HTMLElement, no hacemos nada  -----
             if (!(target instanceof HTMLElement))
                 return;
 
-            /** 
-             * @type {HTMLAnchorElement|null} 
-             * - `Busca el enlace más cercano con data-id o data-route para identificar la ruta, 
-             *    permitiendo que los enlaces internos funcionen sin recargar la página`  
+            /**
+             * @type {HTMLAnchorElement|null}
+             * - `Busca el enlace más cercano con data-id o data-route para identificar la ruta,
+             *    permitiendo que los enlaces internos funcionen sin recargar la página`
              */
             const link = target.closest('a[data-id]');
 
-            //  -----  Si se encuentra un enlace con data-id, manejamos la navegación interna con lazy loading  -----
+            //  -----  si se encuentra un enlace con data-id, manejamos la navegación interna con lazy loading  -----
             if (link) {
 
                 e.preventDefault();
@@ -1937,7 +2007,7 @@ export const spaLoaderContentHtml = (options = {}) => {
                 const routeId = link.dataset.id;
 
 
-                //  -----  Si tiene data-route, importar directamente por nombre de archivo  -----
+                //  -----  si tiene data-route, importar directamente por nombre de archivo  -----
                 if (routeFile) {
 
                     loadRouteModule(routeFile).then((route) => {
@@ -1953,7 +2023,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
                 }
 
-                //  -----  Fallback: si solo tiene data-id, buscar en el manifest por id  -----
+                //  -----  fallback: si solo tiene data-id, buscar en el manifest por id  -----
                 else if (routeId) {
 
                     /** - `Entrada del manifest correspondiente al id` */
@@ -1983,13 +2053,13 @@ export const spaLoaderContentHtml = (options = {}) => {
         });
 
 
-        //  -----  Manejo del evento popstate (navegación atrás/adelante)  -----
+        //  -----  manejo del evento popstate (navegación atrás/adelante)  -----
         window.addEventListener('popstate', (e) => {
 
-            //  -----  Marcar que la navegación se hizo por popstate para evitar pushState duplicados al aplicar la ruta  -----
+            //  -----  marcar que la navegación se hizo por popstate para evitar pushState duplicados al aplicar la ruta  -----
             isPopNavigation = true;
 
-            //  -----  Actualizar favicon inmediatamente (síncronamente) desde el state para evitar parpadeo durante el async de lazy loading  -----
+            //  -----  actualizar favicon inmediatamente (síncronamente) desde el state para evitar parpadeo durante el async de lazy loading  -----
             if (e.state?.favicon)
                 updateFavicon(e.state.favicon);
 
@@ -2000,7 +2070,7 @@ export const spaLoaderContentHtml = (options = {}) => {
             const raw = e.state?.path ?? window.location.pathname;
 
 
-            //  -----  Si tenemos el routeFile en el state, importar directamente (más rápido, usa cache)  -----
+            //  -----  si tenemos el routeFile en el state, importar directamente (más rápido, usa cache)  -----
             if (routeFile) {
 
                 loadRouteModule(routeFile).then((route) => {
@@ -2016,7 +2086,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
             }
 
-            //  -----  Fallback: buscar en el manifest por pathname normalizado  -----
+            //  -----  fallback: buscar en el manifest por pathname normalizado  -----
             else {
 
                 /** - `Entrada del manifest correspondiente al path actual` */

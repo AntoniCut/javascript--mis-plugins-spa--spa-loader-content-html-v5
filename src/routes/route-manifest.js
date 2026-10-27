@@ -1,26 +1,28 @@
 /*
-    *  -------------------------------------------------------------------  *
-    *  -----  /route-manifest.js  --  /src/routes/route-manifest.js  -----  *
-    *  -------------------------------------------------------------------  *
+    *  ------------------------------------------------------------------  *
+    *  -----  route-manifest.js  --  /src/routes/route-manifest.js  -----  *
+    *  ------------------------------------------------------------------  *
 */
 
 
-/** 
+/**
+ * --------------------------------
+ * -----  `routeManifest []`  -----
+ * --------------------------------
  * - `Manifiesto ligero de rutas: solo id, path y nombre de archivo (sin imports)`
  * - Se usa para lazy loading: el módulo de cada ruta se importa dinámicamente bajo demanda.
- * @type {import("../../types/index.js").RouteManifest[]} 
+ * @type {import("../../types/index.js").RouteManifest[]}
  */
-
 export const routeManifest = [
 
-    //  ----------  00 - Home  ----------
-    { 
-        id: 'home', 
-        path: '', 
-        file: 'route-00-home' 
+    //  -----  00 - home  -----
+    {
+        id: 'home',
+        path: '',
+        file: 'route-00-home'
     },
 
-    //  ----------  Páginas de Contenido (HTML / CSS / JavaScript)  ----------
+    //  -----  páginas de contenido (html / css / javascript)  -----
     {
         id: 'htmlPage',
         path: 'html-page',
@@ -51,7 +53,7 @@ export const routeManifest = [
         file: 'route-jquery-ui-page'
     },
 
-    //  ----------  Frameworks (React / Astro)  ----------
+    //  -----  frameworks (react / astro)  -----
     {
         id: 'reactPage',
         path: 'react-page',
@@ -64,11 +66,11 @@ export const routeManifest = [
         file: 'route-astro-page'
     },
 
-    //  ----------  404 - Not Found  ----------
-    { 
-        id: '404NotFoundPage', 
-        path: '404-not-found-page', 
-        file: 'route-404-not-found-page' 
+    //  -----  404 - not found  -----
+    {
+        id: '404NotFoundPage',
+        path: '404-not-found-page',
+        file: 'route-404-not-found-page'
     },
 
 ];

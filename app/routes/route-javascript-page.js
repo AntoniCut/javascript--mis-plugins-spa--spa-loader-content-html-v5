@@ -1,12 +1,21 @@
 /*
-    *  -----  /route-javascript-page.js  --  /src/routes/route-javascript-page.js  -----
+    *  --------------------------------------------------------------------------------  *
+    *  -----  route-javascript-page.js  --  /src/routes/route-javascript-page.js  -----  *
+    *  --------------------------------------------------------------------------------  *
 */
 
 import { paths } from './paths.js';
 
+/** - `urls base de las carpetas de app/ tomadas de paths.js` */
 const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShikiHtml, layoutFooter, styles, scripts, scssPages } = paths;
 
-/** @type {import("../../types/index.js").Route} */
+/**
+ * --------------------------------------
+ * -----  `routeJavascriptPage {}`  -----
+ * --------------------------------------
+ * - `ruta de la vista: shell, componentes, bloques shiki, estilos y scripts que carga el plugin`
+ * @type {import("../../types/index.js").Route}
+ */
 export const routeJavascriptPage = {
     id: 'javascriptPage',
     favicon: `${favicon}/javascript-icon.svg`,

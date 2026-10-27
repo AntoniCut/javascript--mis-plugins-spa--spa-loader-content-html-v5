@@ -1,10 +1,10 @@
 /*
-    *  ----------------------------------------------  *
-    *  -----  /index.js  --  /types/index.js  -----  *
-    *  ----------------------------------------------  *
+    *  -------------------------------------------  *
+    *  -----  index.js  --  /types/index.js  -----  *
+    *  -------------------------------------------  *
 */
 
-//  ----------  Barril de tipos JSDoc para imports centralizados  ----------
+//  -----  marcar el archivo como módulo, barril de tipos jsdoc para imports centralizados  -----
 export {};
 
 /** @typedef {import('./config-options-spa.js').ConfigOptionsSPA} ConfigOptionsSPA */

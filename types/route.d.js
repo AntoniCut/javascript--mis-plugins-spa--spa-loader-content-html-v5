@@ -1,7 +1,7 @@
 /*
-    *  --------------------------------------------------  *
-    *  -----  /route.d.js  --  /types/route.d.js  -----  *
-    *  --------------------------------------------------  *
+    *  -----------------------------------------------  *
+    *  -----  route.d.js  --  /types/route.d.js  -----  *
+    *  -----------------------------------------------  *
 */
 
 
@@ -42,9 +42,9 @@
 
 
 /**
- * ---------------------------------
+ * ----------------------------------
  * -----  `PageComponentEntry`  -----
- * ---------------------------------
+ * ----------------------------------
  * @typedef {Object} PageComponentEntry - Entrada de componente HTML que se renderiza dentro de la página actual.
  *                                        A diferencia de `components` (que pueblan regiones del layout mediante ID),
  *                                          `pagesComponents` inyecta HTML en contenedores de la propia vista usando selectores CSS arbitrarios.

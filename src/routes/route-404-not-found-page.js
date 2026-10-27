@@ -1,14 +1,21 @@
 /*
-    *  ----------------------------------------------  *
-    *  -----  /route-404-not-found-page.js  -----  *
-    *  ----------------------------------------------  *
+    *  --------------------------------------------------------------------------------------  *
+    *  -----  route-404-not-found-page.js  --  /src/routes/route-404-not-found-page.js  -----  *
+    *  --------------------------------------------------------------------------------------  *
 */
 
 import { paths } from './paths.js';
 
+/** - `urls base de las carpetas de app/ tomadas de paths.js` */
 const { favicon, layoutHeader, layoutNavbar, pages, layoutFooter } = paths;
 
-/** @type {import("../../types/index.js").Route} */
+/**
+ * ---------------------------------------
+ * -----  `route404NotFoundPage {}`  -----
+ * ---------------------------------------
+ * - `ruta de la vista: shell, componentes, bloques shiki, estilos y scripts que carga el plugin`
+ * @type {import("../../types/index.js").Route}
+ */
 export const route404NotFoundPage = {
     id: '404NotFoundPage',
     favicon: `${favicon}/typescript-favicon.ico`,
