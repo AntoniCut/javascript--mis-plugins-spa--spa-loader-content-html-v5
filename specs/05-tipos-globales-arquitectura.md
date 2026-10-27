@@ -1,6 +1,6 @@
 # SPEC 05 — Tipos globales de arquitectura
 
-> **Estado:** Aprovado
+> **Estado:** Aprovada
 > **Depende de:** Ninguna
 > **Fecha:** 2026-10-27
 > **Objetivo:** Que los tipos de arquitectura declarados en `/types` estén disponibles globalmente en todo el proyecto sin imports JSDoc ni directivas `/// <reference path>`.
@@ -22,9 +22,9 @@ Esta spec se crea después de haber iniciado la implementación fuera del flujo 
 - Mantener separados los tipos de arquitectura en:
     - `types/config-options-spa.d.js`.
     - `types/route-manifest.d.js`.
-    - `types/route-style.d.js`.
     - `types/route.d.js`.
     - `types/spa-route-loaded-options.d.js`.
+- Integrar `RouteStyle` en `types/route.d.js`, junto con los demás subtipos de `Route`, y eliminar `types/route-style.d.js`.
 - Mantener las extensiones DOM globales en `types/dom.d.ts`.
 - Conservar `types/global.d.ts` vacío, salvo su banner, como archivo reservado para futuras declaraciones globales.
 - Tratar los `.d.js` y `.d.ts` de `/types` como scripts ambientales, sin imports, exports ni referencias entre archivos.
@@ -49,18 +49,23 @@ Esta funcionalidad no introduce estructuras de datos de ejecución nuevas.
 
 Los `@typedef` existentes conservan sus nombres y propiedades. Solo cambia su alcance: pasan de depender de imports o referencias por archivo a estar disponibles globalmente dentro del proyecto definido por `jsconfig.json`.
 
+`RouteStyle` se mantiene como subtipo independiente, pero su declaración vive en `types/route.d.js` junto con `RouteScript`, `PageComponentEntry`, `MarkdownShikiEntry` y los demás tipos que componen `Route`.
+
 ## Implementation plan
 
-1. Convertir los archivos `types/*.d.js` en scripts ambientales eliminando `export {}` y las directivas `/// <reference path>` internas, sin modificar sus `@typedef`.
-2. Mantener `types/dom.d.ts` como declaración ambiental global y dejar `types/global.d.ts` reservado, sin exports ni referencias.
-3. Actualizar `jsconfig.json` para incluir `types/**/*.d.js`, `types/**/*.d.ts`, `src/**/*.js`, `server/**/*.js` y `*.js`, manteniendo fuera `node_modules`, `app/` y `dist/`.
-4. Eliminar las directivas `/// <reference path>` de `src/routes/`, `src/spa/spa.js`, `src/effects/effect-loading-page.js`, `src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js` y `generate-markdown-shiki.js`.
-5. Ejecutar `pnpm refresh` para regenerar `app/` y los bloques Shiki desde las fuentes.
-6. Verificar el alcance global mediante los diagnósticos del editor, búsquedas de referencias residuales, comprobaciones de sintaxis y revisión del diff.
+1. Mover el `@typedef RouteStyle` a `types/route.d.js`, junto a los demás subtipos de `Route`, y eliminar `types/route-style.d.js`.
+2. Convertir los archivos `types/*.d.js` en scripts ambientales eliminando `export {}` y las directivas `/// <reference path>` internas, sin modificar sus `@typedef`.
+3. Mantener `types/dom.d.ts` como declaración ambiental global y dejar `types/global.d.ts` reservado, sin exports ni referencias.
+4. Actualizar `jsconfig.json` para incluir `types/**/*.d.js`, `types/**/*.d.ts`, `src/**/*.js`, `server/**/*.js` y `*.js`, manteniendo fuera `node_modules`, `app/` y `dist/`.
+5. Eliminar las directivas `/// <reference path>` de `src/routes/`, `src/spa/spa.js`, `src/effects/effect-loading-page.js`, `src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js` y `generate-markdown-shiki.js`.
+6. Ejecutar `pnpm refresh` para regenerar `app/` y los bloques Shiki desde las fuentes.
+7. Verificar el alcance global mediante los diagnósticos del editor, búsquedas de referencias residuales, comprobaciones de sintaxis y revisión del diff.
 
 ## Acceptance criteria
 
 - [ ] `Route`, `RouteManifest`, `RouteStyle`, `ConfigOptionsSPA` y `WaitForFirstSpaRouteLoadedOptions` se resuelven en los consumidores incluidos por `jsconfig.json` sin `import(...)` JSDoc.
+- [ ] `RouteStyle` está declarado en `types/route.d.js` junto con los demás subtipos de `Route`.
+- [ ] `types/route-style.d.js` ya no existe.
 - [ ] No queda ninguna directiva `/// <reference path>` en `types/`, `src/`, `app/` ni `generate-markdown-shiki.js`.
 - [ ] Ningún archivo de declaraciones de `/types` contiene `import`, `export` ni `export {}`.
 - [ ] `jsconfig.json` incluye explícitamente `types/**/*.d.js`, `types/**/*.d.ts`, `src/**/*.js`, `server/**/*.js` y `*.js`.
@@ -75,7 +80,9 @@ Los `@typedef` existentes conservan sus nombres y propiedades. Solo cambia su al
 ## Decisions
 
 - **Sí:** declaraciones ambientales globales en `/types`. Son contratos compartidos por la arquitectura completa.
-- **Sí:** mantener los tipos divididos por dominio. Evita un archivo central grande y conserva la organización actual.
+- **Sí:** mantener los tipos divididos por dominio. Evita un archivo central grande.
+- **Sí:** declarar `RouteStyle` en `types/route.d.js`. Es un subtipo directo de `Route`, igual que `RouteScript`, `PageComponentEntry` y `MarkdownShikiEntry`.
+- **No:** conservar `types/route-style.d.js`. Separaría un único subtipo del resto de su dominio sin aportar aislamiento útil.
 - **Sí:** ampliar el alcance de `jsconfig.json` a `src/`, `server/` y los JavaScript raíz. Los tipos deben estar disponibles a nivel de proyecto.
 - **Sí:** conservar `types/global.d.ts` vacío como archivo reservado. Es una decisión explícita aunque actualmente sea redundante.
 - **Sí:** conservar sin commit la implementación iniciada antes de esta spec y revisarla posteriormente contra sus criterios.
