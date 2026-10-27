@@ -1,19 +1,19 @@
 /*
-    *  --------------------------------------------------------  *
-    *  -----  /route-types.js  --  /types/route-types.js  -----  *
-    *  --------------------------------------------------------  *
+    *  -------------------------------------------  *
+    *  -----  route.js  --  /types/route.js  -----  *
+    *  -------------------------------------------  *
 */
 
 
-//  ----------  Esto asegura que VS Code lo trate como módulo  ----------
-export { };
+//  -----  marcar el archivo como módulo para que vs code lo trate como tal  -----
+export {};
 
 
 /**
  * -------------------------------
  * -----  `RouteComponents`  -----
  * -------------------------------
- * @typedef {Record<string, string|undefined>} RouteComponents - Mapa de componentes HTML a cargar dinámicamente. 
+ * @typedef {Record<string, string|undefined>} RouteComponents - Mapa de componentes HTML a cargar dinámicamente.
  *                                                               Cada valor puede ser string o undefined.
  */
 
@@ -53,9 +53,9 @@ export { };
 
 
 /**
- * ---------------------------------
+ * ----------------------------------
  * -----  `PageComponentEntry`  -----
- * ---------------------------------
+ * ----------------------------------
  * @typedef {Object} PageComponentEntry - Entrada de componente HTML que se renderiza dentro de la página actual.
  *                                        A diferencia de `components` (que pueblan regiones del layout mediante ID),
  *                                          `pagesComponents` inyecta HTML en contenedores de la propia vista usando selectores CSS arbitrarios.
