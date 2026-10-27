@@ -5,9 +5,6 @@
 */
 
 
-/// <reference path="./route-style.d.js" />
-
-
 /**
  * -------------------------------
  * -----  `RouteComponents`  -----

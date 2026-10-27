@@ -5,13 +5,6 @@
 */
 
 
-/// <reference path="../../../../types/route-manifest.d.js" />
-/// <reference path="../../../../types/route-style.d.js" />
-/// <reference path="../../../../types/route.d.js" />
-/// <reference path="../../../../types/config-options-spa.d.js" />
-
-
-
 /**
  * --------------------------------------------------
  * -----  `spaLoaderContentHtml(options = {})`  -----
