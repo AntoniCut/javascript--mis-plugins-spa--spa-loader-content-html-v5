@@ -156,7 +156,7 @@ echo "==> Deploy completado."
 - [x] El script falla con mensaje claro si `dist/` no existe tras el build (`Error: no existe la carpeta 'dist'...`).
 - [x] `grep -n "env.production" deploy.sh` no devuelve nada: no hay bloque de subida de entorno.
 - [x] `pnpm build`, `pnpm refresh` y `pnpm dev` siguen funcionando igual (la spec no los toca).
-- [ ] (Verificación manual, fuera de la implementación) `./deploy.sh` sube `dist/` y el sitio responde en `https://javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5/`.
+- [x] (Verificación manual, fuera de la implementación) `./deploy.sh` sube `dist/` y el sitio responde en `https://javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5/`.
 
 ## Decisions
 
