@@ -18,3 +18,6 @@ Thumbs.db
 
 # Workflow de prompts
 workflows/
+
+# Deploy local (IP y rutas del VPS)
+deploy.sh
