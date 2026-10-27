@@ -1,6 +1,6 @@
 # SPEC 02 — Base URL desde variables de entorno
 
-> **Estado:** Aprovado
+> **Estado:** Implementada
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-10-26
 > **Objetivo:** Que el prefijo `/mis-plugins-spa/spa-loader-content-html-v5` se escriba una sola vez, en `.env` como `SITE_BASE`, y que el resto del proyecto lo lea de ahí en lugar de tenerlo copiado en 8 archivos.

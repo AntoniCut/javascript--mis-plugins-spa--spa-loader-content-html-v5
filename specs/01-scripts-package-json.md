@@ -54,13 +54,13 @@ Cada PNG de `assets/img/clase-*/*.png` produce dos AVIF junto al original: `{ste
 
 ## Acceptance criteria
 
-- [ ] `package.json` → `scripts.convert-images` es `gulp convertImages`.
-- [ ] `package.json` → `scriptsDoc.convert-images` es `Convierte las capturas PNG de assets/img/clase-* a AVIF.`
-- [ ] `package.json` → `scripts.code-highlight` sigue siendo `gulp styles && node generate-markdown-shiki.js`.
-- [ ] Las demás claves de `scripts` no cambian: `dev`, `dev:watch`, `reset`, `refresh`, `serve:dev`, `stop:dev`, `server`, `build`, `preview`, `add:ts-nocheck`, `test`.
-- [ ] `pnpm convert-images`, sin PNG en `assets/img/clase-*`, termina con código 0 y escribe `No hay PNG en assets/img/clase-*`.
-- [ ] `README.md` lista `pnpm convert-images` en la tabla de scripts.
-- [ ] `sharp` está en `devDependencies`.
+- [x] `package.json` → `scripts.convert-images` es `gulp convertImages`.
+- [x] `package.json` → `scriptsDoc.convert-images` es `Convierte las capturas PNG de assets/img/clase-* a AVIF.`
+- [x] `package.json` → `scripts.code-highlight` sigue siendo `gulp styles && node generate-markdown-shiki.js`.
+- [x] Las demás claves de `scripts` no cambian: `dev`, `dev:watch`, `reset`, `refresh`, `serve:dev`, `stop:dev`, `server`, `build`, `preview`, `add:ts-nocheck`, `test`.
+- [x] `pnpm convert-images`, sin PNG en `assets/img/clase-*`, termina con código 0 y escribe `No hay PNG en assets/img/clase-*`.
+- [x] `README.md` lista `pnpm convert-images` en la tabla de scripts.
+- [x] `sharp` está en `devDependencies`.
 
 ## Decisions
 
