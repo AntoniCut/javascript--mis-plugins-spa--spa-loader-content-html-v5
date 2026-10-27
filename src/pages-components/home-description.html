@@ -276,8 +276,8 @@
                     <code>pnpm dev</code> lanza Gulp watch y un servidor Express con fallback
                     SPA, archivos estáticos bajo la base del proyecto, soporte
                     <code>php-cgi</code> y proxy BrowserSync con live reload en
-                    <code>app/</code> e <code>index.html</code> (puerto configurable con
-                    <code>DEV_SERVER_PORT</code>).
+                    <code>app/</code> e <code>index.html</code> (puerto de partida con
+                    <code>DEV_SERVER_PORT</code>; si está ocupado usa el siguiente libre).
                 </p>
             </article>
 
@@ -298,8 +298,8 @@
                 <p class="home-page__feature-text">
                     <code>pnpm preview</code> sirve el contenido de <code>dist/</code> con
                     Express, fallback SPA y la misma base de rutas que en desarrollo. Permite
-                    validar el build minificado antes de publicar (puerto
-                    <code>PREVIEW_SERVER_PORT</code>, por defecto 4173).
+                    validar el build minificado antes de publicar (puerto de partida
+                    <code>PREVIEW_SERVER_PORT</code>, por defecto 4173; si está ocupado usa el siguiente libre).
                 </p>
             </article>
 
