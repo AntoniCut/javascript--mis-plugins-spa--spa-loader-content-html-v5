@@ -8,12 +8,12 @@
 import 'dotenv/config';
 
 import { base } from '../src/config/site-base.js';
+import { findAvailablePort } from './find-available-port.js';
 
 import browserSync from 'browser-sync';
 import express from 'express';
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
-import net from 'node:net';
 import path from 'node:path';
 
 
@@ -21,7 +21,7 @@ import path from 'node:path';
 /** - Prefijo URL que usa el base href del proyecto (SITE_BASE del .env). */
 const DEV_ROUTE_BASE = base;
 
-/** - Puerto público del servidor de desarrollo. */
+/** - Puerto de partida del servidor de desarrollo (DEV_SERVER_PORT del .env). Si está ocupado se usa el siguiente libre. */
 const DEV_SERVER_PORT = Number(process.env.DEV_SERVER_PORT || 3000);
 
 /** - Raíz real del proyecto. */
@@ -272,45 +272,26 @@ const makePhpHandler = (rootDir, serverPort) => (req, res, next) => {
 
 
 
-/**
- * -------------------------------------------------
- * -----  `assertPortAvailable(port)`  -----
- * -------------------------------------------------
- * - Verifica que el puerto público solicitado para BrowserSync esté libre.
- * @param {number} port
- * @returns {Promise<void>}
- */
+/** - Puerto público real: el primero libre a partir de DEV_SERVER_PORT. */
+let devServerPort;
 
-const assertPortAvailable = (port) => new Promise((resolve, reject) => {
+//  -----  Resolver el puerto público antes de registrar middlewares, porque php-cgi necesita el puerto real  -----
+try {
 
-    /** - Servidor temporal para comprobar disponibilidad del puerto */
-    const probeServer = net.createServer();
+    //  -----  Busca el primer puerto libre desde el de partida  -----
+    devServerPort = await findAvailablePort(DEV_SERVER_PORT, { envName: 'DEV_SERVER_PORT' });
 
-    probeServer.unref();
+} catch (error) {
 
-    probeServer.once('error', (error) => {
+    //  -----  No hay puerto libre o el valor del .env no es válido  -----
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+}
 
-        if (error.code === 'EADDRINUSE') {
-            reject(new Error(`El puerto público ${port} ya está en uso. Cierra la instancia anterior del servidor de desarrollo o cambia DEV_SERVER_PORT.`));
-            return;
-        }
-
-        reject(error);
-    });
-
-    probeServer.once('listening', () => {
-        probeServer.close((error) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-
-            resolve();
-        });
-    });
-
-    probeServer.listen(port);
-});
+//  -----  Avisar cuando el puerto cambia respecto al configurado  -----
+if (devServerPort !== DEV_SERVER_PORT) {
+    console.log(`El puerto ${DEV_SERVER_PORT} está ocupado. Se usa el ${devServerPort}.`);
+}
 
 
 
@@ -318,7 +299,7 @@ const assertPortAvailable = (port) => new Promise((resolve, reject) => {
 app.use(redirectRootToBase);
 
 //  -----  Middleware para ejecutar archivos PHP via php-cgi  -----
-app.use(makePhpHandler(PROJECT_ROOT, DEV_SERVER_PORT));
+app.use(makePhpHandler(PROJECT_ROOT, devServerPort));
 
 //  -----  Middleware para servir archivos estáticos desde la raíz del proyecto con el prefijo de ruta  -----
 app.use(DEV_ROUTE_BASE, express.static(PROJECT_ROOT, { index: false }));
@@ -330,16 +311,6 @@ app.use(serveSpaFallback);
 app.use((req, res) => {
     res.status(404).send(`Cannot ${req.method} ${req.originalUrl}`);
 });
-
-
-
-//  -----  Verificar que el puerto público esté disponible antes de iniciar el servidor  -----
-try {
-    await assertPortAvailable(DEV_SERVER_PORT);
-} catch (error) {
-    console.error(error instanceof Error ? error.message : error);
-    process.exit(1);
-}
 
 
 
@@ -371,7 +342,7 @@ const internalServer = app.listen(0, '127.0.0.1', () => {
     bs.init({
         
         proxy: `http://127.0.0.1:${address.port}`,
-        port: DEV_SERVER_PORT,
+        port: devServerPort,
         open: false,
         notify: false,
         ui: false,

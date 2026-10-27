@@ -27,8 +27,10 @@ Copia `.env.example` a `.env` antes de arrancar. `SITE_BASE` es obligatoria.
 | Variable | Descripción |
 |---|---|
 | `SITE_BASE` | Base pública del sitio, por ejemplo `/mis-plugins-spa/spa-loader-content-html-v5`. Empieza por `/` y no termina en `/`. La leen los servidores, Gulp (Sass y build) y la SPA. |
-| `DEV_SERVER_PORT` | Puerto de `pnpm dev`. Por defecto `3000`. |
-| `PREVIEW_SERVER_PORT` | Puerto de `pnpm preview`. Por defecto `4173`. |
+| `DEV_SERVER_PORT` | Puerto de partida de `pnpm dev`. Por defecto `3000`. Si está ocupado se usa el siguiente libre (+1, +2…, hasta 20 intentos) y se avisa por consola. |
+| `PREVIEW_SERVER_PORT` | Puerto de partida de `pnpm preview`. Por defecto `4173`. Mismo comportamiento que `DEV_SERVER_PORT`. |
+
+`pnpm stop:dev` busca en ese mismo rango de puertos y solo detiene el `server/dev-server.js` que corre desde este proyecto.
 
 `index.html` y `.htaccess` llevan el marcador `%SITE_BASE%`. El servidor de desarrollo lo sustituye al servir y `pnpm build` lo sustituye en `dist/index.html` y `dist/.htaccess`. En el navegador, `src/config/site-base.js` deduce la base de `<base href>`.
 

@@ -7,7 +7,10 @@
 
 import 'dotenv/config';
 
+import { getPortRange } from './find-available-port.js';
+
 import { execFile } from 'node:child_process';
+import fs from 'node:fs/promises';
 import { promisify } from 'node:util';
 
 
@@ -15,11 +18,14 @@ import { promisify } from 'node:util';
 /** - Ejecuta comandos del sistema y retorna su salida estándar. */
 const execFileAsync = promisify(execFile);
 
-/** - Puerto público configurado para BrowserSync. */
+/** - Puerto de partida configurado para BrowserSync (DEV_SERVER_PORT del .env). */
 const DEV_SERVER_PORT = Number(process.env.DEV_SERVER_PORT || 3000);
 
-/** - Puertos probables usados por BrowserSync y su socket. */
-const DEV_SERVER_PORTS = [DEV_SERVER_PORT, DEV_SERVER_PORT + 1];
+/** - Puertos candidatos: el de partida y los siguientes que prueba dev-server.js si está ocupado. */
+const DEV_SERVER_PORTS = getPortRange(DEV_SERVER_PORT);
+
+/** - Directorio del proyecto actual; solo se detiene el servidor que corre desde aquí. */
+const PROJECT_ROOT = process.cwd();
 
 
 
@@ -101,6 +107,30 @@ const getProcessCommand = async (processId) => {
 
 
 /**
+ * -------------------------------------------
+ * -----  `getProcessCwd(processId)`  -----
+ * -------------------------------------------
+ * - Lee el directorio de trabajo de un PID (Linux: /proc/<pid>/cwd).
+ * - Devuelve una cadena vacía si no se puede leer.
+ * @param {number} processId
+ * @returns {Promise<string>}
+ */
+
+const getProcessCwd = async (processId) => {
+
+    //  -----  intenta resolver el enlace simbólico del cwd  -----
+    try {
+        return await fs.readlink(`/proc/${processId}/cwd`);
+    } catch {
+
+        //  -----  sin permiso o proceso ya terminado: se trata como ajeno  -----
+        return '';
+    }
+};
+
+
+
+/**
  * ------------------------------------------------------
  * -----  `waitForProcessIdsToLeavePorts(...)`  -----
  * ------------------------------------------------------
@@ -144,7 +174,7 @@ const main = async () => {
     const processIds = await getProcessIdsListeningOnPorts(DEV_SERVER_PORTS);
 
     if (processIds.length === 0) {
-        console.log(`No hay ninguna instancia activa de server/dev-server.js escuchando en los puertos ${DEV_SERVER_PORTS.join(' o ')}.`);
+        console.log(`No hay ninguna instancia activa de server/dev-server.js escuchando entre los puertos ${DEV_SERVER_PORTS[0]} y ${DEV_SERVER_PORTS[DEV_SERVER_PORTS.length - 1]}.`);
         return;
     }
 
@@ -159,7 +189,11 @@ const main = async () => {
 
         const command = await getProcessCommand(processId);
 
-        if (command.includes('server/dev-server.js')) {
+        /** - Directorio desde el que corre ese proceso */
+        const cwd = await getProcessCwd(processId);
+
+        //  -----  solo cuenta como propia la instancia de dev-server.js de este proyecto  -----
+        if (command.includes('server/dev-server.js') && cwd === PROJECT_ROOT) {
             devServerProcessIds.push(processId);
             continue;
         }
@@ -169,7 +203,7 @@ const main = async () => {
 
 
     if (devServerProcessIds.length === 0) {
-        console.error('No se encontró ninguna instancia de server/dev-server.js para detener.');
+        console.error('No se encontró ninguna instancia de server/dev-server.js de este proyecto para detener.');
 
         if (foreignProcesses.length > 0) {
             console.error('Los puertos inspeccionados están ocupados por otros procesos:');

@@ -1,6 +1,6 @@
 # SPEC 03 — Puerto libre automático en dev-server y preview-server
 
-> **Estado:** Aprovado
+> **Estado:** Implementado
 > **Depende de:** SPEC 02
 > **Fecha:** 2026-10-27
 > **Objetivo:** Que `pnpm dev` y `pnpm preview` no fallen cuando su puerto está ocupado por otro proyecto: el puerto de `.env` pasa a ser el de partida y, si está ocupado, se prueba el siguiente (+1, +2, …) hasta encontrar uno libre.
@@ -86,17 +86,19 @@ Reglas:
 
 ## Acceptance criteria
 
-- [ ] Con el puerto 3000 libre, `pnpm dev` sirve en `http://localhost:3000{SITE_BASE}/` y no imprime avisos de cambio de puerto.
-- [ ] Con el 3000 ocupado por otro proceso, `pnpm dev` sirve en el 3001, imprime el aviso `El puerto 3000 está ocupado. Se usa el 3001.` y la SPA carga y navega sin 404 en la consola.
-- [ ] Con 3000 y 3001 ocupados, usa el 3002.
-- [ ] Con todo el rango ocupado (20 puertos), `pnpm serve:dev` termina con código distinto de 0 y un mensaje que nombra `DEV_SERVER_PORT` y el rango.
-- [ ] Lo mismo para `pnpm preview` con `PREVIEW_SERVER_PORT` (4173 → 4174) y la URL impresa lleva el puerto real.
-- [ ] Una petición POST a `…/app/services/mysql/query.php` en el puerto desplazado funciona y `SERVER_PORT` de CGI coincide con el puerto real.
-- [ ] Dos copias del proyecto (u otro proyecto con `server/dev-server.js`) corriendo a la vez: cada una toma un puerto distinto y ninguna falla al arrancar.
-- [ ] `pnpm stop:dev` en un proyecto detiene **solo** su servidor, aunque el otro proyecto escuche en un puerto del mismo rango.
-- [ ] `pnpm stop:dev` sin servidor activo imprime el mensaje actual de «no hay ninguna instancia» y termina con código 0.
+- [x] Con el puerto 3000 libre, `pnpm dev` sirve en `http://localhost:3000{SITE_BASE}/` y no imprime avisos de cambio de puerto.
+- [x] Con el 3000 ocupado por otro proceso, `pnpm dev` sirve en el 3001, imprime el aviso `El puerto 3000 está ocupado. Se usa el 3001.` y la SPA carga y navega sin 404 en la consola.
+- [x] Con 3000 y 3001 ocupados, usa el 3002.
+- [x] Con todo el rango ocupado (20 puertos), `pnpm serve:dev` termina con código distinto de 0 y un mensaje que nombra `DEV_SERVER_PORT` y el rango.
+- [x] Lo mismo para `pnpm preview` con `PREVIEW_SERVER_PORT` (4173 → 4174) y la URL impresa lleva el puerto real.
+- [ ] (No aplica en este proyecto: no tiene `app/services/`; el puerto real llega a `makePhpHandler`) Una petición POST a `…/app/services/mysql/query.php` en el puerto desplazado funciona y `SERVER_PORT` de CGI coincide con el puerto real.
+- [x] Dos copias del proyecto (u otro proyecto con `server/dev-server.js`) corriendo a la vez: cada una toma un puerto distinto y ninguna falla al arrancar.
+- [x] `pnpm stop:dev` en un proyecto detiene **solo** su servidor, aunque el otro proyecto escuche en un puerto del mismo rango.
+- [x] `pnpm stop:dev` sin servidor activo imprime el mensaje actual de «no hay ninguna instancia» y termina con código 0.
 - [ ] `pnpm dev`, `pnpm build`, `pnpm refresh` y `pnpm code-highlight` siguen funcionando igual.
-- [ ] `.env.example` y `README.md` describen ambas variables como puerto de partida.
+- [x] `.env.example` y `README.md` describen ambas variables como puerto de partida.
+
+> **Nota de verificación:** los puertos del `.env` local de este proyecto no son 3000/4173, así que las pruebas se hicieron con el puerto de partida real ocupado por un proceso temporal (dev: +1; preview: +1). El rango completo ocupado y los puertos 3000/3001 se comprobaron directamente sobre `findAvailablePort()`. `pnpm build`, `pnpm refresh` y `pnpm code-highlight` no se tocan en esta spec y no se han vuelto a ejecutar.
 
 ## Decisions
 
