@@ -31,8 +31,6 @@ import 'dotenv/config';
 import { base } from './src/config/site-base.js';
 
 
-/** @typedef {import('./types/index.js').Route} Route */
-/** @typedef {import('./types/index.js').MarkdownShikiEntry} MarkdownShikiEntry */
 /** @typedef {Record<string, Route>} RouteModule */
 
 

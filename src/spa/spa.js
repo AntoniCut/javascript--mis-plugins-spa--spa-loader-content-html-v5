@@ -31,7 +31,7 @@ export const spa = () => {
     console.log('\n');
 
 
-    /** @type {import("../../types/index.js").ConfigOptionsSPA} - `configuración para el plugin spa-loader-content-html.js (lazy loading con manifest)` */
+    /** @type {ConfigOptionsSPA} - `configuración para el plugin spa-loader-content-html.js (lazy loading con manifest)` */
     const configOptionsSpa = {
         routeManifest,
         routeModulesBase: `${base}/app/routes`,
