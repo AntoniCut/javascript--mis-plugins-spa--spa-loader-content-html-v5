@@ -1,12 +1,21 @@
 /*
-    *  -----  /route-00-home.js  --  /src/routes/route-00-home.js  -----
+    *  ----------------------------------------------------------------  *
+    *  -----  route-00-home.js  --  /src/routes/route-00-home.js  -----  *
+    *  ----------------------------------------------------------------  *
 */
 
 import { paths } from './paths.js';
 
+/** - `urls base de las carpetas de app/ tomadas de paths.js` */
 const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShikiHtml, layoutFooter, styles, scripts, pluginsSource } = paths;
 
-/** @type {import("../../types/index.js").Route} */
+/**
+ * ------------------------------
+ * -----  `route00Home {}`  -----
+ * ------------------------------
+ * - `ruta de la vista: shell, componentes, bloques shiki, estilos y scripts que carga el plugin`
+ * @type {import("../../types/index.js").Route}
+ */
 export const route00Home = {
     id: 'home',
     favicon: `${favicon}/javascript-favicon.ico`,

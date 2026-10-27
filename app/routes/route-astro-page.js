@@ -1,14 +1,21 @@
 /*
-    *  -----------------------------------------------------------------------  *
-    *  -----  /route-astro-page.js  --  /src/routes/route-astro-page.js  -----  *
-    *  -----------------------------------------------------------------------  *
+    *  ----------------------------------------------------------------------  *
+    *  -----  route-astro-page.js  --  /src/routes/route-astro-page.js  -----  *
+    *  ----------------------------------------------------------------------  *
 */
 
 import { paths } from './paths.js';
 
+/** - `urls base de las carpetas de app/ tomadas de paths.js` */
 const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShikiHtml, layoutFooter, styles, scripts, scssPages } = paths;
 
-/** @type {import("../../types/index.js").Route} */
+/**
+ * ---------------------------------
+ * -----  `routeAstroPage {}`  -----
+ * ---------------------------------
+ * - `ruta de la vista: shell, componentes, bloques shiki, estilos y scripts que carga el plugin`
+ * @type {import("../../types/index.js").Route}
+ */
 export const routeAstroPage = {
     id: 'astroPage',
     favicon: `${favicon}/astro-official.svg`,

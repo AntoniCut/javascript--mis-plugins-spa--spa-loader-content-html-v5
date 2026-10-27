@@ -1,14 +1,14 @@
 /*
-    *  ----------------------------------------------------------------------------------  *
-    *  -----  /config-options-spa-types.js  --  /types/config-options-spa-types.js  -----  *
-    *  ----------------------------------------------------------------------------------  *
+    *  ---------------------------------------------------------------------  *
+    *  -----  config-options-spa.js  --  /types/config-options-spa.js  -----  *
+    *  ---------------------------------------------------------------------  *
 */
 
 /** @typedef {import('./route-manifest.js').RouteManifest} RouteManifest */
 
 
-//  ----------  Esto asegura que VS Code lo trate como módulo  ----------
-export {}; 
+//  -----  marcar el archivo como módulo para que vs code lo trate como tal  -----
+export {};
 
 
 /**

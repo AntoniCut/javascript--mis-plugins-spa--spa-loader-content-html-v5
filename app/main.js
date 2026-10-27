@@ -1,15 +1,15 @@
 /*
-    *  ----------------------------------------  *
-    *  -----  /main.js  --  /src/main.js  -----  *
-    *  ----------------------------------------  *
+    *  ---------------------------------------  *
+    *  -----  main.js  --  /src/main.js  -----  *
+    *  ---------------------------------------  *
 */
 
 import { effectLoadingPage } from './effects/effect-loading-page.js';
 import { spa } from './spa/spa.js';
 
 
-//  ----------  Efecto de Carga para la Página  ----------
+//  -----  lanzar el efecto de carga de la página  -----
 effectLoadingPage();
 
-//  ----------  Inicialización de la SPA  ----------
+//  -----  inicializar la spa con el plugin spa-loader-content-html  -----
 spa();

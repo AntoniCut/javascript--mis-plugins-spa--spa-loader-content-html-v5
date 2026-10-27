@@ -1,7 +1,8 @@
 /*
-    *  -------------------------------------------------  *
-    *  -----  /paths.js  --  /src/routes/paths.js  -----  *
-    *  -------------------------------------------------  */
+    *  ------------------------------------------------  *
+    *  -----  paths.js  --  /src/routes/paths.js  -----  *
+    *  ------------------------------------------------  *
+*/
 
 
 import { base } from '../config/site-base.js';
@@ -11,7 +12,12 @@ import { base } from '../config/site-base.js';
 export { base };
 
 
-/** - `path para las rutas del curso de TypeScript` */
+/**
+ * ------------------------
+ * -----  `paths {}`  -----
+ * ------------------------
+ * - `urls de las carpetas que usan las rutas (apuntan a app/, no a src/)`
+ */
 export const paths = {
     favicon: `${base}/assets/favicon`,
     layoutHeader: `${base}/app/components/layouts/layout-header.html`,

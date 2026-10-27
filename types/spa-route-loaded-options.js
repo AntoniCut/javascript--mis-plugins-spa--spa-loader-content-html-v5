@@ -1,12 +1,12 @@
 /*
-    *  ----------------------------------------------------------------------------------  *
-    *  -----  /config-options-spa-types.js  --  /types/config-options-spa-types.js  -----  *
-    *  ----------------------------------------------------------------------------------  *
+    *  ---------------------------------------------------------------------------------  *
+    *  -----  spa-route-loaded-options.js  --  /types/spa-route-loaded-options.js  -----  *
+    *  ---------------------------------------------------------------------------------  *
 */
 
 
-//  ----------  Esto asegura que VS Code lo trate como módulo  ----------
-export {}; 
+//  -----  marcar el archivo como módulo para que vs code lo trate como tal  -----
+export {};
 
 
 /**

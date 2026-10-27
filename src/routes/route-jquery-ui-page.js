@@ -1,12 +1,21 @@
 /*
-    *  -----  /route-jquery-ui-page.js  --  /src/routes/route-jquery-ui-page.js  -----
+    *  ------------------------------------------------------------------------------  *
+    *  -----  route-jquery-ui-page.js  --  /src/routes/route-jquery-ui-page.js  -----  *
+    *  ------------------------------------------------------------------------------  *
 */
 
 import { paths } from './paths.js';
 
+/** - `urls base de las carpetas de app/ tomadas de paths.js` */
 const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShikiHtml, layoutFooter, styles, scripts, scssPages } = paths;
 
-/** @type {import("../../types/index.js").Route} */
+/**
+ * ------------------------------------
+ * -----  `routeJqueryUiPage {}`  -----
+ * ------------------------------------
+ * - `ruta de la vista: shell, componentes, bloques shiki, estilos y scripts que carga el plugin`
+ * @type {import("../../types/index.js").Route}
+ */
 export const routeJqueryUiPage = {
     id: 'jqueryUiPage',
     favicon: `${favicon}/jquery-ui-icon.svg`,
