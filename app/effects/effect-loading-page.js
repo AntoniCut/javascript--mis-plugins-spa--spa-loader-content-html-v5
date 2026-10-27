@@ -4,7 +4,6 @@
     *  -----------------------------------------------------------------------------  *
 */
 
-/** @typedef {import('../../types/index.js').WaitForFirstSpaRouteLoadedOptions} WaitForFirstSpaRouteLoadedOptions */
 
 
 

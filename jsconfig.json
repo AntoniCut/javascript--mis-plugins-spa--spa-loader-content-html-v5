@@ -10,11 +10,13 @@
             "DOM"
         ],
         "moduleResolution": "bundler"
-        
     },
     "include": [
-        "types",
-        "src/**/*"
+        "types/**/*.d.js",
+        "types/**/*.d.ts",
+        "src/**/*.js",
+        "server/**/*.js",
+        "*.js"
     ],
     "exclude": [
         "node_modules"

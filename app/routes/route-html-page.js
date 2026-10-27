@@ -4,6 +4,7 @@
     *  --------------------------------------------------------------------  *
 */
 
+
 import { paths } from './paths.js';
 
 /** - `urls base de las carpetas de app/ tomadas de paths.js` */
@@ -14,7 +15,7 @@ const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShi
  * -----  `routeHtmlPage {}`  -----
  * --------------------------------
  * - `ruta de la vista: shell, componentes, bloques shiki, estilos y scripts que carga el plugin`
- * @type {import("../../types/index.js").Route}
+ * @type {Route}
  */
 export const routeHtmlPage = {
     id: 'htmlPage',

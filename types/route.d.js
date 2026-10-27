@@ -5,15 +5,21 @@
 */
 
 
-/// <reference path="./route-style.d.js" />
-
-
 /**
  * -------------------------------
  * -----  `RouteComponents`  -----
  * -------------------------------
  * @typedef {Record<string, string|undefined>} RouteComponents - Mapa de componentes HTML a cargar dinámicamente.
  *                                                               Cada valor puede ser string o undefined.
+ */
+
+
+/**
+ * --------------------------
+ * -----  `RouteStyle`  -----
+ * --------------------------
+ * @typedef {Object} RouteStyle - Representa una hoja de estilos que debe cargarse dinámicamente.
+ * @property {string} href - Ruta absoluta o relativa del archivo CSS.
  */
 
 

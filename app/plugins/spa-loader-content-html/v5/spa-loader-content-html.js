@@ -5,13 +5,6 @@
 */
 
 
-/// <reference path="../../../../types/route-manifest.d.js" />
-/// <reference path="../../../../types/route-style.d.js" />
-/// <reference path="../../../../types/route.d.js" />
-/// <reference path="../../../../types/config-options-spa.d.js" />
-
-
-
 /**
  * --------------------------------------------------
  * -----  `spaLoaderContentHtml(options = {})`  -----
@@ -168,16 +161,23 @@ export const spaLoaderContentHtml = (options = {}) => {
                     initialPathname
                 );
 
-            } catch (e) {
-//  -----  si falla la carga inicial, cargar la ruta 404  -----
-
+            } 
+            
+            
+            //  -----  si falla la carga inicial, cargar la ruta 404  -----
+            catch (e) {
+                
                 //  -----  cargar la ruta 404  -----
                 await loadNotFoundRoute('init');
             }
 
-        } else {
+        } 
+        
+        
+        //  -----  si no hay entrada en el manifest, intentar cargar la ruta 404  -----
+        else {
 
-            //  -----  si no hay entrada en el manifest, intentar cargar la ruta 404  -----
+            //  -----  cargar la ruta 404  -----
             await loadNotFoundRoute('init');
 
             //  -----  reemplazar el estado del historial con la ruta inicial para evitar duplicados en el historial  -----
@@ -368,8 +368,12 @@ export const spaLoaderContentHtml = (options = {}) => {
             //  -----  devolver la ruta importada  -----
             return route;
 
-        } catch (e) {
-            //  -----  si el import falla, mostrar el error y registrar el módulo como roto  -----
+        } 
+        
+        //  -----  si el import falla  -----
+        catch (e) {
+            
+            //  -----  mostrar el error de importación  -----
             console.error(`❌ Error importando módulo de ruta: ${file}`, e);
 
             //  -----  registrar el módulo como roto para no reintentar import() en futuras navegaciones  -----
@@ -454,9 +458,13 @@ export const spaLoaderContentHtml = (options = {}) => {
                 //  -----  notificar que no se pudo importar la ruta 404  -----
                 notifyRouteLoadError(undefined, new Error('No se pudo importar la ruta 404.'), source);
 
-        } catch (e) {
-//  -----  si falla el import de la ruta 404, notificar el error  -----
+        } 
+        
+        
+        //  -----  si falla el import de la ruta 404  -----
+        catch (e) {
 
+            //  -----  Notificar el error de importación de la ruta 404  -----
             notifyRouteLoadError(undefined, new Error('Error importando ruta 404.'), source);
         }
 
@@ -585,7 +593,7 @@ export const spaLoaderContentHtml = (options = {}) => {
      * - Notifica que una ruta SPA terminó de renderizarse.
      * - Emite `spa:route-loaded` en cada navegación.
      * - Emite `spa:first-route-loaded` una sola vez en la primera carga.
-    * @param {Route} route - Ruta que se ha cargado, para incluir detalles en los eventos emitidos.
+     * @param {Route} route - Ruta que se ha cargado, para incluir detalles en los eventos emitidos.
      */
 
     const notifyRouteLoaded = (route) => {

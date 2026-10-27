@@ -1,23 +1,4 @@
-<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#6A9955">/// </span><span style="color:#808080">&#x3C;</span><span style="color:#569CD6">reference</span><span style="color:#9CDCFE"> path</span><span style="color:#D4D4D4">=</span><span style="color:#CE9178">"../../../../types/route-manifest.d.js"</span><span style="color:#808080"> /></span></span>
-<span class="line"><span style="color:#6A9955">/// </span><span style="color:#808080">&#x3C;</span><span style="color:#569CD6">reference</span><span style="color:#9CDCFE"> path</span><span style="color:#D4D4D4">=</span><span style="color:#CE9178">"../../../../types/route-style.d.js"</span><span style="color:#808080"> /></span></span>
-<span class="line"><span style="color:#6A9955">/// </span><span style="color:#808080">&#x3C;</span><span style="color:#569CD6">reference</span><span style="color:#9CDCFE"> path</span><span style="color:#D4D4D4">=</span><span style="color:#CE9178">"../../../../types/route.d.js"</span><span style="color:#808080"> /></span></span>
-<span class="line"><span style="color:#6A9955">/// </span><span style="color:#808080">&#x3C;</span><span style="color:#569CD6">reference</span><span style="color:#9CDCFE"> path</span><span style="color:#D4D4D4">=</span><span style="color:#CE9178">"../../../../types/config-options-spa.d.js"</span><span style="color:#808080"> /></span></span>
-<span class="line"></span>
-<span class="line"></span>
-<span class="line"></span>
-<span class="line"><span style="color:#6A9955">/**</span></span>
-<span class="line"><span style="color:#6A9955"> * --------------------------------------------------</span></span>
-<span class="line"><span style="color:#6A9955"> * -----  `spaLoaderContentHtml(options = {})`  -----</span></span>
-<span class="line"><span style="color:#6A9955"> * --------------------------------------------------</span></span>
-<span class="line"><span style="color:#6A9955"> *</span></span>
-<span class="line"><span style="color:#6A9955"> * - `Plugin para cargar contenido HTML dinámicamente en una SPA`</span></span>
-<span class="line"><span style="color:#6A9955"> *</span></span>
-<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@version</span><span style="color:#9CDCFE"> 5.0.0</span></span>
-<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@author</span><span style="color:#4EC9B0"> Antonio Francisco Cutillas García</span></span>
-<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Partial&#x3C;ConfigOptionsSPA>}</span><span style="color:#9CDCFE"> [options</span><span style="color:#D4D4D4">=</span><span style="color:#9CDCFE">{}]</span><span style="color:#6A9955"> - Opciones de configuración.</span></span>
-<span class="line"><span style="color:#6A9955"> */</span></span>
-<span class="line"></span>
-<span class="line"><span style="color:#C586C0">export</span><span style="color:#569CD6"> const</span><span style="color:#DCDCAA"> spaLoaderContentHtml</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">options</span><span style="color:#D4D4D4"> = {}) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#C586C0">export</span><span style="color:#569CD6"> const</span><span style="color:#DCDCAA"> spaLoaderContentHtml</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">options</span><span style="color:#D4D4D4"> = {}) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {Window &#x26; { __spaFirstRouteLoaded?: boolean }}</span><span style="color:#6A9955"> - `Referencia al objeto window del navegador` */</span></span>
@@ -161,16 +142,23 @@
 <span class="line"><span style="color:#9CDCFE">                    initialPathname</span></span>
 <span class="line"><span style="color:#D4D4D4">                );</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#D4D4D4">            } </span><span style="color:#C586C0">catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
-<span class="line"><span style="color:#6A9955">//  -----  si falla la carga inicial, cargar la ruta 404  -----</span></span>
-<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">            } </span></span>
+<span class="line"><span style="color:#D4D4D4">            </span></span>
+<span class="line"><span style="color:#D4D4D4">            </span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  si falla la carga inicial, cargar la ruta 404  -----</span></span>
+<span class="line"><span style="color:#C586C0">            catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#D4D4D4">                </span></span>
 <span class="line"><span style="color:#6A9955">                //  -----  cargar la ruta 404  -----</span></span>
 <span class="line"><span style="color:#C586C0">                await</span><span style="color:#DCDCAA"> loadNotFoundRoute</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'init'</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"><span style="color:#D4D4D4">            }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#D4D4D4">        } </span><span style="color:#C586C0">else</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#D4D4D4">        } </span></span>
+<span class="line"><span style="color:#D4D4D4">        </span></span>
+<span class="line"><span style="color:#D4D4D4">        </span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  si no hay entrada en el manifest, intentar cargar la ruta 404  -----</span></span>
+<span class="line"><span style="color:#C586C0">        else</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  si no hay entrada en el manifest, intentar cargar la ruta 404  -----</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  cargar la ruta 404  -----</span></span>
 <span class="line"><span style="color:#C586C0">            await</span><span style="color:#DCDCAA"> loadNotFoundRoute</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'init'</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  reemplazar el estado del historial con la ruta inicial para evitar duplicados en el historial  -----</span></span>
@@ -361,8 +349,12 @@
 <span class="line"><span style="color:#6A9955">            //  -----  devolver la ruta importada  -----</span></span>
 <span class="line"><span style="color:#C586C0">            return</span><span style="color:#9CDCFE"> route</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#D4D4D4">        } </span><span style="color:#C586C0">catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
-<span class="line"><span style="color:#6A9955">            //  -----  si el import falla, mostrar el error y registrar el módulo como roto  -----</span></span>
+<span class="line"><span style="color:#D4D4D4">        } </span></span>
+<span class="line"><span style="color:#D4D4D4">        </span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  si el import falla  -----</span></span>
+<span class="line"><span style="color:#C586C0">        catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#D4D4D4">            </span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el error de importación  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">            console</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">error</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">`❌ Error importando módulo de ruta: </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">file</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  registrar el módulo como roto para no reintentar import() en futuras navegaciones  -----</span></span>
@@ -447,9 +439,13 @@
 <span class="line"><span style="color:#6A9955">                //  -----  notificar que no se pudo importar la ruta 404  -----</span></span>
 <span class="line"><span style="color:#DCDCAA">                notifyRouteLoadError</span><span style="color:#D4D4D4">(</span><span style="color:#569CD6">undefined</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">new</span><span style="color:#DCDCAA"> Error</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'No se pudo importar la ruta 404.'</span><span style="color:#D4D4D4">), </span><span style="color:#9CDCFE">source</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#D4D4D4">        } </span><span style="color:#C586C0">catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
-<span class="line"><span style="color:#6A9955">//  -----  si falla el import de la ruta 404, notificar el error  -----</span></span>
+<span class="line"><span style="color:#D4D4D4">        } </span></span>
+<span class="line"><span style="color:#D4D4D4">        </span></span>
+<span class="line"><span style="color:#D4D4D4">        </span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  si falla el import de la ruta 404  -----</span></span>
+<span class="line"><span style="color:#C586C0">        catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  Notificar el error de importación de la ruta 404  -----</span></span>
 <span class="line"><span style="color:#DCDCAA">            notifyRouteLoadError</span><span style="color:#D4D4D4">(</span><span style="color:#569CD6">undefined</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">new</span><span style="color:#DCDCAA"> Error</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Error importando ruta 404.'</span><span style="color:#D4D4D4">), </span><span style="color:#9CDCFE">source</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"><span style="color:#D4D4D4">        }</span></span>
 <span class="line"></span>
@@ -578,7 +574,7 @@
 <span class="line"><span style="color:#6A9955">     * - Notifica que una ruta SPA terminó de renderizarse.</span></span>
 <span class="line"><span style="color:#6A9955">     * - Emite `spa:route-loaded` en cada navegación.</span></span>
 <span class="line"><span style="color:#6A9955">     * - Emite `spa:first-route-loaded` una sola vez en la primera carga.</span></span>
-<span class="line"><span style="color:#6A9955">    * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Route}</span><span style="color:#9CDCFE"> route</span><span style="color:#6A9955"> - Ruta que se ha cargado, para incluir detalles en los eventos emitidos.</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Route}</span><span style="color:#9CDCFE"> route</span><span style="color:#6A9955"> - Ruta que se ha cargado, para incluir detalles en los eventos emitidos.</span></span>
 <span class="line"><span style="color:#6A9955">     */</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#569CD6">    const</span><span style="color:#DCDCAA"> notifyRouteLoaded</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>

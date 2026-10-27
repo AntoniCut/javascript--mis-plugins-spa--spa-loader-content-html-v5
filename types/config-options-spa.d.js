@@ -5,9 +5,6 @@
 */
 
 
-/// <reference path="./route-manifest.d.js" />
-
-
 /**
  * --------------------------------
  * -----  `ConfigOptionsSPA`  -----

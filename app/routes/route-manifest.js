@@ -11,7 +11,7 @@
  * --------------------------------
  * - `Manifiesto ligero de rutas: solo id, path y nombre de archivo (sin imports)`
  * - Se usa para lazy loading: el módulo de cada ruta se importa dinámicamente bajo demanda.
- * @type {import("../../types/index.js").RouteManifest[]}
+ * @type {RouteManifest[]}
  */
 export const routeManifest = [
 
