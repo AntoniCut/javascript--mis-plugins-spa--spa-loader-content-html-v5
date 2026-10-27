@@ -8,6 +8,7 @@
 import 'dotenv/config';
 
 import { base } from '../src/config/site-base.js';
+import { findAvailablePort } from './find-available-port.js';
 
 import express from 'express';
 import { spawn } from 'node:child_process';
@@ -18,7 +19,7 @@ import path from 'node:path';
 /** - Prefijo URL que usa el base href del proyecto (SITE_BASE del .env). */
 const DEV_ROUTE_BASE = base;
 
-/** - Puerto público para previsualizar el build de producción. */
+/** - Puerto de partida para previsualizar el build (PREVIEW_SERVER_PORT del .env). Si está ocupado se usa el siguiente libre. */
 const PREVIEW_SERVER_PORT = Number(process.env.PREVIEW_SERVER_PORT || 4173);
 
 /** - Raíz del build de producción. */
@@ -232,11 +233,40 @@ const makePhpHandler = (rootDir, serverPort) => (req, res, next) => {
 
 
 
+/** - Host donde escucha el servidor de previsualización. */
+const PREVIEW_SERVER_HOST = '127.0.0.1';
+
+/** - Puerto real de previsualización: el primero libre a partir de PREVIEW_SERVER_PORT. */
+let previewServerPort;
+
+//  -----  Resolver el puerto antes de registrar middlewares, porque php-cgi necesita el puerto real  -----
+try {
+
+    //  -----  Busca el primer puerto libre desde el de partida, probando en el mismo host que usará listen  -----
+    previewServerPort = await findAvailablePort(PREVIEW_SERVER_PORT, {
+        host: PREVIEW_SERVER_HOST,
+        envName: 'PREVIEW_SERVER_PORT',
+    });
+
+} catch (error) {
+
+    //  -----  No hay puerto libre o el valor del .env no es válido  -----
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+}
+
+//  -----  Avisar cuando el puerto cambia respecto al configurado  -----
+if (previewServerPort !== PREVIEW_SERVER_PORT) {
+    console.log(`El puerto ${PREVIEW_SERVER_PORT} está ocupado. Se usa el ${previewServerPort}.`);
+}
+
+
+
 //  -----  Middleware para redirigir la raíz a la base de la SPA  -----
 app.use(redirectRootToBase);
 
 //  -----  Middleware para ejecutar archivos PHP via php-cgi  -----
-app.use(makePhpHandler(DIST_ROOT, PREVIEW_SERVER_PORT));
+app.use(makePhpHandler(DIST_ROOT, previewServerPort));
 
 //  -----  Middleware para servir archivos estáticos desde la raíz del proyecto con el prefijo de ruta  -----
 app.use(DEV_ROUTE_BASE, express.static(DIST_ROOT, { index: false }));
@@ -259,11 +289,25 @@ app.use((req, res) => {
  * - Inicia el servidor Express en un puerto específico.
  * - Maneja el cierre ordenado del servidor.
  */
-const previewServer = app.listen(PREVIEW_SERVER_PORT, '127.0.0.1', () => {
+const previewServer = app.listen(previewServerPort, PREVIEW_SERVER_HOST, () => {
     
     console.log('\n');
-    console.log(`Preview disponible en http://localhost:${PREVIEW_SERVER_PORT}${DEV_ROUTE_BASE}/`);
+    console.log(`Preview disponible en http://localhost:${previewServerPort}${DEV_ROUTE_BASE}/`);
     console.log('\n');
+});
+
+//  -----  Respaldo ante una carrera entre la sonda de puerto y listen  -----
+previewServer.on('error', (error) => {
+
+    //  -----  Puerto ocupado justo antes de escuchar: mensaje claro con la variable  -----
+    if (error.code === 'EADDRINUSE') {
+        console.error(`El puerto ${previewServerPort} se ocupó antes de arrancar. Vuelve a ejecutar el comando o cambia PREVIEW_SERVER_PORT.`);
+        process.exit(1);
+    }
+
+    //  -----  Cualquier otro error se muestra y termina el proceso  -----
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
 });
 
 
