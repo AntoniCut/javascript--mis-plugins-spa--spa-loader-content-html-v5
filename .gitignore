@@ -21,3 +21,6 @@ workflows/
 
 # Deploy local (IP y rutas del VPS)
 deploy.sh
+
+# Atl (OpenCode)
+.atl/
