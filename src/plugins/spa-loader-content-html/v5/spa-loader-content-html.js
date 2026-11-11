@@ -2006,6 +2006,15 @@ export const spaLoaderContentHtml = (options = {}) => {
             //  -----  si se encuentra un enlace con data-id, manejamos la navegación interna con lazy loading  -----
             if (link) {
 
+                //  -----  respetar el comportamiento nativo del navegador: si el clic lleva modificadores (ctrl/cmd/shift/alt),  -----
+                //  -----  no es el botón principal o ya fue cancelado por otro handler, no interceptar la navegación  -----
+                if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+
+                    //  -----  salir sin preventDefault para que el navegador abra el enlace en una nueva pestaña/ventana  -----
+                    return;
+                }
+
+                //  -----  cancelar la acción por defecto solo para el clic simple que la SPA va a manejar  -----
                 e.preventDefault();
 
                 /** - `Nombre del archivo de ruta desde data-route (ej: 'route-01-01-inferir-tipos')` */
