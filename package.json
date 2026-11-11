@@ -40,7 +40,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/gulp": "^4.0.18",
+    "@types/node": "^26.6.6",
     "browser-sync": "^3.0.3",
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
