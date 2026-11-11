@@ -16,6 +16,7 @@ con renderizado de código fuente resaltado mediante Shiki (tema `dark-plus`).
 | `pnpm server` | Alias de `serve:dev`. |
 | `pnpm build` | Limpia `dist/`, `app/` y el HTML de Shiki, regenera `app/` y minifica a `dist/`. |
 | `pnpm preview` | Sirve `dist/` en local y abre el navegador. |
+| `pnpm stop:preview` | Cierra el servidor de preview si sigue en marcha. |
 | `pnpm code-highlight` | Compila el SCSS y regenera los bloques HTML resaltados con Shiki. |
 | `pnpm convert-images` | Convierte las capturas PNG de `assets/img/clase-*` a AVIF. |
 | `pnpm add:ts-nocheck` | Añade `// @ts-nocheck` a los JS de desarrollo. |
@@ -30,7 +31,7 @@ Copia `.env.example` a `.env` antes de arrancar. `SITE_BASE` es obligatoria.
 | `DEV_SERVER_PORT` | Puerto de partida de `pnpm dev`. Por defecto `3000`. Si está ocupado se usa el siguiente libre (+1, +2…, hasta 20 intentos) y se avisa por consola. |
 | `PREVIEW_SERVER_PORT` | Puerto de partida de `pnpm preview`. Por defecto `4173`. Mismo comportamiento que `DEV_SERVER_PORT`. |
 
-`pnpm stop:dev` busca en ese mismo rango de puertos y solo detiene el `server/dev-server.js` que corre desde este proyecto.
+`pnpm stop:dev` y `pnpm stop:preview` buscan en esos mismos rangos de puertos y solo detienen el `server/dev-server.js` o el `server/preview-server.js` que corren desde este proyecto.
 
 `index.html` y `.htaccess` llevan el marcador `%SITE_BASE%`. El servidor de desarrollo lo sustituye al servir y `pnpm build` lo sustituye en `dist/index.html` y `dist/.htaccess`. En el navegador, `src/config/site-base.js` deduce la base de `<base href>`.
 
