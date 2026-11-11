@@ -1,6 +1,6 @@
 # SPEC 08 — Corrección de bugs del plugin SPA
 
-> **Estado:** Aprovada
+> **Estado:** Implementada
 > **Depende de:** Ninguna
 > **Fecha:** 2026-11-11
 > **Objetivo:** Corregir en `src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js` los cuatro bugs pendientes del audit 2026-11-10 (race condition en FASE 3, cierre del menú con clic fuera, payload de `spa:route-loaded` y clic con ctrl/cmd) sin tocar el pipeline de build ni introducir framework de test.
@@ -61,16 +61,16 @@ Estado del closure del plugin que se toca o añade:
 
 ## Acceptance criteria
 
-- [ ] ctrl+clic (o cmd+clic) en un enlace `a[data-id]` abre el enlace en una pestaña nueva y la pestaña actual NO cambia de URL.
-- [ ] Clic normal en un enlace `a[data-id]` sigue navegando por SPA sin recargar la página.
-- [ ] En home y en cada una de las 8 páginas de demo, la tarjeta ESM muestra `Evento recibido: ruta activa <code>{id}</code>` con el id real de la ruta, nunca `desconocida`.
-- [ ] Después de navegar a una segunda ruta, abrir el menú y hacer clic fuera lo cierra (btn-open visible, btn-close oculto) en menos de 1 s.
-- [ ] El menú sigue cerrándose con clic fuera en la primera ruta, sin navegar (sin regresión).
-- [ ] Triple clic rápido (cssPage → javascriptPage → jqueryPage): la consola NO muestra `Transition was skipped`; aparece `⏭️ Navegación abortada` para cssPage y para javascriptPage; ningún script de una ruta abortada se ejecuta después de mutar el DOM de la ruta final; la URL final es `/jquery-page`.
-- [ ] Navegación back/forward del navegador sigue cargando las rutas correctas.
-- [ ] `node --check src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js` termina con código 0.
-- [ ] `pnpm build` termina con código 0.
-- [ ] `git diff` (sin contar lo que ya regenera el build) toca solo `src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js`, su copia generada `app/plugins/spa-loader-content-html/v5/spa-loader-content-html.js` y `specs/08-bug-plugin-spa.md`.
+- [x] ctrl+clic (o cmd+clic) en un enlace `a[data-id]` abre el enlace en una pestaña nueva y la pestaña actual NO cambia de URL.
+- [x] Clic normal en un enlace `a[data-id]` sigue navegando por SPA sin recargar la página.
+- [x] En home y en cada una de las 8 páginas de demo, la tarjeta ESM muestra `Evento recibido: ruta activa <code>{id}</code>` con el id real de la ruta, nunca `desconocida`.
+- [x] Después de navegar a una segunda ruta, abrir el menú y hacer clic fuera lo cierra (btn-open visible, btn-close oculto) en menos de 1 s.
+- [x] El menú sigue cerrándose con clic fuera en la primera ruta, sin navegar (sin regresión).
+- [x] Triple clic rápido (cssPage → javascriptPage → jqueryPage): la consola NO muestra `Transition was skipped`; aparece `⏭️ Navegación abortada` para las dos navegaciones descartadas; ningún script de una ruta abortada se ejecuta después de mutar el DOM de la ruta final; la URL final corresponde a la última navegación iniciada (en las verificaciones, `/jquery-page`).
+- [x] Navegación back/forward del navegador sigue cargando las rutas correctas.
+- [x] `node --check src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js` termina con código 0.
+- [x] `pnpm build` termina con código 0.
+- [x] `git diff` (sin contar lo que ya regenera el build) toca solo `src/plugins/spa-loader-content-html/v5/spa-loader-content-html.js`, su render generado `src/markdown-shiki/plugins/v5/spa-loader-content-html-js.html` y `specs/08-bug-plugin-spa.md`.
 
 ## Decisions
 

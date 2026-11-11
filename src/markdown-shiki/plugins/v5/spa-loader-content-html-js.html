@@ -17,6 +17,10 @@
 <span class="line"><span style="color:#569CD6">    let</span><span style="color:#9CDCFE"> activeNavigationAbort</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `Indica si hay una View Transition en curso, para no iniciar otra encima (Chrome aborta la segunda)` */</span></span>
+<span class="line"><span style="color:#569CD6">    let</span><span style="color:#9CDCFE"> activeViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"></span>
 <span class="line"><span style="color:#6A9955">    /**</span></span>
 <span class="line"><span style="color:#6A9955">     * - `Clave de cache-busting ESTABLE durante toda la sesión (se evalúa una sola vez al cargar el plugin).`</span></span>
 <span class="line"><span style="color:#6A9955">     * - `Antes se usaba Date.now() en cada navegación, lo que impedía al navegador cachear scripts y CSS`</span></span>
@@ -484,9 +488,12 @@
 <span class="line"><span style="color:#9CDCFE">            activeNavigationAbort</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">abort</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"><span style="color:#D4D4D4">        }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  crear un nuevo AbortController para esta navegación y marcar como navegando  -----</span></span>
-<span class="line"><span style="color:#9CDCFE">        activeNavigationAbort</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">new</span><span style="color:#DCDCAA"> AbortController</span><span style="color:#D4D4D4">();</span></span>
-<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> signal</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">activeNavigationAbort</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  crear un nuevo AbortController para esta navegación y marcarlo como el activo  -----</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> controller</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">new</span><span style="color:#DCDCAA"> AbortController</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"><span style="color:#9CDCFE">        activeNavigationAbort</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">controller</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva  -----</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> signal</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">controller</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">        //  -----  marcar que hay una navegación en curso  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">        isNavigating</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
@@ -510,9 +517,12 @@
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#DCDCAA"> mutate</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#DCDCAA"> applyPreloadedContent</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">payload</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  si el navegador soporta View Transitions, iniciar la View Transition  -----</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  si el navegador soporta View Transitions y no hay otra en curso, iniciar la View Transition  -----</span></span>
 <span class="line"><span style="color:#6A9955">            //  -----  con el callback síncrono de mutación del DOM  -----</span></span>
-<span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">startViewTransition</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">startViewTransition</span><span style="color:#D4D4D4"> &#x26;&#x26; !</span><span style="color:#9CDCFE">activeViewTransition</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">                activeViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                //  -----  iniciar la View Transition con el callback síncrono de mutación del DOM  -----</span></span>
 <span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> viewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">startViewTransition</span><span style="color:#D4D4D4">(() </span><span style="color:#569CD6">=></span><span style="color:#DCDCAA"> mutate</span><span style="color:#D4D4D4">());</span></span>
@@ -524,18 +534,24 @@
 <span class="line"><span style="color:#C586C0">                await</span><span style="color:#9CDCFE"> viewTransition</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">updateCallbackDone</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">catch</span><span style="color:#D4D4D4">(() </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> { });</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                //  -----  dejar que la animación termine en segundo plano sin bloquear la carga de scripts (se ignora su rechazo).  -----</span></span>
-<span class="line"><span style="color:#9CDCFE">                viewTransition</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">finished</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">catch</span><span style="color:#D4D4D4">(() </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> { });</span></span>
+<span class="line"><span style="color:#6A9955">                //  -----  al terminar (bien o mal), liberar el flag para permitir la próxima transición  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">                viewTransition</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">finished</span></span>
+<span class="line"><span style="color:#D4D4D4">                    .</span><span style="color:#DCDCAA">catch</span><span style="color:#D4D4D4">(() </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> { })</span></span>
+<span class="line"><span style="color:#D4D4D4">                    .</span><span style="color:#DCDCAA">finally</span><span style="color:#D4D4D4">(() </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#6A9955">                        //  -----  liberar el flag de transición en curso  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">                        activeViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">                    });</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">            } </span><span style="color:#C586C0">else</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                //  -----  sin soporte de View Transitions: mutar directamente el DOM  -----</span></span>
+<span class="line"><span style="color:#6A9955">                //  -----  sin soporte de View Transitions o con una transición ya en curso: mutar directamente el DOM  -----</span></span>
 <span class="line"><span style="color:#DCDCAA">                mutate</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"><span style="color:#D4D4D4">            }</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  FASE 3: Cargar scripts asíncronos con el DOM ya mutado (en paralelo con la animación)  -----</span></span>
 <span class="line"><span style="color:#6A9955">            //  -----  los scripts necesitan el DOM ya mutado (contenedores inyectados) para funcionar  -----</span></span>
-<span class="line"><span style="color:#6A9955">            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado  -----</span></span>
-<span class="line"><span style="color:#C586C0">            await</span><span style="color:#DCDCAA"> applyRouteMetaAsync</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado, pasando la señal de esta navegación  -----</span></span>
+<span class="line"><span style="color:#C586C0">            await</span><span style="color:#DCDCAA"> applyRouteMetaAsync</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  notificar fin de carga de ruta para el loader inicial y listeners externos  -----</span></span>
 <span class="line"><span style="color:#DCDCAA">            notifyRouteLoaded</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">);</span></span>
@@ -556,11 +572,16 @@
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">        } </span><span style="color:#C586C0">finally</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  liberar el flag de navegación y el controller al terminar (o ser abortado)  -----</span></span>
-<span class="line"><span style="color:#9CDCFE">            isNavigating</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  liberar el estado SOLO si esta navegación sigue siendo la activa: si una navegación más nueva  -----</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  ya reemplazó el controller, esta (la vieja) no puede pisarle los flags (race condition)  -----</span></span>
+<span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">activeNavigationAbort</span><span style="color:#D4D4D4"> === </span><span style="color:#9CDCFE">controller</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  limpiar el controller de la navegación  -----</span></span>
-<span class="line"><span style="color:#9CDCFE">            activeNavigationAbort</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#6A9955">                //  -----  liberar el flag de navegación  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">                isNavigating</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  limpiar el controller de la navegación  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">                activeNavigationAbort</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">            }</span></span>
 <span class="line"><span style="color:#D4D4D4">        }</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">    };</span></span>
@@ -587,8 +608,10 @@
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                //  -----  detalles de la ruta cargada para que los listeners puedan usar esta información  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">                detail:</span><span style="color:#D4D4D4"> {</span></span>
-<span class="line"><span style="color:#9CDCFE">                    id:</span><span style="color:#9CDCFE"> route</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4"> || </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">,</span></span>
-<span class="line"><span style="color:#9CDCFE">                    path:</span><span style="color:#9CDCFE"> route</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">path</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">window</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">location</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">pathname</span></span>
+<span class="line"><span style="color:#9CDCFE">                    route:</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#9CDCFE">                        id:</span><span style="color:#9CDCFE"> route</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4"> || </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">                        path:</span><span style="color:#9CDCFE"> route</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">path</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">window</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">location</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">pathname</span></span>
+<span class="line"><span style="color:#D4D4D4">                    }</span></span>
 <span class="line"><span style="color:#D4D4D4">                }</span></span>
 <span class="line"><span style="color:#D4D4D4">            })</span></span>
 <span class="line"><span style="color:#D4D4D4">        );</span></span>
@@ -1253,18 +1276,30 @@
 <span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@async</span></span>
 <span class="line"><span style="color:#6A9955">     * - `Carga los scripts dinámicos de la ruta de forma secuencial (FASE 3, después de la View Transition).`</span></span>
 <span class="line"><span style="color:#6A9955">     * - `Los scripts necesitan el DOM ya mutado (contenedores y page components inyectados) para funcionar.`</span></span>
+<span class="line"><span style="color:#6A9955">     * - `Recibe la señal de la navegación para detener la FASE 3 si llega una navegación más nueva.`</span></span>
 <span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Route}</span><span style="color:#9CDCFE"> route</span><span style="color:#6A9955"> - Ruta cuyos scripts se van a cargar.</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {AbortSignal}</span><span style="color:#9CDCFE"> signal</span><span style="color:#6A9955"> - Señal de la navegación en curso; si queda abortada, la FASE 3 se detiene con AbortError.</span></span>
 <span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;void>}</span><span style="color:#6A9955"> - Promesa que se resuelve cuando todos los scripts se han cargado.</span></span>
 <span class="line"><span style="color:#6A9955">     */</span></span>
-<span class="line"><span style="color:#569CD6">    const</span><span style="color:#DCDCAA"> applyRouteMetaAsync</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#DCDCAA"> applyRouteMetaAsync</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">        //  -----  cargar scripts dinámicos  -----</span></span>
 <span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">scripts</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  cargar cada script de la ruta de forma secuencial para respetar dependencias  -----</span></span>
 <span class="line"><span style="color:#C586C0">            for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> s</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> route</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">scripts</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  si la navegación fue abortada por una más nueva, detener la FASE 3 sin cargar más scripts  -----</span></span>
+<span class="line"><span style="color:#C586C0">                if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">aborted</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#C586C0">                    throw</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> DOMException</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Navegación abortada por una navegación más nueva'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'AbortError'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  cargar el script de la ruta  -----</span></span>
 <span class="line"><span style="color:#C586C0">                await</span><span style="color:#DCDCAA"> loadScripts</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">s</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"><span style="color:#D4D4D4">            }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  comprobar tras el último script: si la navegación fue abortada, no continuar con la notificación de fin  -----</span></span>
+<span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">aborted</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#C586C0">                throw</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> DOMException</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Navegación abortada por una navegación más nueva'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'AbortError'</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"><span style="color:#D4D4D4">        }</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">    };</span></span>
@@ -1505,27 +1540,48 @@
 <span class="line"><span style="color:#6A9955">        //  -----  cerrar el menú al hacer clic fuera del navbar, sin duplicar listeners y con un namespace simple en dataset  -----</span></span>
 <span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">_spaClickBound</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  listener para cerrar el menú al hacer clic fuera del navbar, con protección contra errores por si el navbar no existe en alguna vista  -----</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  listener para cerrar el menú al hacer clic fuera del navbar: consulta los elementos actuales del DOM  -----</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  en el momento del clic, porque el navbar se reemplaza en cada navegación  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">            document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">"click"</span><span style="color:#D4D4D4">, () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                //  -----  si el navbar no está visible, no hacemos nada  -----</span></span>
+<span class="line"><span style="color:#6A9955">                //  -----  resolver el navbar actual en el momento del clic (el de la vista presente, no el de la primera carga)  -----</span></span>
+<span class="line"><span style="color:#6A9955">                /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `navbar actual de la vista presente en el momento del clic` */</span></span>
+<span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> currentNavbar</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'.navbar__container'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  si la vista actual no tiene navbar, no hay nada que cerrar  -----</span></span>
+<span class="line"><span style="color:#C586C0">                if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">currentNavbar</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#C586C0">                    return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  resolver los botones actuales del navbar para operar sobre los nodos vivos  -----</span></span>
+<span class="line"><span style="color:#6A9955">                /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `botón de cerrar actual de la vista presente` */</span></span>
+<span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> currentBtnClose</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'.navbar__btn-close'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  resolver el botón de apertura actual  -----</span></span>
+<span class="line"><span style="color:#6A9955">                /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `botón de abrir actual de la vista presente` */</span></span>
+<span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> currentBtnOpen</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'.navbar__btn-open'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
 <span class="line"><span style="color:#C586C0">                try</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                    //  -----  si el navbar no está visible, no hacemos nada  -----</span></span>
-<span class="line"><span style="color:#DCDCAA">                    slideUp</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">navbar</span><span style="color:#D4D4D4">, </span><span style="color:#4FC1FF">CLOSE_DURATION</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#6A9955">                    //  -----  animar el cierre del navbar actual  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">                    slideUp</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">currentNavbar</span><span style="color:#D4D4D4">, </span><span style="color:#4FC1FF">CLOSE_DURATION</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#9CDCFE">                    newBtnClose</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">style</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">display</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">"none"</span><span style="color:#D4D4D4">;</span></span>
-<span class="line"><span style="color:#9CDCFE">                    newBtnOpen</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">style</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">display</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">"flex"</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#6A9955">                    //  -----  ocultar el botón de cerrar y mostrar el de abrir (solo si existen en esta vista)  -----</span></span>
+<span class="line"><span style="color:#C586C0">                    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">currentBtnClose</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#9CDCFE">                        currentBtnClose</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">style</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">display</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">"none"</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                    //  -----  mostrar el botón de abrir del navbar actual  -----</span></span>
+<span class="line"><span style="color:#C586C0">                    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">currentBtnOpen</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#9CDCFE">                        currentBtnOpen</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">style</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">display</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">"flex"</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                    //  -----  desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----</span></span>
 <span class="line"><span style="color:#DCDCAA">                    unlockBodyScroll</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">                }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                //  -----  proteger contra errores si el navbar no existe en alguna vista, para evitar romper el flujo global del plugin  -----</span></span>
+<span class="line"><span style="color:#6A9955">                //  -----  proteger contra errores imprevistos al cerrar el menú para no romper el flujo global del plugin  -----</span></span>
 <span class="line"><span style="color:#C586C0">                catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#9CDCFE">                    console</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">warn</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'⚠️ No se pudo cerrar el menú al hacer clic fuera (probablemente falta .navbar__container en la vista):'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#9CDCFE">                    console</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">warn</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'⚠️ No se pudo cerrar el menú al hacer clic fuera:'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"><span style="color:#D4D4D4">                }</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">            });</span></span>
@@ -1987,6 +2043,15 @@
 <span class="line"><span style="color:#6A9955">            //  -----  si se encuentra un enlace con data-id, manejamos la navegación interna con lazy loading  -----</span></span>
 <span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">link</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  respetar el comportamiento nativo del navegador: si el clic lleva modificadores (ctrl/cmd/shift/alt),  -----</span></span>
+<span class="line"><span style="color:#6A9955">                //  -----  no es el botón principal o ya fue cancelado por otro handler, no interceptar la navegación  -----</span></span>
+<span class="line"><span style="color:#C586C0">                if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">defaultPrevented</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">button</span><span style="color:#D4D4D4"> !== </span><span style="color:#B5CEA8">0</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">metaKey</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">ctrlKey</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">shiftKey</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">altKey</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                    //  -----  salir sin preventDefault para que el navegador abra el enlace en una nueva pestaña/ventana  -----</span></span>
+<span class="line"><span style="color:#C586C0">                    return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">                }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">                //  -----  cancelar la acción por defecto solo para el clic simple que la SPA va a manejar  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">                e</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">preventDefault</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                /** - `Nombre del archivo de ruta desde data-route (ej: 'route-01-01-inferir-tipos')` */</span></span>
