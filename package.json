@@ -16,6 +16,7 @@
     "convert-images": "gulp convertImages",
     "build": "gulp build",
     "preview": "node server/preview-server.js --open",
+    "stop:preview": "node server/stop-preview-server.js",
     "add:ts-nocheck": "cross-env NODE_ENV=development node addTsNoCheck.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -31,6 +32,7 @@
     "convert-images": "Convierte las capturas PNG de assets/img/clase-* a AVIF.",
     "build": "Limpia dist/, app/ y markdown-shiki, regenera app/ y minifica a dist/ para producción.",
     "preview": "Sirve dist/ en local y abre el navegador.",
+    "stop:preview": "Cierra el servidor de preview si sigue en marcha.",
     "add:ts-nocheck": "Añade // @ts-nocheck a los JS de desarrollo que lo necesiten.",
     "test": "Marcador: aún no hay tests."
   },
@@ -38,7 +40,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/gulp": "^4.0.18",
+    "@types/node": "^26.6.6",
     "browser-sync": "^3.0.3",
     "concurrently": "^9.2.1",
     "cross-env": "^7.0.3",
