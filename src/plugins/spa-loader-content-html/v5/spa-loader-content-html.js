@@ -1526,27 +1526,48 @@ export const spaLoaderContentHtml = (options = {}) => {
         //  -----  cerrar el menú al hacer clic fuera del navbar, sin duplicar listeners y con un namespace simple en dataset  -----
         if (!document.body.dataset._spaClickBound) {
 
-            //  -----  listener para cerrar el menú al hacer clic fuera del navbar, con protección contra errores por si el navbar no existe en alguna vista  -----
+            //  -----  listener para cerrar el menú al hacer clic fuera del navbar: consulta los elementos actuales del DOM  -----
+            //  -----  en el momento del clic, porque el navbar se reemplaza en cada navegación  -----
             document.addEventListener("click", () => {
 
-                //  -----  si el navbar no está visible, no hacemos nada  -----
+                //  -----  resolver el navbar actual en el momento del clic (el de la vista presente, no el de la primera carga)  -----
+                /** @type {HTMLElement|null} - `navbar actual de la vista presente en el momento del clic` */
+                const currentNavbar = document.querySelector('.navbar__container');
+
+                //  -----  si la vista actual no tiene navbar, no hay nada que cerrar  -----
+                if (!currentNavbar)
+                    return;
+
+                //  -----  resolver los botones actuales del navbar para operar sobre los nodos vivos  -----
+                /** @type {HTMLElement|null} - `botón de cerrar actual de la vista presente` */
+                const currentBtnClose = document.querySelector('.navbar__btn-close');
+
+                //  -----  resolver el botón de apertura actual  -----
+                /** @type {HTMLElement|null} - `botón de abrir actual de la vista presente` */
+                const currentBtnOpen = document.querySelector('.navbar__btn-open');
+
                 try {
 
-                    //  -----  si el navbar no está visible, no hacemos nada  -----
-                    slideUp(navbar, CLOSE_DURATION);
+                    //  -----  animar el cierre del navbar actual  -----
+                    slideUp(currentNavbar, CLOSE_DURATION);
 
-                    newBtnClose.style.display = "none";
-                    newBtnOpen.style.display = "flex";
+                    //  -----  ocultar el botón de cerrar y mostrar el de abrir (solo si existen en esta vista)  -----
+                    if (currentBtnClose)
+                        currentBtnClose.style.display = "none";
+
+                    //  -----  mostrar el botón de abrir del navbar actual  -----
+                    if (currentBtnOpen)
+                        currentBtnOpen.style.display = "flex";
 
                     //  -----  desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----
                     unlockBodyScroll();
 
                 }
 
-                //  -----  proteger contra errores si el navbar no existe en alguna vista, para evitar romper el flujo global del plugin  -----
+                //  -----  proteger contra errores imprevistos al cerrar el menú para no romper el flujo global del plugin  -----
                 catch (e) {
 
-                    console.warn('⚠️ No se pudo cerrar el menú al hacer clic fuera (probablemente falta .navbar__container en la vista):', e);
+                    console.warn('⚠️ No se pudo cerrar el menú al hacer clic fuera:', e);
                 }
 
             });
