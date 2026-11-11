@@ -36,6 +36,10 @@ export const spaLoaderContentHtml = (options = {}) => {
     let activeNavigationAbort = null;
 
 
+    /** - `Indica si hay una View Transition en curso, para no iniciar otra encima (Chrome aborta la segunda)` */
+    let activeViewTransition = false;
+
+
     /**
      * - `Clave de cache-busting ESTABLE durante toda la sesión (se evalúa una sola vez al cargar el plugin).`
      * - `Antes se usaba Date.now() en cada navegación, lo que impedía al navegador cachear scripts y CSS`
@@ -503,9 +507,12 @@ export const spaLoaderContentHtml = (options = {}) => {
             activeNavigationAbort.abort();
         }
 
-        //  -----  crear un nuevo AbortController para esta navegación y marcar como navegando  -----
-        activeNavigationAbort = new AbortController();
-        const signal = activeNavigationAbort.signal;
+        //  -----  crear un nuevo AbortController para esta navegación y marcarlo como el activo  -----
+        const controller = new AbortController();
+        activeNavigationAbort = controller;
+
+        //  -----  señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva  -----
+        const signal = controller.signal;
 
         //  -----  marcar que hay una navegación en curso  -----
         isNavigating = true;
@@ -529,9 +536,12 @@ export const spaLoaderContentHtml = (options = {}) => {
             const mutate = () => applyPreloadedContent(payload, route);
 
 
-            //  -----  si el navegador soporta View Transitions, iniciar la View Transition  -----
+            //  -----  si el navegador soporta View Transitions y no hay otra en curso, iniciar la View Transition  -----
             //  -----  con el callback síncrono de mutación del DOM  -----
-            if (document.startViewTransition) {
+            if (document.startViewTransition && !activeViewTransition) {
+
+                //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----
+                activeViewTransition = true;
 
                 //  -----  iniciar la View Transition con el callback síncrono de mutación del DOM  -----
                 const viewTransition = document.startViewTransition(() => mutate());
@@ -543,18 +553,24 @@ export const spaLoaderContentHtml = (options = {}) => {
                 await viewTransition.updateCallbackDone.catch(() => { });
 
                 //  -----  dejar que la animación termine en segundo plano sin bloquear la carga de scripts (se ignora su rechazo).  -----
-                viewTransition.finished.catch(() => { });
+                //  -----  al terminar (bien o mal), liberar el flag para permitir la próxima transición  -----
+                viewTransition.finished
+                    .catch(() => { })
+                    .finally(() => {
+                        //  -----  liberar el flag de transición en curso  -----
+                        activeViewTransition = false;
+                    });
 
             } else {
 
-                //  -----  sin soporte de View Transitions: mutar directamente el DOM  -----
+                //  -----  sin soporte de View Transitions o con una transición ya en curso: mutar directamente el DOM  -----
                 mutate();
             }
 
             //  -----  FASE 3: Cargar scripts asíncronos con el DOM ya mutado (en paralelo con la animación)  -----
             //  -----  los scripts necesitan el DOM ya mutado (contenedores inyectados) para funcionar  -----
-            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado  -----
-            await applyRouteMetaAsync(route);
+            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado, pasando la señal de esta navegación  -----
+            await applyRouteMetaAsync(route, signal);
 
             //  -----  notificar fin de carga de ruta para el loader inicial y listeners externos  -----
             notifyRouteLoaded(route);
@@ -575,11 +591,16 @@ export const spaLoaderContentHtml = (options = {}) => {
 
         } finally {
 
-            //  -----  liberar el flag de navegación y el controller al terminar (o ser abortado)  -----
-            isNavigating = false;
+            //  -----  liberar el estado SOLO si esta navegación sigue siendo la activa: si una navegación más nueva  -----
+            //  -----  ya reemplazó el controller, esta (la vieja) no puede pisarle los flags (race condition)  -----
+            if (activeNavigationAbort === controller) {
 
-            //  -----  limpiar el controller de la navegación  -----
-            activeNavigationAbort = null;
+                //  -----  liberar el flag de navegación  -----
+                isNavigating = false;
+
+                //  -----  limpiar el controller de la navegación  -----
+                activeNavigationAbort = null;
+            }
         }
 
     };
@@ -1274,18 +1295,30 @@ export const spaLoaderContentHtml = (options = {}) => {
      * @async
      * - `Carga los scripts dinámicos de la ruta de forma secuencial (FASE 3, después de la View Transition).`
      * - `Los scripts necesitan el DOM ya mutado (contenedores y page components inyectados) para funcionar.`
+     * - `Recibe la señal de la navegación para detener la FASE 3 si llega una navegación más nueva.`
      * @param {Route} route - Ruta cuyos scripts se van a cargar.
+     * @param {AbortSignal} signal - Señal de la navegación en curso; si queda abortada, la FASE 3 se detiene con AbortError.
      * @return {Promise<void>} - Promesa que se resuelve cuando todos los scripts se han cargado.
      */
-    const applyRouteMetaAsync = async (route) => {
+    const applyRouteMetaAsync = async (route, signal) => {
 
         //  -----  cargar scripts dinámicos  -----
         if (route.scripts) {
 
             //  -----  cargar cada script de la ruta de forma secuencial para respetar dependencias  -----
             for (const s of route.scripts) {
+
+                //  -----  si la navegación fue abortada por una más nueva, detener la FASE 3 sin cargar más scripts  -----
+                if (signal.aborted)
+                    throw new DOMException('Navegación abortada por una navegación más nueva', 'AbortError');
+
+                //  -----  cargar el script de la ruta  -----
                 await loadScripts(s);
             }
+
+            //  -----  comprobar tras el último script: si la navegación fue abortada, no continuar con la notificación de fin  -----
+            if (signal.aborted)
+                throw new DOMException('Navegación abortada por una navegación más nueva', 'AbortError');
         }
 
     };
