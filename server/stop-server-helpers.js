@@ -39,11 +39,14 @@ const runCommand = async (command, args) => {
     //  -----  si el comando falla, comprobar si el código 1 trae salida útil  -----
     catch (error) {
 
+        /** @type {{ code?: number, stdout?: string }} - `error de execFile con código de salida y salida parcial` */
+        const execError = /** @type {{ code?: number, stdout?: string }} */ (error);
+
         //  -----  si el código es 1 y hay stdout, devolverlo  -----
-        if (typeof error?.stdout === 'string' && error.code === 1)
+        if (typeof execError.stdout === 'string' && execError.code === 1)
 
             //  -----  devolver la salida estándar del comando fallido  -----
-            return error.stdout;
+            return execError.stdout;
 
 
         //  -----  si no, relanzar el error  -----
