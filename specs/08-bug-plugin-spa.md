@@ -100,5 +100,6 @@ Estado del closure del plugin que se toca o añade:
 - Refactor del monolito de 2.137 líneas del plugin SPA.
 - Limpieza de dependencias no usadas ni `.gitignore` de `pnpm-workspace.yaml`.
 - Dejar de versionar los 36 archivos generados de `src/markdown-shiki/`.
+- El error preexistente `Transition was skipped. Navigation transition active` en navegación back/forward rápida: Chrome corre su propia same-document view transition de historial mientras el plugin llama a `startViewTransition()`. Es solo un log de consola (la navegación funciona). Anotado para una spec aparte cuando se termine esta.
 
 Cada uno de esos cambios, si se necesita, debe definirse en su propia spec.
