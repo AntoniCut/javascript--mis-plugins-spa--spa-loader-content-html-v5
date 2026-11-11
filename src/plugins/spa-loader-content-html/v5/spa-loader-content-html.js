@@ -36,6 +36,10 @@ export const spaLoaderContentHtml = (options = {}) => {
     let activeNavigationAbort = null;
 
 
+    /** - `Indica si hay una View Transition en curso, para no iniciar otra encima (Chrome aborta la segunda)` */
+    let activeViewTransition = false;
+
+
     /**
      * - `Clave de cache-busting ESTABLE durante toda la sesión (se evalúa una sola vez al cargar el plugin).`
      * - `Antes se usaba Date.now() en cada navegación, lo que impedía al navegador cachear scripts y CSS`
@@ -503,9 +507,12 @@ export const spaLoaderContentHtml = (options = {}) => {
             activeNavigationAbort.abort();
         }
 
-        //  -----  crear un nuevo AbortController para esta navegación y marcar como navegando  -----
-        activeNavigationAbort = new AbortController();
-        const signal = activeNavigationAbort.signal;
+        //  -----  crear un nuevo AbortController para esta navegación y marcarlo como el activo  -----
+        const controller = new AbortController();
+        activeNavigationAbort = controller;
+
+        //  -----  señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva  -----
+        const signal = controller.signal;
 
         //  -----  marcar que hay una navegación en curso  -----
         isNavigating = true;
@@ -529,9 +536,12 @@ export const spaLoaderContentHtml = (options = {}) => {
             const mutate = () => applyPreloadedContent(payload, route);
 
 
-            //  -----  si el navegador soporta View Transitions, iniciar la View Transition  -----
+            //  -----  si el navegador soporta View Transitions y no hay otra en curso, iniciar la View Transition  -----
             //  -----  con el callback síncrono de mutación del DOM  -----
-            if (document.startViewTransition) {
+            if (document.startViewTransition && !activeViewTransition) {
+
+                //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----
+                activeViewTransition = true;
 
                 //  -----  iniciar la View Transition con el callback síncrono de mutación del DOM  -----
                 const viewTransition = document.startViewTransition(() => mutate());
@@ -543,18 +553,24 @@ export const spaLoaderContentHtml = (options = {}) => {
                 await viewTransition.updateCallbackDone.catch(() => { });
 
                 //  -----  dejar que la animación termine en segundo plano sin bloquear la carga de scripts (se ignora su rechazo).  -----
-                viewTransition.finished.catch(() => { });
+                //  -----  al terminar (bien o mal), liberar el flag para permitir la próxima transición  -----
+                viewTransition.finished
+                    .catch(() => { })
+                    .finally(() => {
+                        //  -----  liberar el flag de transición en curso  -----
+                        activeViewTransition = false;
+                    });
 
             } else {
 
-                //  -----  sin soporte de View Transitions: mutar directamente el DOM  -----
+                //  -----  sin soporte de View Transitions o con una transición ya en curso: mutar directamente el DOM  -----
                 mutate();
             }
 
             //  -----  FASE 3: Cargar scripts asíncronos con el DOM ya mutado (en paralelo con la animación)  -----
             //  -----  los scripts necesitan el DOM ya mutado (contenedores inyectados) para funcionar  -----
-            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado  -----
-            await applyRouteMetaAsync(route);
+            //  -----  cargar los scripts y metadatos de la ruta con el dom ya mutado, pasando la señal de esta navegación  -----
+            await applyRouteMetaAsync(route, signal);
 
             //  -----  notificar fin de carga de ruta para el loader inicial y listeners externos  -----
             notifyRouteLoaded(route);
@@ -575,11 +591,16 @@ export const spaLoaderContentHtml = (options = {}) => {
 
         } finally {
 
-            //  -----  liberar el flag de navegación y el controller al terminar (o ser abortado)  -----
-            isNavigating = false;
+            //  -----  liberar el estado SOLO si esta navegación sigue siendo la activa: si una navegación más nueva  -----
+            //  -----  ya reemplazó el controller, esta (la vieja) no puede pisarle los flags (race condition)  -----
+            if (activeNavigationAbort === controller) {
 
-            //  -----  limpiar el controller de la navegación  -----
-            activeNavigationAbort = null;
+                //  -----  liberar el flag de navegación  -----
+                isNavigating = false;
+
+                //  -----  limpiar el controller de la navegación  -----
+                activeNavigationAbort = null;
+            }
         }
 
     };
@@ -606,8 +627,10 @@ export const spaLoaderContentHtml = (options = {}) => {
 
                 //  -----  detalles de la ruta cargada para que los listeners puedan usar esta información  -----
                 detail: {
-                    id: route?.id || null,
-                    path: route?.path || window.location.pathname
+                    route: {
+                        id: route?.id || null,
+                        path: route?.path || window.location.pathname
+                    }
                 }
             })
         );
@@ -1272,18 +1295,30 @@ export const spaLoaderContentHtml = (options = {}) => {
      * @async
      * - `Carga los scripts dinámicos de la ruta de forma secuencial (FASE 3, después de la View Transition).`
      * - `Los scripts necesitan el DOM ya mutado (contenedores y page components inyectados) para funcionar.`
+     * - `Recibe la señal de la navegación para detener la FASE 3 si llega una navegación más nueva.`
      * @param {Route} route - Ruta cuyos scripts se van a cargar.
+     * @param {AbortSignal} signal - Señal de la navegación en curso; si queda abortada, la FASE 3 se detiene con AbortError.
      * @return {Promise<void>} - Promesa que se resuelve cuando todos los scripts se han cargado.
      */
-    const applyRouteMetaAsync = async (route) => {
+    const applyRouteMetaAsync = async (route, signal) => {
 
         //  -----  cargar scripts dinámicos  -----
         if (route.scripts) {
 
             //  -----  cargar cada script de la ruta de forma secuencial para respetar dependencias  -----
             for (const s of route.scripts) {
+
+                //  -----  si la navegación fue abortada por una más nueva, detener la FASE 3 sin cargar más scripts  -----
+                if (signal.aborted)
+                    throw new DOMException('Navegación abortada por una navegación más nueva', 'AbortError');
+
+                //  -----  cargar el script de la ruta  -----
                 await loadScripts(s);
             }
+
+            //  -----  comprobar tras el último script: si la navegación fue abortada, no continuar con la notificación de fin  -----
+            if (signal.aborted)
+                throw new DOMException('Navegación abortada por una navegación más nueva', 'AbortError');
         }
 
     };
@@ -1524,27 +1559,48 @@ export const spaLoaderContentHtml = (options = {}) => {
         //  -----  cerrar el menú al hacer clic fuera del navbar, sin duplicar listeners y con un namespace simple en dataset  -----
         if (!document.body.dataset._spaClickBound) {
 
-            //  -----  listener para cerrar el menú al hacer clic fuera del navbar, con protección contra errores por si el navbar no existe en alguna vista  -----
+            //  -----  listener para cerrar el menú al hacer clic fuera del navbar: consulta los elementos actuales del DOM  -----
+            //  -----  en el momento del clic, porque el navbar se reemplaza en cada navegación  -----
             document.addEventListener("click", () => {
 
-                //  -----  si el navbar no está visible, no hacemos nada  -----
+                //  -----  resolver el navbar actual en el momento del clic (el de la vista presente, no el de la primera carga)  -----
+                /** @type {HTMLElement|null} - `navbar actual de la vista presente en el momento del clic` */
+                const currentNavbar = document.querySelector('.navbar__container');
+
+                //  -----  si la vista actual no tiene navbar, no hay nada que cerrar  -----
+                if (!currentNavbar)
+                    return;
+
+                //  -----  resolver los botones actuales del navbar para operar sobre los nodos vivos  -----
+                /** @type {HTMLElement|null} - `botón de cerrar actual de la vista presente` */
+                const currentBtnClose = document.querySelector('.navbar__btn-close');
+
+                //  -----  resolver el botón de apertura actual  -----
+                /** @type {HTMLElement|null} - `botón de abrir actual de la vista presente` */
+                const currentBtnOpen = document.querySelector('.navbar__btn-open');
+
                 try {
 
-                    //  -----  si el navbar no está visible, no hacemos nada  -----
-                    slideUp(navbar, CLOSE_DURATION);
+                    //  -----  animar el cierre del navbar actual  -----
+                    slideUp(currentNavbar, CLOSE_DURATION);
 
-                    newBtnClose.style.display = "none";
-                    newBtnOpen.style.display = "flex";
+                    //  -----  ocultar el botón de cerrar y mostrar el de abrir (solo si existen en esta vista)  -----
+                    if (currentBtnClose)
+                        currentBtnClose.style.display = "none";
+
+                    //  -----  mostrar el botón de abrir del navbar actual  -----
+                    if (currentBtnOpen)
+                        currentBtnOpen.style.display = "flex";
 
                     //  -----  desbloquear scroll del body al cerrar el menú para permitir que el fondo vuelva a moverse  -----
                     unlockBodyScroll();
 
                 }
 
-                //  -----  proteger contra errores si el navbar no existe en alguna vista, para evitar romper el flujo global del plugin  -----
+                //  -----  proteger contra errores imprevistos al cerrar el menú para no romper el flujo global del plugin  -----
                 catch (e) {
 
-                    console.warn('⚠️ No se pudo cerrar el menú al hacer clic fuera (probablemente falta .navbar__container en la vista):', e);
+                    console.warn('⚠️ No se pudo cerrar el menú al hacer clic fuera:', e);
                 }
 
             });
@@ -2006,6 +2062,15 @@ export const spaLoaderContentHtml = (options = {}) => {
             //  -----  si se encuentra un enlace con data-id, manejamos la navegación interna con lazy loading  -----
             if (link) {
 
+                //  -----  respetar el comportamiento nativo del navegador: si el clic lleva modificadores (ctrl/cmd/shift/alt),  -----
+                //  -----  no es el botón principal o ya fue cancelado por otro handler, no interceptar la navegación  -----
+                if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) {
+
+                    //  -----  salir sin preventDefault para que el navegador abra el enlace en una nueva pestaña/ventana  -----
+                    return;
+                }
+
+                //  -----  cancelar la acción por defecto solo para el clic simple que la SPA va a manejar  -----
                 e.preventDefault();
 
                 /** - `Nombre del archivo de ruta desde data-route (ej: 'route-01-01-inferir-tipos')` */
