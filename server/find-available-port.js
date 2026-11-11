@@ -69,8 +69,11 @@ const isPortFree = (port, host) => new Promise((resolve, reject) => {
     //  -----  puerto ocupado o sin permiso: no está libre; otro error se propaga  -----
     probeServer.once('error', (error) => {
 
+        /** @type {NodeJS.ErrnoException} - `error de socket con código de sistema` */
+        const socketError = /** @type {NodeJS.ErrnoException} */ (error);
+
         //  -----  si está ocupado o sin permiso, informar de que no está libre  -----
-        if (error.code === 'EADDRINUSE' || error.code === 'EACCES') {
+        if (socketError.code === 'EADDRINUSE' || socketError.code === 'EACCES') {
 
             //  -----  resolver como puerto no libre  -----
             resolve(false);

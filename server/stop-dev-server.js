@@ -51,11 +51,12 @@ const main = async () => {
 
 
 //  -----  ejecutar la función principal y controlar los errores  -----
-main().catch((error) => {
+main()
+    .catch((/** @type {unknown} */ error) => {
 
-    //  -----  mostrar el mensaje del error  -----
-    console.error(error instanceof Error ? error.message : error);
+        //  -----  mostrar el mensaje del error  -----
+         console.error(error instanceof Error ? error.message : error);
 
-    //  -----  terminar con código de error  -----
-    process.exit(1);
+        //  -----  terminar con código de error  -----
+        process.exit(1);
 });

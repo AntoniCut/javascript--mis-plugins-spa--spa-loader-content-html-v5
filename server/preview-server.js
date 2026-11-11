@@ -391,8 +391,11 @@ const previewServer = app.listen(previewServerPort, PREVIEW_SERVER_HOST, () => {
 //  -----  respaldo ante una carrera entre la sonda de puerto y listen  -----
 previewServer.on('error', (error) => {
 
+    /** @type {NodeJS.ErrnoException} - `error del servidor con código de sistema` */
+    const serverError = /** @type {NodeJS.ErrnoException} */ (error);
+
     //  -----  si el puerto se ocupó justo antes de escuchar, mostrar un mensaje claro con la variable  -----
-    if (error.code === 'EADDRINUSE') {
+    if (serverError.code === 'EADDRINUSE') {
 
         //  -----  avisar de que el puerto se ocupó antes de arrancar  -----
         console.error(`El puerto ${previewServerPort} se ocupó antes de arrancar. Vuelve a ejecutar el comando o cambia PREVIEW_SERVER_PORT.`);
