@@ -27,3 +27,6 @@ deploy.sh
 
 # Atl (OpenCode)
 .atl/
+
+# Playwright MCP (capturas y logs de sesión)
+.playwright-mcp/
