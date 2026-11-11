@@ -8,6 +8,9 @@ pnpm-workspace.yaml
 .env.*
 !.env.example
 
+# carpeta de la app
+app/
+
 # Carpeta de distribución / compilados
 dist/
 
