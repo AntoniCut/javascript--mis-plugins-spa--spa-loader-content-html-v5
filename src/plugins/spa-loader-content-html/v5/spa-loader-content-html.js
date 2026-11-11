@@ -606,8 +606,10 @@ export const spaLoaderContentHtml = (options = {}) => {
 
                 //  -----  detalles de la ruta cargada para que los listeners puedan usar esta información  -----
                 detail: {
-                    id: route?.id || null,
-                    path: route?.path || window.location.pathname
+                    route: {
+                        id: route?.id || null,
+                        path: route?.path || window.location.pathname
+                    }
                 }
             })
         );
