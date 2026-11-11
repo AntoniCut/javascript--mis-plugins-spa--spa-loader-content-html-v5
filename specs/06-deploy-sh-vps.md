@@ -20,7 +20,7 @@ Diferencia clave respecto a escuelait: aquí **no hay PHP en producción**. `dis
 
 **In:**
 
-- Crear `deploy.sh` en la raíz del proyecto con los valores reales del VPS (`TU_USUARIO@TU_IP_O_DOMINIO:22`) y `REMOTE_PATH=/var/www/javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5`.
+- Crear `deploy.sh` en la raíz del proyecto con los valores reales del VPS (`${VPS_USER}@${VPS_HOST}:${VPS_PORT}`, definidos solo en ese archivo local ignorado por git) y `REMOTE_PATH=/var/www/javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5`.
 - Crear `deploy.sh.example` con placeholders (`TU_USUARIO`, `TU_IP_O_DOMINIO`, `TU_DOMINIO`) y sin datos sensibles, como archivo versionable.
 - Añadir `deploy.sh` al `.gitignore` bajo la sección `# Deploy local (IP y rutas del VPS)`, igual que en los proyectos hermanos.
 - Dar permiso de ejecución a `deploy.sh` (`chmod +x`).
@@ -40,23 +40,25 @@ Sin estructuras de datos de ejecución nuevas. El script se configura con cinco 
 
 | Variable | Valor en `deploy.sh` | Valor en `deploy.sh.example` |
 | --- | --- | --- |
-| `VPS_USER` | `TU_USUARIO` |`TU_USUARIO` |
-| `VPS_HOST` | `TU_IP_O_DOMINIO` | `TU_IP_O_DOMINIO` |
+| `VPS_USER` | valor real, solo en el archivo local ignorado | `TU_USUARIO` |
+| `VPS_HOST` | valor real, solo en el archivo local ignorado | `TU_IP_O_DOMINIO` |
 | `VPS_PORT` | `22` | `22` |
 | `REMOTE_PATH` | `/var/www/javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5` | `/var/www/TU_DOMINIO/mis-plugins-spa/spa-loader-content-html-v5` |
 | `LOCAL_BUILD_DIR` | `dist` | `dist` |
 
+Este documento no reproduce los datos de conexión del VPS (`VPS_USER`, `VPS_HOST`). Viven únicamente en `deploy.sh`, que está en `.gitignore`, para que no queden versionados ni publicados en el repositorio.
+
 El `CONTROL_PATH` de SSH se nombra `ssh-deploy-spa-loader-v5-${VPS_USER}-${VPS_HOST}-${VPS_PORT}` para no colisionar con los sockets de los otros proyectos (`ssh-deploy-jquery-...`, `ssh-deploy-spa-v5-...`).
 
-Contenido previsto de `deploy.sh`:
+Contenido previsto de `deploy.sh` (los valores reales de `VPS_USER` y `VPS_HOST` se completan solo en el archivo local, nunca en este documento):
 
 ```bash
 #!/usr/bin/env bash
 set -euo pipefail
 
 # ==== Configuración ====
-VPS_USER="TU_USUARIO"
-VPS_HOST="TU_IP_O_DOMINIO"
+VPS_USER="TU_USUARIO"             # valor real solo en el deploy.sh local
+VPS_HOST="TU_IP_O_DOMINIO"        # valor real solo en el deploy.sh local
 VPS_PORT="22"                     # cambia si usas otro puerto SSH
 REMOTE_PATH="/var/www/javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5"  # ruta en el VPS servida por nginx
 LOCAL_BUILD_DIR="dist"            # carpeta que genera Gulp/tu build
