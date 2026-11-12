@@ -131,6 +131,12 @@ const rejectReason = (sql) => {
         //  -----  avisar de que la consulta toca el sistema de ficheros  -----
         return 'Esa consulta no está permitida.';
 
+    //  -----  impedir escrituras escondidas tras un WITH: MySQL 8.4 admite
+    //         WITH antes de UPDATE y DELETE, que pasarían el filtro anterior  -----
+    if (/\b(update|delete|insert|replace|alter|truncate|drop|grant|revoke)\b/i.test(sql))
+        //  -----  avisar de que la sentencia modifica datos o el esquema  -----
+        return 'Solo se admiten consultas de lectura, sin sentencias de escritura.';
+
     //  -----  la sentencia es válida  -----
     return '';
 

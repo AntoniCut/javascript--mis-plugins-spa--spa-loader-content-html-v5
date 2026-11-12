@@ -109,6 +109,12 @@
             return 'Esa consulta no está permitida.';
         }
 
+        //  -----  impedir escrituras escondidas tras un WITH: MySQL 8 admite
+        //         WITH antes de UPDATE y DELETE, que pasarían el filtro anterior  -----
+        if (preg_match('/\b(update|delete|insert|replace|alter|truncate|drop|grant|revoke)\b/i', $sql)) {
+            return 'Solo se admiten consultas de lectura, sin sentencias de escritura.';
+        }
+
         return '';
     }
 
