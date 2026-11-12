@@ -94,6 +94,9 @@ const paths = {
         spaDir: path.join('src', 'spa'),
         spa:    path.posix.join('src', 'spa', '**/*'),
 
+        servicesDir: path.join('src', 'services'),
+        services:    path.posix.join('src', 'services', '**/*.{php,js,json,sql,html}'),
+
         scriptsDir:   path.join('src', 'scripts'),
         scripts:      path.posix.join('src', 'scripts', '**/*.js'),
         scriptsNoMap: '!' + path.posix.join('src', 'scripts', '**/*.map'),
@@ -111,6 +114,7 @@ const paths = {
         css:     path.posix.join('app', '**/*.css'),
         js:      path.posix.join('app', '**/*.js'),
         jsNoMap: '!' + path.posix.join('app', '**/*.map'),
+        php:     path.posix.join('app', '**/*.php'),
     },
 
 };
@@ -614,6 +618,9 @@ export const copyRoutes = createCopyTask('copyRoutes', { glob: paths.src.routes,
 /** - `copia src/spa/ → app/spa/.` */
 export const copySpa = createCopyTask('copySpa', { glob: paths.src.spa, checkPath: paths.src.spaDir });
 
+/** - `copia src/services/ → app/services/.` */
+export const copyServices = createCopyTask('copyServices', { glob: paths.src.services, checkPath: paths.src.servicesDir });
+
 /** - `copia src/main.js → app/main.js.` */
 export const copyMain = createCopyTask('copyMain', {
     glob:      paths.src.main,
@@ -720,6 +727,7 @@ const buildSources = parallel(
     copyPlugins,
     copyRoutes,
     copySpa,
+    copyServices,
     copyScripts,
     copyMain,
     styles
@@ -773,6 +781,7 @@ const watchTask = () => {
         [paths.src.plugins,       copyPlugins],
         [paths.src.routes,        copyRoutes],
         [paths.src.spa,           copySpa],
+        [paths.src.services,      copyServices],
         [paths.src.scripts,       copyScripts],
         [paths.src.main,          copyMain],
         [paths.src.scssAll,       series(styles, generateShiki, copyMarkdownShiki)],
@@ -861,10 +870,68 @@ const replaceSiteBase = () => new Transform({
 
 
 /**
- * ---------------------------------
+ * ------------------------------------
+ * -----  `phpMinifyTransform()`  -----
+ * ------------------------------------
+ * - Quita comentarios PHP y colapsa espacios. No toca strings ni heredocs.
+ * @return {Transform} - Transform que reescribe el PHP.
+ */
+const phpMinifyTransform = () => {
+
+    //  -----  crear el transform de minificado php  -----
+    return new Transform({
+
+        /** - `cada chunk es un archivo de vinyl` */
+        objectMode: true,
+
+        /**
+         * @param {import('vinyl')} file - Archivo PHP del stream.
+         * @param {BufferEncoding} _enc - Codificación, sin uso en modo objeto.
+         * @param {import('stream').TransformCallback} cb - `'callback' para continuar el stream`.
+         */
+        transform(file, _enc, cb) {
+
+            //  -----  si está vacío o es un directorio, dejarlo pasar  -----
+            if (file.isNull() || file.stat?.isDirectory?.())
+                //  -----  devolver el archivo sin cambios  -----
+                return cb(null, file);
+
+            //  -----  si el contenido es un buffer, minificar el php  -----
+            if (file.isBuffer()) {
+
+                /** @type {string} - `php leído del archivo` */
+                let content = file.contents.toString('utf8');
+
+                //  -----  quitar comentarios de bloque  -----
+                content = content.replace(/\/\*[\s\S]*?\*\//g, '');
+
+                //  -----  quitar comentarios de línea  -----
+                content = content.replace(/^\s*\/\/.*$/gm, '');
+
+                //  -----  colapsar espacios y líneas vacías  -----
+                content = content.split('\n').map((line) => line.trim()).filter(Boolean).join('\n');
+
+                //  -----  guardar el php minificado  -----
+                file.contents = Buffer.from(content, 'utf8');
+
+            }
+
+            //  -----  dejar pasar el archivo  -----
+            cb(null, file);
+
+        },
+
+    });
+
+};
+
+
+
+/**
+ * ----------------------------
  * -----  `minifyRootIndex()`  -----
- * ---------------------------------
- * - Minifica index.html raíz → dist/index.html.
+ * ----------------------------
+ * - Minifica index.html raíz → dist/, con la base sustituida.
  * @return {NodeJS.ReadWriteStream | Promise<void>} - Stream de la tarea o promesa vacía.
  */
 export const minifyRootIndex = () =>
@@ -950,10 +1017,28 @@ export const minifyAllJs = () =>
 
 
 /**
+ * --------------------------------
+ * -----  `minifyServices()`  -----
+ * --------------------------------
+ * - Minifica el PHP de app/ → dist/.
+ * @return {NodeJS.ReadWriteStream | Promise<void>} - Stream de minificado o promesa vacía.
+ */
+export const minifyServices = () =>
+
+    !existsDir(paths.appRoot)
+        ? Promise.resolve()
+        : src(paths.app.php, { base: '.', allowEmpty: true })
+            .pipe(safePipe())
+            .pipe(phpMinifyTransform())
+            .pipe(validateFiles('minifyServices'))
+            .pipe(dest(paths.distRoot));
+
+
+/**
  * ----------------------------------------
  * -----  `copyStaticAssetsToDist()`  -----
  * ----------------------------------------
- * - Copia assets estáticos (no HTML/CSS/JS/map) de app/ → dist/.
+ * - Copia assets estáticos (no HTML/CSS/JS/PHP/map) de app/ → dist/.
  * @return {NodeJS.ReadWriteStream | Promise<void>} - Stream de la tarea o promesa vacía.
  */
 export const copyStaticAssetsToDist = () =>
@@ -965,6 +1050,7 @@ export const copyStaticAssetsToDist = () =>
             '!' + paths.app.html,
             '!' + paths.app.css,
             '!' + paths.app.js,
+            '!' + paths.app.php,
             '!' + path.posix.join(paths.appRoot, '**/*.map'),
         ], { base: '.', allowEmpty: true, encoding: false })
             .pipe(safePipe())
@@ -1065,6 +1151,7 @@ export const build = series(
         minifyRootIndex,
         htaccessToDist,
         minifyHtml,
+        minifyServices,
         copyStaticAssetsToDist,
         copyRootAssetsToDist
     )
