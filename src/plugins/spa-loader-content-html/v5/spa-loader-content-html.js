@@ -2136,6 +2136,9 @@ export const spaLoaderContentHtml = (options = {}) => {
             //  -----  marcar que la navegación se hizo por popstate para evitar pushState duplicados al aplicar la ruta  -----
             isPopNavigation = true;
 
+            //  -----  detectar si el navegador ya arrancó su propia transición visual de historial para no iniciar la del plugin encima  -----
+            hasUAVisualTransition = e.hasUAVisualTransition === true;
+
             //  -----  actualizar favicon inmediatamente (síncronamente) desde el state para evitar parpadeo durante el async de lazy loading  -----
             if (e.state?.favicon)
                 updateFavicon(e.state.favicon);
