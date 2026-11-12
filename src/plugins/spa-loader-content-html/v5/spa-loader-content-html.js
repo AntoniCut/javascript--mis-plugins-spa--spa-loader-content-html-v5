@@ -28,6 +28,10 @@ export const spaLoaderContentHtml = (options = {}) => {
     let isPopNavigation = false;
 
 
+    /** - `Indica si el navegador ya arrancó su propia transición visual de historial (e.hasUAVisualTransition === true), para no iniciar la del plugin encima` */
+    let hasUAVisualTransition = false;
+
+
     /** - `Indica si hay una carga de ruta en curso, para evitar navegaciones concurrentes (race conditions ante clics rápidos)` */
     let isNavigating = false;
 
