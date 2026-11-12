@@ -19,14 +19,23 @@
 
 ## Tasks
 
-- **T1** gulpfile (S1) — route: inline — commit: pendiente
-- **T2** src/services PHP (S2, S3) — route: inline — commit: pendiente
-- **T3** server espejo Node (S4) — route: inline — commit: pendiente
-- **T4** docker + env + package.json (S5) — route: inline — commit: pendiente
-- **T5** deploy.sh hardening (S6) — route: inline — commit: pendiente
-- **T6** infra/ producción (S7) — route: inline — commit: pendiente
-- **T7** specs/arquitectura skill (S8) — route: inline — commit: pendiente
-- **T8** .htaccess (S9) — route: inline — commit: pendiente
+- **T1** gulpfile (S1) — route: inline — commit: `3f76f34` — evidencia: refresh copia `app/services/*.php`; build minifica a `dist/app/services/` (231→131 líneas)
+- **T2** src/services PHP (S2, S3) — route: inline — commit: `3f76f34` — evidencia: `php -l` OK; sondas php-cgi 405/400/500 según contrato
+- **T3** server espejo Node (S4) — route: inline — commit: `bb57450` — evidencia: sondas dev-server 400/500 según contrato
+- **T4** docker + env + package.json (S5) — route: inline — commit: `bb57450` — evidencia: mysql2 instalado; Docker daemon no disponible en esta máquina (check ambiental pendiente)
+- **T5** deploy.sh hardening (S6) — route: inline — commit: `0a7a9a5` (deploy.sh.example; deploy.sh es local) — evidencia: `bash -n` OK
+- **T6** infra/ producción (S7) — route: inline — commit: `0a7a9a5` — evidencia: nginx conf modelada sobre config documentada de referencia
+- **T7** specs/arquitectura skill (S8) — route: inline — commit: `05d25b9`
+- **T8** .htaccess (S9) — route: inline — commit: `0a7a9a5` — evidencia: FilesMatch presente en dist/.htaccess
+
+## Verificación
+
+- `php -l` en fuentes y minificados: OK.
+- `pnpm run refresh` → `app/services/` poblado. `pnpm run build` → `dist/app/services/*` minificado, sin `.env*` en dist.
+- Sondas funcionales (dev-server, php-cgi + espejo Node): GET→405, INSERT/DELETE→400, INTO OUTFILE→400, SELECT sin MySQL local→500 "Connection refused" (PHP) / ECONNREFUSED 3308 (Node). Contrato verificado en ambos runtimes.
+- Differential check vs `765941d` (worktree scratch con mismo lockfile): dist byte-idéntico salvo adiciones de `services/`, `.htaccess` intencional y sourcemaps con ruta del directorio del scratch.
+- Check ambiental pendiente: ida y vuelta real con MySQL (Docker daemon no corre en esta máquina).
+- RDD: assessment del slice `765941d..HEAD` → `high` (shell_process en infra/provision). Preflight STATUS → START con consentimiento relay → consent v3 presentado al usuario.
 
 ## Log
 
