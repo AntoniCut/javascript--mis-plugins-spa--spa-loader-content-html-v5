@@ -1,6 +1,6 @@
 # SPEC 09 — View Transition del plugin vs transición de navegación del navegador
 
-> **Estado:** Aprovada
+> **Estado:** Aprobado
 > **Depende de:** Ninguna
 > **Fecha:** 2026-11-12
 > **Objetivo:** Eliminar el error de consola `Transition was skipped. Navigation transition active` en navegación back/forward rápida haciendo que el plugin no inicie su View Transition cuando el navegador ya arrancó la propia (vía `PopStateEvent.hasUAVisualTransition`), manteniendo la animación en navegaciones por clic.
