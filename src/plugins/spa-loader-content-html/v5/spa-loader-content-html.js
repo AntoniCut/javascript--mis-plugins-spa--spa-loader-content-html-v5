@@ -505,6 +505,12 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const loadContent = async (route) => {
 
+        //  -----  consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación  -----
+        const skipViewTransition = hasUAVisualTransition;
+
+        //  -----  resetear el flag tras leerlo (consumo único) para que la siguiente navegación no herede la omisión  -----
+        hasUAVisualTransition = false;
+
         //  -----  guard de navegación: si ya hay una carga en curso, abortarla para evitar race conditions ante clics rápidos  -----
         if (isNavigating && activeNavigationAbort) {
             //  -----  abortar la navegación en curso  -----
