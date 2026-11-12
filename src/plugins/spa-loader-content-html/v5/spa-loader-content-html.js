@@ -132,7 +132,7 @@ export const spaLoaderContentHtml = (options = {}) => {
         //  -----  configurar listener para navegación (antes de la carga inicial para capturar clics durante la carga)  -----
         setupEventListeners();
 
-        //  -----  buscar la entrada del manifest que corresponde a la URL actual  -----
+        /** - `buscar la entrada del manifest que corresponde a la URL actual` */
         const entry = findManifestEntryByPath(window.location.pathname);
 
         //  -----  si se encuentra una entrada en el manifest, cargar la ruta correspondiente  -----
@@ -141,7 +141,7 @@ export const spaLoaderContentHtml = (options = {}) => {
             //  -----  intentar importar la ruta de la entrada del manifest  -----
             try {
 
-                //  -----  importar dinámicamente el módulo de ruta y cargar su contenido  -----
+                /** - `importar dinámicamente el módulo de ruta y cargar su contenido` */
                 const route = await loadRouteModule(entry.file);
 
                 //  -----  si se importó la ruta, cargar su contenido  -----
@@ -453,7 +453,7 @@ export const spaLoaderContentHtml = (options = {}) => {
         //  -----  intentar importar la ruta 404  -----
         try {
 
-            //  -----  importar dinámicamente el módulo de la ruta 404 y cargar su contenido  -----
+            /** - `importar dinámicamente el módulo de la ruta 404 y cargar su contenido` */
             const route = await loadRouteModule(entry404.file);
 
             //  -----  si se pudo importar la ruta 404, cargar su contenido  -----
@@ -505,7 +505,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const loadContent = async (route) => {
 
-        //  -----  consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación  -----
+        /** - `consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación` */
         const skipViewTransition = hasUAVisualTransition;
 
         //  -----  resetear el flag tras leerlo (consumo único) para que la siguiente navegación no herede la omisión  -----
@@ -517,11 +517,11 @@ export const spaLoaderContentHtml = (options = {}) => {
             activeNavigationAbort.abort();
         }
 
-        //  -----  crear un nuevo AbortController para esta navegación y marcarlo como el activo  -----
+        /** - `crear un nuevo AbortController para esta navegación y marcarlo como el activo` */
         const controller = new AbortController();
         activeNavigationAbort = controller;
 
-        //  -----  señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva  -----
+        /** - `señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva` */
         const signal = controller.signal;
 
         //  -----  marcar que hay una navegación en curso  -----
@@ -535,14 +535,17 @@ export const spaLoaderContentHtml = (options = {}) => {
                 //  -----  lanzar un error por ruta inválida  -----
                 throw new Error('Ruta inválida');
 
-            //  -----  FASE 1: Precargar TODO el contenido asíncrono (fetch) FUERA de la View Transition  -----
-            //  -----  así el callback de startViewTransition será síncrono y Chrome no aborta por timeout  -----
+            /** - `FASE 1: precargar TODO el contenido asíncrono (fetch) FUERA de la View Transition, así el callback de startViewTransition será síncrono y Chrome no aborta por timeout` */
             const payload = await preloadRouteContent(route, signal);
 
             //  -----  FASE 2: Mutar el DOM DENTRO de la View Transition (callback síncrono)  -----
             //  -----  las mutaciones (innerHTML, display, navbar, metadatos síncronos) son instantáneas  -----
 
-            /** - `Callback síncrono que aplica todo el contenido precargado de golpe al DOM` */
+            /**
+             * ------------------------
+             * -----  `mutate()`  -----
+             * ------------------------
+             * - `Callback síncrono que aplica todo el contenido precargado de golpe al DOM` */
             const mutate = () => applyPreloadedContent(payload, route);
 
 
@@ -553,7 +556,7 @@ export const spaLoaderContentHtml = (options = {}) => {
                 //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----
                 activeViewTransition = true;
 
-                //  -----  iniciar la View Transition con el callback síncrono de mutación del DOM  -----
+                /** - `iniciar la View Transition con el callback síncrono de mutación del DOM` */
                 const viewTransition = document.startViewTransition(() => mutate());
 
                 //  -----  esperar SOLO a que el DOM quede mutado (updateCallbackDone), NO a que termine la animación (finished).  -----
@@ -744,7 +747,7 @@ export const spaLoaderContentHtml = (options = {}) => {
                 //  -----  propagar el abort para cancelar la carga  -----
                 throw e;
 
-            //  -----  distinguir error HTTP (respuesta recibida con código de error) de error de red (sin respuesta)  -----
+            /** - `distinguir error HTTP (respuesta recibida con código de error) de error de red (sin respuesta)` */
             const isHttpError = e instanceof Error && /^HTTP \d/.test(e.message);
 
             //  -----  mostrar el error de descarga en consola  -----
@@ -781,6 +784,10 @@ export const spaLoaderContentHtml = (options = {}) => {
     const preloadRouteContent = async (route, signal) => {
 
         /**
+         * ----------------------------
+         * -----  `payload` = {}  -----
+         * ----------------------------
+         * - `Objeto con el contenido precargado.`
          * @type {{
          *   components: Array<{el: HTMLElement, html: string} | {el: HTMLElement, hide: true}>,
          *   hasComponents: boolean,
@@ -796,11 +803,15 @@ export const spaLoaderContentHtml = (options = {}) => {
         };
 
 
-        //  -----  precargar componentes del DOM (route.components)  -----
-        //  -----  sus contenedores (layoutHeader, layoutNavbar, layoutMain, layoutFooter) SÍ existen ya en el DOM,  -----
-        //  -----  así que se resuelve el elemento real para inyectar en la fase de mutación.  -----
-        //  -----  los fetch se lanzan EN PARALELO (Promise.all): no hay dependencia entre ellos en la fase de  -----
-        //  -----  descarga; el orden de dependencia solo importa al inyectar (applyPreloadedContent).  -----
+        /**
+         * -----------------------------------
+         * -----  `preloadComponents()`  -----
+         * -----------------------------------
+         * @async
+         * - Precarga el HTML de los componentes del DOM (route.components) con fetch en paralelo, sin tocar el DOM.
+         * - Sus contenedores (layoutHeader, layoutNavbar, layoutMain, layoutFooter) ya existen en el DOM, así que se resuelve el elemento real para inyectar en la fase de mutación.
+         * - No hay dependencia entre los fetch en la fase de descarga; el orden solo importa al inyectar (applyPreloadedContent).
+         */
         const preloadComponents = async () => {
 
             //  -----  si la ruta no declara components, avisar y salir  -----
@@ -853,11 +864,15 @@ export const spaLoaderContentHtml = (options = {}) => {
         };
 
 
-        //  -----  precargar page components (route.pagesComponents)  -----
-        //  -----  OJO: sus contenedores destino (p.ej. [data-component-page="htmlPage"]) viven DENTRO  -----
-        //  -----  del HTML de los componentes principales, que aún NO se ha inyectado. Por eso aquí solo  -----
-        //  -----  hacemos fetch y guardamos el selector como string; el contenedor se resuelve en la  -----
-        //  -----  fase de mutación (applyPreloadedContent), tras inyectar los componentes principales.  -----
+        /**
+         * ---------------------------------------
+         * -----  `preloadPageComponents()`  -----
+         * ---------------------------------------
+         * @async
+         * - Precarga el HTML de los page components (route.pagesComponents) con fetch en paralelo, sin tocar el DOM.
+         * - Sus contenedores destino (p. ej. [data-component-page="htmlPage"]) viven dentro del HTML de los componentes principales, que aún no se ha inyectado.
+         * - Aquí solo se hace fetch y se guarda el selector como string; el contenedor se resuelve en la fase de mutación (applyPreloadedContent), tras inyectar los componentes principales.
+         */
         const preloadPageComponents = async () => {
 
             //  -----  si la ruta no declara pagesComponents, salir  -----
@@ -897,11 +912,15 @@ export const spaLoaderContentHtml = (options = {}) => {
         };
 
 
-        //  -----  precargar Markdown Shiki (route.MarkdownShikiHtml)  -----
-        //  -----  OJO: sus contenedores destino (p.ej. [data-shiki="codeHtml"]) viven DENTRO del HTML  -----
-        //  -----  de los page components (o de los componentes principales), que aún NO se ha inyectado.  -----
-        //  -----  aquí solo hacemos fetch y guardamos el selector; se resuelve en la fase de mutación,  -----
-        //  -----  tras inyectar componentes principales y page components.  -----
+        /**
+         * --------------------------------------
+         * -----  `preloadMarkdownShiki()`  -----
+         * --------------------------------------
+         * @async
+         * - Precarga el HTML de Markdown Shiki (route.MarkdownShikiHtml) con fetch en paralelo, sin tocar el DOM.
+         * - Sus contenedores destino (p. ej. [data-shiki="codeHtml"]) viven dentro del HTML de los page components (o de los componentes principales), que aún no se ha inyectado.
+         * - Aquí solo se hace fetch y se guarda el selector; se resuelve en la fase de mutación, tras inyectar componentes principales y page components.
+         */
         const preloadMarkdownShiki = async () => {
 
             //  -----  si la ruta no declara MarkdownShikiHtml, salir  -----
@@ -1272,7 +1291,7 @@ export const spaLoaderContentHtml = (options = {}) => {
         //  -----  evitar push duplicado  -----
         if (!isPopNavigation && window.location.pathname !== newPathname) {
 
-            //  -----  buscar el archivo de ruta en el manifest para guardarlo en el historial  -----
+            /** - `buscar el archivo de ruta en el manifest para guardarlo en el historial` */
             const manifestEntry = findManifestEntryById(route.id);
 
             //  -----  pushState con pathname normalizado, routeFile y favicon para actualización inmediata en popstate  -----
@@ -1962,7 +1981,7 @@ export const spaLoaderContentHtml = (options = {}) => {
 
                 console.log(`✅ Módulo importado: ${moduleUrl}`);
 
-                //  -----  si se especificó exportFunctionName y es una función exportada del módulo, la ejecutamos (re-render en cada navegación)  -----
+                /** - `si se especificó exportFunctionName y es una función exportada del módulo, la ejecutamos (re-render en cada navegación)` */
                 const exported = exportFunctionName ? module[exportFunctionName] : undefined;
 
                 if (typeof exported === 'function') {
