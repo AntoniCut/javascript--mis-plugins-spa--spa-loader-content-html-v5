@@ -546,9 +546,9 @@ export const spaLoaderContentHtml = (options = {}) => {
             const mutate = () => applyPreloadedContent(payload, route);
 
 
-            //  -----  si el navegador soporta View Transitions y no hay otra en curso, iniciar la View Transition  -----
-            //  -----  con el callback síncrono de mutación del DOM  -----
-            if (document.startViewTransition && !activeViewTransition) {
+            //  -----  si el navegador soporta View Transitions, no hay otra en curso y el navegador no está animando su propia  -----
+            //  -----  transición de historial (popstate), iniciar la View Transition con el callback síncrono de mutación del DOM  -----
+            if (document.startViewTransition && !activeViewTransition && !skipViewTransition) {
 
                 //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----
                 activeViewTransition = true;
