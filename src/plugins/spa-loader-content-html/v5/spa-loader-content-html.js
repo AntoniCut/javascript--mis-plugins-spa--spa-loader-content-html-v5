@@ -28,6 +28,10 @@ export const spaLoaderContentHtml = (options = {}) => {
     let isPopNavigation = false;
 
 
+    /** - `Indica si el navegador ya arrancó su propia transición visual de historial (e.hasUAVisualTransition === true), para no iniciar la del plugin encima` */
+    let hasUAVisualTransition = false;
+
+
     /** - `Indica si hay una carga de ruta en curso, para evitar navegaciones concurrentes (race conditions ante clics rápidos)` */
     let isNavigating = false;
 
@@ -501,6 +505,12 @@ export const spaLoaderContentHtml = (options = {}) => {
 
     const loadContent = async (route) => {
 
+        //  -----  consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación  -----
+        const skipViewTransition = hasUAVisualTransition;
+
+        //  -----  resetear el flag tras leerlo (consumo único) para que la siguiente navegación no herede la omisión  -----
+        hasUAVisualTransition = false;
+
         //  -----  guard de navegación: si ya hay una carga en curso, abortarla para evitar race conditions ante clics rápidos  -----
         if (isNavigating && activeNavigationAbort) {
             //  -----  abortar la navegación en curso  -----
@@ -536,9 +546,9 @@ export const spaLoaderContentHtml = (options = {}) => {
             const mutate = () => applyPreloadedContent(payload, route);
 
 
-            //  -----  si el navegador soporta View Transitions y no hay otra en curso, iniciar la View Transition  -----
-            //  -----  con el callback síncrono de mutación del DOM  -----
-            if (document.startViewTransition && !activeViewTransition) {
+            //  -----  si el navegador soporta View Transitions, no hay otra en curso y el navegador no está animando su propia  -----
+            //  -----  transición de historial (popstate), iniciar la View Transition con el callback síncrono de mutación del DOM  -----
+            if (document.startViewTransition && !activeViewTransition && !skipViewTransition) {
 
                 //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----
                 activeViewTransition = true;
@@ -2131,6 +2141,9 @@ export const spaLoaderContentHtml = (options = {}) => {
 
             //  -----  marcar que la navegación se hizo por popstate para evitar pushState duplicados al aplicar la ruta  -----
             isPopNavigation = true;
+
+            //  -----  detectar si el navegador ya arrancó su propia transición visual de historial para no iniciar la del plugin encima  -----
+            hasUAVisualTransition = e.hasUAVisualTransition === true;
 
             //  -----  actualizar favicon inmediatamente (síncronamente) desde el state para evitar parpadeo durante el async de lazy loading  -----
             if (e.state?.favicon)

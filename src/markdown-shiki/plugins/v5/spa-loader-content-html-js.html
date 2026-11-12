@@ -9,6 +9,10 @@
 <span class="line"><span style="color:#569CD6">    let</span><span style="color:#9CDCFE"> isPopNavigation</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `Indica si el navegador ya arrancó su propia transición visual de historial (e.hasUAVisualTransition === true), para no iniciar la del plugin encima` */</span></span>
+<span class="line"><span style="color:#569CD6">    let</span><span style="color:#9CDCFE"> hasUAVisualTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"></span>
 <span class="line"><span style="color:#6A9955">    /** - `Indica si hay una carga de ruta en curso, para evitar navegaciones concurrentes (race conditions ante clics rápidos)` */</span></span>
 <span class="line"><span style="color:#569CD6">    let</span><span style="color:#9CDCFE"> isNavigating</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
@@ -482,6 +486,12 @@
 <span class="line"></span>
 <span class="line"><span style="color:#569CD6">    const</span><span style="color:#DCDCAA"> loadContent</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación  -----</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> skipViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">hasUAVisualTransition</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  resetear el flag tras leerlo (consumo único) para que la siguiente navegación no herede la omisión  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        hasUAVisualTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
 <span class="line"><span style="color:#6A9955">        //  -----  guard de navegación: si ya hay una carga en curso, abortarla para evitar race conditions ante clics rápidos  -----</span></span>
 <span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">isNavigating</span><span style="color:#D4D4D4"> &#x26;&#x26; </span><span style="color:#9CDCFE">activeNavigationAbort</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"><span style="color:#6A9955">            //  -----  abortar la navegación en curso  -----</span></span>
@@ -517,9 +527,9 @@
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#DCDCAA"> mutate</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#DCDCAA"> applyPreloadedContent</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">payload</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  si el navegador soporta View Transitions y no hay otra en curso, iniciar la View Transition  -----</span></span>
-<span class="line"><span style="color:#6A9955">            //  -----  con el callback síncrono de mutación del DOM  -----</span></span>
-<span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">startViewTransition</span><span style="color:#D4D4D4"> &#x26;&#x26; !</span><span style="color:#9CDCFE">activeViewTransition</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  si el navegador soporta View Transitions, no hay otra en curso y el navegador no está animando su propia  -----</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  transición de historial (popstate), iniciar la View Transition con el callback síncrono de mutación del DOM  -----</span></span>
+<span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">startViewTransition</span><span style="color:#D4D4D4"> &#x26;&#x26; !</span><span style="color:#9CDCFE">activeViewTransition</span><span style="color:#D4D4D4"> &#x26;&#x26; !</span><span style="color:#9CDCFE">skipViewTransition</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">                activeViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
@@ -2112,6 +2122,9 @@
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  marcar que la navegación se hizo por popstate para evitar pushState duplicados al aplicar la ruta  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">            isPopNavigation</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  detectar si el navegador ya arrancó su propia transición visual de historial para no iniciar la del plugin encima  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            hasUAVisualTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">hasUAVisualTransition</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  actualizar favicon inmediatamente (síncronamente) desde el state para evitar parpadeo durante el async de lazy loading  -----</span></span>
 <span class="line"><span style="color:#C586C0">            if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">state</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">favicon</span><span style="color:#D4D4D4">)</span></span>
