@@ -3,6 +3,19 @@
 Plugin SPA en Vanilla JS (ES Modules) para cargar contenido HTML dinámicamente,
 con renderizado de código fuente resaltado mediante Shiki (tema `dark-plus`).
 
+## Inicio rápido
+
+Requisitos: Node.js 24 y pnpm 11.
+
+```bash
+pnpm install
+cp .env.example .env   # completá SITE_BASE
+pnpm dev
+```
+
+La consola imprime la URL y el puerto reales (puede no ser `3000`).
+`pnpm dev` vacía y regenera `app/`; editá siempre en `src/`, nunca en `app/` ni `dist/`.
+
 ## Scripts
 
 | Script | Descripción |
@@ -34,6 +47,24 @@ Copia `.env.example` a `.env` antes de arrancar. `SITE_BASE` es obligatoria.
 `pnpm stop:dev` y `pnpm stop:preview` buscan en esos mismos rangos de puertos y solo detienen el `server/dev-server.js` o el `server/preview-server.js` que corren desde este proyecto.
 
 `index.html` y `.htaccess` llevan el marcador `%SITE_BASE%`. El servidor de desarrollo lo sustituye al servir y `pnpm build` lo sustituye en `dist/index.html` y `dist/.htaccess`. En el navegador, `src/config/site-base.js` deduce la base de `<base href>`.
+
+## Estructura del proyecto
+
+| Ruta | Qué es | ¿Se versiona? |
+|---|---|---|
+| `src/` | Fuente de verdad: SPA, plugin, rutas, páginas, SCSS y servicios PHP | Sí |
+| `src/markdown-shiki/` | HTML resaltado por Shiki, pre-generado | Sí |
+| `app/` | Copia regenerada por Gulp desde `src/` para desarrollo | No |
+| `dist/` | Build minificado para producción | No |
+| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, espejos de API y preview | Sí |
+| `infra/` | Configuración del servidor de producción (nginx, PHP-FPM, provision). Se aplica a mano en el VPS | Sí |
+| `types/` | Tipos globales y JSDoc compartidos | Sí |
+| `docker/mysql/` | MySQL local para desarrollo | Sí |
+| `specs/` | Specs numeradas y decisiones de arquitectura | Sí |
+| `odd/tasks/` | Documentos de tareas ODD | Sí |
+
+> `app/` y `dist/` son generados. Si un cambio desaparece al correr `pnpm dev` o
+> `pnpm build`, estabas editando la carpeta equivocada.
 
 ## MarkdownShiki
 
@@ -110,3 +141,37 @@ watch de Gulp copie:
 ```bash
 pnpm code-highlight
 ```
+
+## Verificación
+
+No hay suite de tests: `pnpm test` es un placeholder que falla a propósito.
+La verificación mínima de un cambio es:
+
+1. `pnpm build` termina sin errores.
+2. `pnpm preview` sirve `dist/` y la vista tocada carga sin errores de consola.
+3. Si tocaste una fuente referenciada por una ruta de Shiki: `pnpm code-highlight`.
+
+## Deploy
+
+`deploy.sh` (local, gitignored) hace `pnpm build` y sube con rsync:
+
+- `dist/` → `/var/www/javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5`
+  con `--delete`. El `.env` remoto queda protegido por `--exclude` y
+  `--filter 'P .env'`.
+- `.env.production` → `.env` remoto, con permisos `F640 root:www-data`.
+
+Lo que **no** hace:
+
+- No aplica `infra/`. El bloque nginx y el provision del VPS se copian y
+  ejecutan a mano; ver `infra/README.md`.
+- No crea ni migra la base MySQL.
+- No reinicia PHP-FPM.
+
+La plantilla versionada es `deploy.sh.example`: copiala, completá host y rutas, y
+no commitees el `deploy.sh` real.
+
+## Documentación para agentes
+
+Las convenciones, los comandos y las trampas del repo para agentes de IA están
+en [`AGENTS.md`](./AGENTS.md). Las decisiones de arquitectura y las reglas de
+negocio viven en `specs/`, y las tareas en curso en `odd/tasks/`.
