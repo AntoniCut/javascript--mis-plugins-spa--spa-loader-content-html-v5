@@ -41,7 +41,9 @@ rsync -avz --delete \
 
 if [ -f .env.production ]; then
   echo "==> Subiendo .env de produccion..."
-  rsync -avz --chmod=F640 \
+  # --chown=root:www-data: PHP-FPM corre como www-data y debe poder leerlo.
+  # Requiere VPS_USER=root; sin esto, -a preserva el dueño local y PHP no lee el .env.
+  rsync -avz --chmod=F640 --chown=root:www-data \
     -e "ssh -p $VPS_PORT" \
     .env.production \
     "$VPS_USER@$VPS_HOST:$REMOTE_PATH/.env"
