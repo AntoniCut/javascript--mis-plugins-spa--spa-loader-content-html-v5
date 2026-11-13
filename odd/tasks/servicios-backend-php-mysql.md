@@ -19,14 +19,14 @@
 
 ## Tasks
 
-- **T1** gulpfile (S1) — route: inline — commit: pendiente
-- **T2** src/services PHP (S2, S3) — route: inline — commit: pendiente
-- **T3** server espejo Node (S4) — route: inline — commit: pendiente
-- **T4** docker + env + package.json (S5) — route: inline — commit: pendiente
-- **T5** deploy.sh hardening (S6) — route: inline — commit: pendiente
-- **T6** infra/ producción (S7) — route: inline — commit: pendiente
-- **T7** specs/arquitectura skill (S8) — route: inline — commit: pendiente
-- **T8** .htaccess (S9) — route: inline — commit: pendiente
+- **T1** gulpfile (S1) — route: inline — commit: `3f76f34` (C1)
+- **T2** src/services PHP (S2, S3) — route: inline — commit: `3f76f34` (C1) + fix `3ac14fc`
+- **T3** server espejo Node (S4) — route: inline — commit: `bb57450` (C2) + fix `3ac14fc`
+- **T4** docker + env + package.json (S5) — route: inline — commit: `bb57450` (C2) + fix `3ac14fc`
+- **T5** deploy.sh hardening (S6) — route: inline — commit: `0a7a9a5` (C3)
+- **T6** infra/ producción (S7) — route: inline — commit: `0a7a9a5` (C3)
+- **T7** specs/arquitectura skill (S8) — route: inline — commit: `05d25b9` (C4)
+- **T8** .htaccess (S9) — route: inline — commit: `0a7a9a5` (C3)
 
 ## Log
 
@@ -34,3 +34,5 @@
 - **L2** (2026-11-12, decisión de alcance, verbatim): "Implementar la arquitectura y con su ejemplo como en el spa-jquery-v5 con mysql"
 - **L3** (2026-11-12, decisiones de arquitectura acordadas): tres zonas — `server/` solo dev, `src/services/` código que viaja en el build (prod = PHP-FPM), `infra/` config del servidor de producción. Carpeta de skills: `specs/arquitectura/`. Regla de ubicación: un proyecto usa el servicio → colocalizado; dos o más → `services/` a nivel dominio (repo aparte).
 - **L4** (2026-11-12, adaptaciones vs referencia): defaults `javascript_user` / `javascript_mis_plugins_spa`, puerto MySQL local `3308` (la referencia usa 3307 para no pisar a jquery), container name `javascript-mis-plugins-spa-mysql`.
+- **L5** (2026-11-13, evidencia de commits): C1 `3f76f34` (gulpfile.js, src/services/load-env.php, src/services/mysql/query.php — 447+/4-); C2 `bb57450` (server/mysql-query.js, server/dev-server.js, docker-compose.yml, .env.example, docker/mysql/init/01-stacks.sql, package.json — 403+); C3 `0a7a9a5` (.htaccess, deploy.sh.example, infra/ — 154+); C4 `05d25b9` (specs/arquitectura/01-servicios-backend-arquitectura.md, odd/tasks — 114+); fix `3ac14fc` (query.php, mysql-query.js, docker-compose.yml — cierra bypass `WITH-DML` y honra `MYSQL_DATABASE`). Nota: `deploy.sh` real está en `.gitignore` (línea 26, contiene host/credenciales); se commitea la plantilla `deploy.sh.example`, coherente con el patrón jQuery.
+- **L6** (2026-11-13, re-verificación del fix `3ac14fc`): `php -l` (query.php, load-env.php) y `node --check` (mysql-query.js) OK. Batería determinística de 12 casos contra el regex exacto de `mysql_query_reject`/`rejectReason` (copiado literal): PHP y Node en paridad perfecta. Rechaza `WITH ... UPDATE/DELETE/INSERT`; no rompe lecturas (`SELECT`, `SHOW`, `DESCRIBE`, `EXPLAIN`, `WITH ... SELECT`, `WITH RECURSIVE`). Falsos positivos aceptables (conservador, rechaza de más): literales `'update'`/`'delete'` e identificadores con backticks `` `update` ``. `MYSQL_DATABASE` con default `javascript_mis_plugins_spa` en docker-compose, query.php y mysql-query.js (paridad).
