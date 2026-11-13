@@ -113,7 +113,7 @@
 <span class="line"><span style="color:#6A9955">        //  -----  configurar listener para navegación (antes de la carga inicial para capturar clics durante la carga)  -----</span></span>
 <span class="line"><span style="color:#DCDCAA">        setupEventListeners</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  buscar la entrada del manifest que corresponde a la URL actual  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /** - `buscar la entrada del manifest que corresponde a la URL actual` */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> entry</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">findManifestEntryByPath</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">window</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">location</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">pathname</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">        //  -----  si se encuentra una entrada en el manifest, cargar la ruta correspondiente  -----</span></span>
@@ -122,7 +122,7 @@
 <span class="line"><span style="color:#6A9955">            //  -----  intentar importar la ruta de la entrada del manifest  -----</span></span>
 <span class="line"><span style="color:#C586C0">            try</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                //  -----  importar dinámicamente el módulo de ruta y cargar su contenido  -----</span></span>
+<span class="line"><span style="color:#6A9955">                /** - `importar dinámicamente el módulo de ruta y cargar su contenido` */</span></span>
 <span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> route</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> loadRouteModule</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">entry</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">file</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                //  -----  si se importó la ruta, cargar su contenido  -----</span></span>
@@ -434,7 +434,7 @@
 <span class="line"><span style="color:#6A9955">        //  -----  intentar importar la ruta 404  -----</span></span>
 <span class="line"><span style="color:#C586C0">        try</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  importar dinámicamente el módulo de la ruta 404 y cargar su contenido  -----</span></span>
+<span class="line"><span style="color:#6A9955">            /** - `importar dinámicamente el módulo de la ruta 404 y cargar su contenido` */</span></span>
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#4FC1FF"> route</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> loadRouteModule</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">entry404</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">file</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  si se pudo importar la ruta 404, cargar su contenido  -----</span></span>
@@ -486,7 +486,7 @@
 <span class="line"></span>
 <span class="line"><span style="color:#569CD6">    const</span><span style="color:#DCDCAA"> loadContent</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /** - `consumir el flag de transición visual del navegador (popstate): true si el user agent ya anima esta navegación` */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> skipViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">hasUAVisualTransition</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">        //  -----  resetear el flag tras leerlo (consumo único) para que la siguiente navegación no herede la omisión  -----</span></span>
@@ -498,11 +498,11 @@
 <span class="line"><span style="color:#9CDCFE">            activeNavigationAbort</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">abort</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"><span style="color:#D4D4D4">        }</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  crear un nuevo AbortController para esta navegación y marcarlo como el activo  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /** - `crear un nuevo AbortController para esta navegación y marcarlo como el activo` */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> controller</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">new</span><span style="color:#DCDCAA"> AbortController</span><span style="color:#D4D4D4">();</span></span>
 <span class="line"><span style="color:#9CDCFE">        activeNavigationAbort</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">controller</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /** - `señal de esta navegación, para abortar fetches y detener la FASE 3 si llega una navegación más nueva` */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> signal</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">controller</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">        //  -----  marcar que hay una navegación en curso  -----</span></span>
@@ -516,14 +516,17 @@
 <span class="line"><span style="color:#6A9955">                //  -----  lanzar un error por ruta inválida  -----</span></span>
 <span class="line"><span style="color:#C586C0">                throw</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> Error</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Ruta inválida'</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  FASE 1: Precargar TODO el contenido asíncrono (fetch) FUERA de la View Transition  -----</span></span>
-<span class="line"><span style="color:#6A9955">            //  -----  así el callback de startViewTransition será síncrono y Chrome no aborta por timeout  -----</span></span>
+<span class="line"><span style="color:#6A9955">            /** - `FASE 1: precargar TODO el contenido asíncrono (fetch) FUERA de la View Transition, así el callback de startViewTransition será síncrono y Chrome no aborta por timeout` */</span></span>
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#4FC1FF"> payload</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> preloadRouteContent</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  FASE 2: Mutar el DOM DENTRO de la View Transition (callback síncrono)  -----</span></span>
 <span class="line"><span style="color:#6A9955">            //  -----  las mutaciones (innerHTML, display, navbar, metadatos síncronos) son instantáneas  -----</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            /** - `Callback síncrono que aplica todo el contenido precargado de golpe al DOM` */</span></span>
+<span class="line"><span style="color:#6A9955">            /**</span></span>
+<span class="line"><span style="color:#6A9955">             * ------------------------</span></span>
+<span class="line"><span style="color:#6A9955">             * -----  `mutate()`  -----</span></span>
+<span class="line"><span style="color:#6A9955">             * ------------------------</span></span>
+<span class="line"><span style="color:#6A9955">             * - `Callback síncrono que aplica todo el contenido precargado de golpe al DOM` */</span></span>
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#DCDCAA"> mutate</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#DCDCAA"> applyPreloadedContent</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">payload</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"></span>
@@ -534,7 +537,7 @@
 <span class="line"><span style="color:#6A9955">                //  -----  marcar que hay una View Transition en curso para no iniciar otra encima  -----</span></span>
 <span class="line"><span style="color:#9CDCFE">                activeViewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                //  -----  iniciar la View Transition con el callback síncrono de mutación del DOM  -----</span></span>
+<span class="line"><span style="color:#6A9955">                /** - `iniciar la View Transition con el callback síncrono de mutación del DOM` */</span></span>
 <span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> viewTransition</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">startViewTransition</span><span style="color:#D4D4D4">(() </span><span style="color:#569CD6">=></span><span style="color:#DCDCAA"> mutate</span><span style="color:#D4D4D4">());</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">                //  -----  esperar SOLO a que el DOM quede mutado (updateCallbackDone), NO a que termine la animación (finished).  -----</span></span>
@@ -725,7 +728,7 @@
 <span class="line"><span style="color:#6A9955">                //  -----  propagar el abort para cancelar la carga  -----</span></span>
 <span class="line"><span style="color:#C586C0">                throw</span><span style="color:#9CDCFE"> e</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  distinguir error HTTP (respuesta recibida con código de error) de error de red (sin respuesta)  -----</span></span>
+<span class="line"><span style="color:#6A9955">            /** - `distinguir error HTTP (respuesta recibida con código de error) de error de red (sin respuesta)` */</span></span>
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#4FC1FF"> isHttpError</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">e</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Error</span><span style="color:#D4D4D4"> &#x26;&#x26;</span><span style="color:#D16969"> /</span><span style="color:#DCDCAA">^</span><span style="color:#D16969">HTTP \d/</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">test</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">e</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  mostrar el error de descarga en consola  -----</span></span>
@@ -762,6 +765,10 @@
 <span class="line"><span style="color:#569CD6">    const</span><span style="color:#DCDCAA"> preloadRouteContent</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">signal</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">        /**</span></span>
+<span class="line"><span style="color:#6A9955">         * ----------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * -----  `payload` = {}  -----</span></span>
+<span class="line"><span style="color:#6A9955">         * ----------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * - `Objeto con el contenido precargado.`</span></span>
 <span class="line"><span style="color:#6A9955">         * </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {{</span></span>
 <span class="line"><span style="color:#4EC9B0">         *   components: Array&#x3C;{el: HTMLElement, html: string} | {el: HTMLElement, hide: true}>,</span></span>
 <span class="line"><span style="color:#4EC9B0">         *   hasComponents: boolean,</span></span>
@@ -777,11 +784,15 @@
 <span class="line"><span style="color:#D4D4D4">        };</span></span>
 <span class="line"></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  precargar componentes del DOM (route.components)  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  sus contenedores (layoutHeader, layoutNavbar, layoutMain, layoutFooter) SÍ existen ya en el DOM,  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  así que se resuelve el elemento real para inyectar en la fase de mutación.  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  los fetch se lanzan EN PARALELO (Promise.all): no hay dependencia entre ellos en la fase de  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  descarga; el orden de dependencia solo importa al inyectar (applyPreloadedContent).  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /**</span></span>
+<span class="line"><span style="color:#6A9955">         * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * -----  `preloadComponents()`  -----</span></span>
+<span class="line"><span style="color:#6A9955">         * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * </span><span style="color:#569CD6">@async</span></span>
+<span class="line"><span style="color:#6A9955">         * - Precarga el HTML de los componentes del DOM (route.components) con fetch en paralelo, sin tocar el DOM.</span></span>
+<span class="line"><span style="color:#6A9955">         * - Sus contenedores (layoutHeader, layoutNavbar, layoutMain, layoutFooter) ya existen en el DOM, así que se resuelve el elemento real para inyectar en la fase de mutación.</span></span>
+<span class="line"><span style="color:#6A9955">         * - No hay dependencia entre los fetch en la fase de descarga; el orden solo importa al inyectar (applyPreloadedContent).</span></span>
+<span class="line"><span style="color:#6A9955">         */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#DCDCAA"> preloadComponents</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  si la ruta no declara components, avisar y salir  -----</span></span>
@@ -834,11 +845,15 @@
 <span class="line"><span style="color:#D4D4D4">        };</span></span>
 <span class="line"></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  precargar page components (route.pagesComponents)  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  OJO: sus contenedores destino (p.ej. [data-component-page="htmlPage"]) viven DENTRO  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  del HTML de los componentes principales, que aún NO se ha inyectado. Por eso aquí solo  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  hacemos fetch y guardamos el selector como string; el contenedor se resuelve en la  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  fase de mutación (applyPreloadedContent), tras inyectar los componentes principales.  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /**</span></span>
+<span class="line"><span style="color:#6A9955">         * ---------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * -----  `preloadPageComponents()`  -----</span></span>
+<span class="line"><span style="color:#6A9955">         * ---------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * </span><span style="color:#569CD6">@async</span></span>
+<span class="line"><span style="color:#6A9955">         * - Precarga el HTML de los page components (route.pagesComponents) con fetch en paralelo, sin tocar el DOM.</span></span>
+<span class="line"><span style="color:#6A9955">         * - Sus contenedores destino (p. ej. [data-component-page="htmlPage"]) viven dentro del HTML de los componentes principales, que aún no se ha inyectado.</span></span>
+<span class="line"><span style="color:#6A9955">         * - Aquí solo se hace fetch y se guarda el selector como string; el contenedor se resuelve en la fase de mutación (applyPreloadedContent), tras inyectar los componentes principales.</span></span>
+<span class="line"><span style="color:#6A9955">         */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#DCDCAA"> preloadPageComponents</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  si la ruta no declara pagesComponents, salir  -----</span></span>
@@ -878,11 +893,15 @@
 <span class="line"><span style="color:#D4D4D4">        };</span></span>
 <span class="line"></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        //  -----  precargar Markdown Shiki (route.MarkdownShikiHtml)  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  OJO: sus contenedores destino (p.ej. [data-shiki="codeHtml"]) viven DENTRO del HTML  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  de los page components (o de los componentes principales), que aún NO se ha inyectado.  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  aquí solo hacemos fetch y guardamos el selector; se resuelve en la fase de mutación,  -----</span></span>
-<span class="line"><span style="color:#6A9955">        //  -----  tras inyectar componentes principales y page components.  -----</span></span>
+<span class="line"><span style="color:#6A9955">        /**</span></span>
+<span class="line"><span style="color:#6A9955">         * --------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * -----  `preloadMarkdownShiki()`  -----</span></span>
+<span class="line"><span style="color:#6A9955">         * --------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">         * </span><span style="color:#569CD6">@async</span></span>
+<span class="line"><span style="color:#6A9955">         * - Precarga el HTML de Markdown Shiki (route.MarkdownShikiHtml) con fetch en paralelo, sin tocar el DOM.</span></span>
+<span class="line"><span style="color:#6A9955">         * - Sus contenedores destino (p. ej. [data-shiki="codeHtml"]) viven dentro del HTML de los page components (o de los componentes principales), que aún no se ha inyectado.</span></span>
+<span class="line"><span style="color:#6A9955">         * - Aquí solo se hace fetch y se guarda el selector; se resuelve en la fase de mutación, tras inyectar componentes principales y page components.</span></span>
+<span class="line"><span style="color:#6A9955">         */</span></span>
 <span class="line"><span style="color:#569CD6">        const</span><span style="color:#DCDCAA"> preloadMarkdownShiki</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  si la ruta no declara MarkdownShikiHtml, salir  -----</span></span>
@@ -1253,7 +1272,7 @@
 <span class="line"><span style="color:#6A9955">        //  -----  evitar push duplicado  -----</span></span>
 <span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">isPopNavigation</span><span style="color:#D4D4D4"> &#x26;&#x26; </span><span style="color:#9CDCFE">window</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">location</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">pathname</span><span style="color:#D4D4D4"> !== </span><span style="color:#9CDCFE">newPathname</span><span style="color:#D4D4D4">) {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">            //  -----  buscar el archivo de ruta en el manifest para guardarlo en el historial  -----</span></span>
+<span class="line"><span style="color:#6A9955">            /** - `buscar el archivo de ruta en el manifest para guardarlo en el historial` */</span></span>
 <span class="line"><span style="color:#569CD6">            const</span><span style="color:#4FC1FF"> manifestEntry</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">findManifestEntryById</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">route</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">            //  -----  pushState con pathname normalizado, routeFile y favicon para actualización inmediata en popstate  -----</span></span>
@@ -1943,7 +1962,7 @@
 <span class="line"></span>
 <span class="line"><span style="color:#9CDCFE">                console</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">log</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">`✅ Módulo importado: </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">moduleUrl</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4">);</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">                //  -----  si se especificó exportFunctionName y es una función exportada del módulo, la ejecutamos (re-render en cada navegación)  -----</span></span>
+<span class="line"><span style="color:#6A9955">                /** - `si se especificó exportFunctionName y es una función exportada del módulo, la ejecutamos (re-render en cada navegación)` */</span></span>
 <span class="line"><span style="color:#569CD6">                const</span><span style="color:#4FC1FF"> exported</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">exportFunctionName</span><span style="color:#D4D4D4"> ? </span><span style="color:#4EC9B0">module</span><span style="color:#D4D4D4">[</span><span style="color:#9CDCFE">exportFunctionName</span><span style="color:#D4D4D4">] : </span><span style="color:#569CD6">undefined</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#C586C0">                if</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">typeof</span><span style="color:#9CDCFE"> exported</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'function'</span><span style="color:#D4D4D4">) {</span></span>

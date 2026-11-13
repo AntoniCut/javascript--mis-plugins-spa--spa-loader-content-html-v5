@@ -1,0 +1,264 @@
+<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> setStatus</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">isError</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  escribir el aviso  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    status</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  marcar el aviso como error o como resultado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    status</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">classList</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">toggle</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'is-error'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">isError</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `clearResult(result)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Vacía la tabla anterior.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#9CDCFE"> result</span><span style="color:#6A9955"> - Contenedor del resultado.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> clearResult</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  quitar la tabla anterior  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    result</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">replaceChildren</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `renderTable(result, columns, rows)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Pinta las filas en una tabla semántica.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#9CDCFE"> result</span><span style="color:#6A9955"> - Contenedor del resultado.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {string[]}</span><span style="color:#9CDCFE"> columns</span><span style="color:#6A9955"> - Nombres de columna.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Array&#x3C;Record&#x3C;string, string|number|boolean|null>>}</span><span style="color:#9CDCFE"> rows</span><span style="color:#6A9955"> - Filas de la consulta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> renderTable</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">columns</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">rows</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableElement}</span><span style="color:#6A9955"> - `tabla del resultado` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> table</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'table'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  asignar la clase de la tabla  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    table</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'mysql-page__table'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableSectionElement}</span><span style="color:#6A9955"> - `cabecera de la tabla` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> thead</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'thead'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableRowElement}</span><span style="color:#6A9955"> - `fila de nombres de columna` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> headRow</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'tr'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  crear cada cabecera  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> column</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> columns</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableCellElement}</span><span style="color:#6A9955"> - `nombre de columna` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> th</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'th'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  marcar la celda como cabecera de columna  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        th</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">scope</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'col'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el nombre  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        th</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">column</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir la cabecera a la fila  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        headRow</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">th</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  añadir la fila de cabeceras  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    thead</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">headRow</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  añadir la cabecera a la tabla  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    table</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">thead</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableSectionElement}</span><span style="color:#6A9955"> - `cuerpo de la tabla` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> tbody</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'tbody'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  crear cada fila  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> row</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> rows</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableRowElement}</span><span style="color:#6A9955"> - `fila de datos` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> tr</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'tr'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  crear cada celda  -----</span></span>
+<span class="line"><span style="color:#C586C0">        for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> column</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> columns</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTableCellElement}</span><span style="color:#6A9955"> - `celda de la fila` */</span></span>
+<span class="line"><span style="color:#569CD6">            const</span><span style="color:#4FC1FF"> td</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'td'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            /** - `valor de la celda` */</span></span>
+<span class="line"><span style="color:#569CD6">            const</span><span style="color:#4FC1FF"> value</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">row</span><span style="color:#D4D4D4">[</span><span style="color:#9CDCFE">column</span><span style="color:#D4D4D4">];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar NULL cuando la celda viene vacía  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            td</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">undefined</span><span style="color:#D4D4D4"> ? </span><span style="color:#CE9178">'NULL'</span><span style="color:#D4D4D4"> : </span><span style="color:#DCDCAA">String</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  añadir la celda a la fila  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            tr</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">td</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir la fila al cuerpo  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        tbody</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">tr</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  añadir el cuerpo a la tabla  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    table</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">tbody</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  mostrar la tabla  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    result</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">table</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `runQuery(form)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Envía el sql al servidor y pinta la respuesta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLFormElement}</span><span style="color:#9CDCFE"> form</span><span style="color:#6A9955"> - Formulario de la consulta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;void>}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> runQuery</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTextAreaElement|null}</span><span style="color:#6A9955"> - `campo del sql` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> field</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[name="sql"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `aviso de la consulta` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> status</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">parentElement</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-mysql-status]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `contenedor de la tabla` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> result</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">parentElement</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-mysql-result]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLButtonElement|null}</span><span style="color:#6A9955"> - `botón de envío` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> button</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[type="submit"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si falta alguna pieza del formulario  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">field</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLTextAreaElement</span><span style="color:#D4D4D4">) || !</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4"> || !</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4"> || !(</span><span style="color:#9CDCFE">button</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLButtonElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay destino para el resultado  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  vaciar el resultado anterior  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    clearResult</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  avisar de que la consulta está en curso  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'Consultando…'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  bloquear el botón mientras responde el servidor  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  intentar la petición  -----</span></span>
+<span class="line"><span style="color:#C586C0">    try</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `respuesta php, la misma en desarrollo y en nginx` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'app/services/mysql/query.php'</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            method:</span><span style="color:#CE9178"> 'POST'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            headers:</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#CE9178">                'Content-Type'</span><span style="color:#9CDCFE">:</span><span style="color:#CE9178"> 'application/json'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            },</span></span>
+<span class="line"><span style="color:#9CDCFE">            body:</span><span style="color:#4FC1FF"> JSON</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">stringify</span><span style="color:#D4D4D4">({</span></span>
+<span class="line"><span style="color:#9CDCFE">                sql:</span><span style="color:#9CDCFE"> field</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            }),</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `tipo declarado por el servidor` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> contentType</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">headers</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">get</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'content-type'</span><span style="color:#D4D4D4">) || </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  si nginx devolvió html, no leerlo como json  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">contentType</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">includes</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'application/json'</span><span style="color:#D4D4D4">)) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el código http en la página  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`El servidor respondió </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> sin JSON. La consulta no llegó a PHP.`</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no pintar una tabla  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {MysqlQueryResponse}</span><span style="color:#6A9955"> - `cuerpo json de la consulta` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> body</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#9CDCFE"> response</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo devuelto por el servidor  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">ok</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  escribir el motivo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'No se pudo ejecutar la consulta.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no pintar una tabla vacía  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el recuento  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  pintar las filas  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        renderTable</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">columns</span><span style="color:#D4D4D4"> || [], </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">rows</span><span style="color:#D4D4D4"> || []);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  si la petición no llega, avisar en la página  -----</span></span>
+<span class="line"><span style="color:#C586C0">    catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `texto del fallo de red` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> message</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">error</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Error</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'No se pudo contactar con el servidor.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo de red  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  volver a permitir el envío  -----</span></span>
+<span class="line"><span style="color:#C586C0">    finally</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  activar el botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `mount()`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Enlaza el formulario de consulta cuando la ruta ya está en el DOM.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#C586C0">export</span><span style="color:#569CD6"> const</span><span style="color:#DCDCAA"> mount</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLFormElement|null}</span><span style="color:#6A9955"> - `formulario de la consulta` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> form</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-mysql-query-form]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si esta ruta no está montada  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">form</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLFormElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay formulario  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  no volver a enlazar el mismo formulario  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">bound</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  el envío ya está enlazado  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  marcar el formulario como enlazado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">bound</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  enviar la consulta sin recargar la SPA  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'submit'</span><span style="color:#D4D4D4">, (</span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  evitar el envío nativo del formulario  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        event</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">preventDefault</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  lanzar la consulta  -----</span></span>
+<span class="line"><span style="color:#569CD6">        void</span><span style="color:#DCDCAA"> runQuery</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span></code></pre>
