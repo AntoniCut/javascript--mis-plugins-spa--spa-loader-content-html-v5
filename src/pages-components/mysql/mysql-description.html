@@ -1,0 +1,87 @@
+<!--
+    *  -------------------------------------------------------------------------  *
+    *  -----  mysql-description.html  --  /src/pages-components/mysql/mysql-description.html  -----  *
+    *  -------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="mysql-page">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="mysql-page__hero">
+        <div class="mysql-page__hero-badge">
+            <span class="mysql-page__hero-tag" aria-hidden="true">SQL</span>
+            <h3 class="mysql-page__hero-title">MySQL</h3>
+            <p class="mysql-page__hero-subtitle">Consultas sobre javascript_mis_plugins_spa</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Intro  -----  -->
+    <section class="mysql-page__intro">
+        <p class="mysql-page__intro-text">
+            <strong>MySQL</strong> guarda la tabla <strong>stacks</strong> de este prototipo.
+            El contenedor Docker publica el puerto <strong>3308</strong> para no ocupar el
+            MySQL del curso de EscuelaIT.
+        </p>
+        <p class="mysql-page__intro-text">
+            El navegador no se conecta a MySQL. El formulario envía la sentencia a
+            <strong>app/services/mysql/query.php</strong>, que la ejecuta con el usuario
+            <strong>javascript_user</strong> y devuelve las filas en JSON.
+        </p>
+    </section>
+
+
+    <!--  -----  Features  -----  -->
+    <section class="mysql-page__features">
+
+        <h3 class="mysql-page__features-title">Qué puedes consultar</h3>
+
+        <div class="mysql-page__features-grid">
+
+            <article class="mysql-page__feature">
+                <h4 class="mysql-page__feature-title">Tabla stacks</h4>
+                <p class="mysql-page__feature-text">
+                    Siete páginas del stack: slug, título, ruta y orden.
+                </p>
+            </article>
+
+            <article class="mysql-page__feature">
+                <h4 class="mysql-page__feature-title">Solo lectura</h4>
+                <p class="mysql-page__feature-text">
+                    SELECT, SHOW, DESCRIBE y EXPLAIN. Una sentencia por envío.
+                </p>
+            </article>
+
+            <article class="mysql-page__feature">
+                <h4 class="mysql-page__feature-title">Tope de filas</h4>
+                <p class="mysql-page__feature-text">
+                    La respuesta muestra como máximo 200 filas.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!--  -----  Concepts  -----  -->
+    <section class="mysql-page__concepts-section">
+
+        <h3 class="mysql-page__concepts-title">Sentencias admitidas</h3>
+
+        <ul class="mysql-page__concepts">
+            <li class="mysql-page__concept">SELECT</li>
+            <li class="mysql-page__concept">SHOW</li>
+            <li class="mysql-page__concept">DESCRIBE</li>
+            <li class="mysql-page__concept">EXPLAIN</li>
+            <li class="mysql-page__concept">WHERE</li>
+            <li class="mysql-page__concept">ORDER BY</li>
+            <li class="mysql-page__concept">LIMIT</li>
+        </ul>
+
+    </section>
+
+</div>

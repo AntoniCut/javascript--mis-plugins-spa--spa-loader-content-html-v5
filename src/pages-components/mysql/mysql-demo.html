@@ -1,0 +1,58 @@
+<!--
+    *  -------------------------------------------------------------------  *
+    *  -----  mysql-demo.html  --  /src/pages-components/mysql/mysql-demo.html  -----  *
+    *  -------------------------------------------------------------------  *
+-->
+
+
+
+<div class="mysql-demo">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="mysql-page__hero">
+        <div class="mysql-page__hero-badge">
+            <span class="mysql-page__hero-tag" aria-hidden="true">SQL</span>
+            <h3 class="mysql-page__hero-title">Consulta</h3>
+            <p class="mysql-page__hero-subtitle">Demo de scripts SPA V5</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Estado del script clásico  -----  -->
+    <p class="mysql-page__intro-text" data-mysql-cjs-status>
+        Esperando mysql-page.cjs.js…
+    </p>
+
+
+    <!--  -----  Formulario de consulta  -----  -->
+    <section class="mysql-page__features">
+
+        <h3 class="mysql-page__features-title">Ejecutar consulta</h3>
+
+        <form class="mysql-page__form" data-mysql-query-form>
+
+            <label class="mysql-page__label" for="mysqlQuerySql">Consulta SQL</label>
+
+            <textarea
+                id="mysqlQuerySql"
+                class="mysql-page__sql"
+                name="sql"
+                rows="6"
+                spellcheck="false"
+                required
+            >SELECT id, slug, title, path, sort_order
+FROM stacks
+ORDER BY sort_order;</textarea>
+
+            <button class="mysql-page__submit" type="submit">Ejecutar consulta</button>
+
+        </form>
+
+        <p class="mysql-page__status" data-mysql-status role="status"></p>
+
+        <div class="mysql-page__result" data-mysql-result></div>
+
+    </section>
+
+</div>

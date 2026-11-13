@@ -66,6 +66,13 @@ export const routeManifest = [
         file: 'route-astro-page'
     },
 
+    //  -----  base de datos (mysql)  -----
+    {
+        id: 'mysqlPage',
+        path: 'mysql-page',
+        file: 'route-mysql-page'
+    },
+
     //  -----  404 - not found  -----
     {
         id: '404NotFoundPage',

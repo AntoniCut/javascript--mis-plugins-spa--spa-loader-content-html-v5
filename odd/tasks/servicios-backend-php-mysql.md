@@ -45,3 +45,10 @@
   - `404.html` creado en la raíz del dominio: sin él, `error_page 404 /404.html` encadenaba con `location /` → `/index.html` inexistente y producía un ciclo (500) en lugar de 404.
   - Verificación real: `POST {"sql":"SELECT 1 AS ok"}` → `{"ok":true,...,"rows":[{"ok":1}],...}` con `ok` numérico; `GET query.php` → 405; `GET .env` → 404; ruta inexistente bajo el SPA → 200 (fallback esperado a `index.html`).
   - Pendiente de commit: `deploy.sh.example` y este `L7`. `deploy.sh` real y `.env.production` quedan gitignored.
+- **L8** (2026-11-13, página MySQL portada desde `jquery-spa-with-method-load-from-jquery-v5`):
+  - Alcance: página de demo que consume el endpoint PHP. Ruta plana `mysql-page` (consistente con las demás), no `stack/mysql-page` de la referencia.
+  - Archivos: `assets/favicon/mysql-icon.svg`; `src/pages/mysql/mysql-page.html`; `src/pages-components/mysql/{mysql-description,mysql-demo}.html`; `src/scripts/js/pages/mysql-page.{cjs,esm}.js`; `src/scss/pages/mysql-page.scss`; `src/routes/route-mysql-page.js`; entrada `mysqlPage` en `route-manifest.js`; enlaces en `layout-navbar.html` y `layout-footer.html`; 5 bloques generados en `src/markdown-shiki/pages/mysql/`.
+  - Decisiones: `fetch('app/services/mysql/query.php')` relativo (funciona en dev, preview y prod por `<base href>`); scripts con `isModule: true` (no `type: 'module'`); claves de `components` sin `#`; SCSS con `../base/variables` y `var.$color-white`.
+  - Local: `pnpm refresh` + `pnpm serve:dev` (BrowserSync 9876) + Docker MySQL 3308. Verificado: 7 filas con `id` numérico, rechazo de `DELETE` con mensaje 400, navegación SPA por navbar y re-mount del ESM.
+  - Producción: tabla `stacks` creada y sembrada con `INSERT IGNORE` en `javascript_mis_plugins_spa`; deploy con `./deploy.sh`. Verificado en `https://javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5/mysql-page`: título correcto, 7 filas, rechazo de escritura. La primera visita usó `route-manifest.js` cacheado; un hard reload lo resolvió.
+  - Pendiente de commit: todos los archivos nuevos de la página + los 5 bloques Shiki generados.
