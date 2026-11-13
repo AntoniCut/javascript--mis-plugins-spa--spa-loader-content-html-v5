@@ -144,9 +144,22 @@
             $pass = env_get('DB_PASS') ?? '';
         }
 
-        $conn = mysqli_connect($host, $user, $pass, $db, $port);
+        //  -----  inicializar la conexion para poder configurar opciones  -----
+        $conn = mysqli_init();
 
-        if (!$conn) {
+        if (!$conn instanceof mysqli) {
+            return [null, 'No se pudo inicializar mysqli.'];
+        }
+
+        //  -----  devolver enteros y flotantes como tipos nativos, igual que Node  -----
+        if (defined('MYSQLI_OPT_INT_AND_FLOAT_NATIVE')) {
+            mysqli_options($conn, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
+        }
+
+        //  -----  abrir la conexion con la configuracion aplicada  -----
+        $connected = mysqli_real_connect($conn, $host, $user, $pass, $db, $port);
+
+        if (!$connected) {
             return [null, 'Conexion MySQL fallida: ' . mysqli_connect_error()];
         }
 
