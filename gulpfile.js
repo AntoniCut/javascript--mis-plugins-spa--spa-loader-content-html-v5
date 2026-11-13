@@ -146,13 +146,19 @@ const WATCH_OPTIONS = /** @type {import('gulp').WatchOptions} */ ({
  * @return {NodeJS.ReadWriteStream}
  */
 const safePipe = () => plumber({
+
+    /**
+     * - Maneja el error del stream sin detener Gulp.
+     * @param {Error} err - Error capturado por el stream.
+     */
     errorHandler(err) {
 
         //  -----  mostrar el mensaje del error en consola  -----
         console.error(err.message);
 
         //  -----  terminar el stream sin detener gulp  -----
-        this.emit('end');
+        /** @type {NodeJS.ReadWriteStream} */ 
+        (this).emit('end');
     },
 });
 
@@ -520,12 +526,12 @@ export const clean = parallel(cleanDist, cleanApp, cleanMarkdownShiki);
  * -----  `CopyTaskOptions`  -----
  * -------------------------------
  * @typedef {Object} CopyTaskOptions
- * @property {string | string[]} glob      — Glob(s) de origen.
- * @property {string}            checkPath — Ruta a verificar antes de copiar.
- * @property {string}            [base]    — Base para src(). Default: paths.srcRoot.
- * @property {string}            [destDir] — Directorio destino. Default: paths.appRoot.
- * @property {boolean}           [isFile]  — true si checkPath es un archivo, no directorio.
- * @property {string | string[]} [exclude] — Globs de exclusión adicionales.
+ * @property {string | string[]} glob      - Glob(s) de origen.
+ * @property {string}            checkPath - Ruta a verificar antes de copiar.
+ * @property {string}            [base]    - Base para src(). Default: paths.srcRoot.
+ * @property {string}            [destDir] - Directorio destino. Default: paths.appRoot.
+ * @property {boolean}           [isFile]  - true si checkPath es un archivo, no directorio.
+ * @property {string | string[]} [exclude] - Globs de exclusión adicionales.
  */
 
 
@@ -560,7 +566,7 @@ const createCopyTask = (name, opts) => {
 
         /** - `globs de origen con las exclusiones` */
         const globs = opts.exclude
-            ? /** @type {string[]} */ ([].concat(opts.glob, opts.exclude))
+            ? /** @type {string[]} */ ([]).concat(opts.glob, opts.exclude)
             : opts.glob;
 
         /** @type {Record<string, unknown>} - `opciones de src()` */
@@ -870,6 +876,19 @@ const replaceSiteBase = () => new Transform({
 
 
 /**
+ * -------------------------------
+ * -----  `PhpVinylFile {}`  -----
+ * -------------------------------
+ * - Subconjunto del archivo de vinyl que usa el minificador de PHP.
+ * @typedef {Object} PhpVinylFile
+ * @property {() => boolean} isNull - true si el archivo no tiene contenido.
+ * @property {() => boolean} isBuffer - true si el contenido es un Buffer.
+ * @property {Buffer} contents - Contenido del archivo.
+ * @property {{isDirectory?: () => boolean}} [stat] - Stats del archivo.
+ */
+
+
+/**
  * ------------------------------------
  * -----  `phpMinifyTransform()`  -----
  * ------------------------------------
@@ -885,7 +904,7 @@ const phpMinifyTransform = () => {
         objectMode: true,
 
         /**
-         * @param {import('vinyl')} file - Archivo PHP del stream.
+         * @param {PhpVinylFile} file - Archivo PHP del stream.
          * @param {BufferEncoding} _enc - Codificación, sin uso en modo objeto.
          * @param {import('stream').TransformCallback} cb - `'callback' para continuar el stream`.
          */
