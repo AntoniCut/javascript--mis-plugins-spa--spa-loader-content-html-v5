@@ -87,6 +87,12 @@ export const routeManifest = [
         file: 'route-php-page'
     },
 
+    {
+        id: 'expressPage',
+        path: 'express-page',
+        file: 'route-express-page'
+    },
+
     //  -----  404 - not found  -----
     {
         id: '404NotFoundPage',

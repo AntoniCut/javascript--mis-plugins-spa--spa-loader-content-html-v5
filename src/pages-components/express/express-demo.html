@@ -1,0 +1,80 @@
+<!--
+    *  ------------------------------------------------------------------------------------  *
+    *  -----  express-demo.html  --  /src/pages-components/express/express-demo.html  -----  *
+    *  ------------------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="express-demo">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="express-page__hero">
+        <div class="express-page__hero-badge">
+            <span class="express-page__hero-tag" aria-hidden="true">CRUD</span>
+            <h3 class="express-page__hero-title">Tareas</h3>
+            <p class="express-page__hero-subtitle">Demo contra /api/tasks</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Estado del script clásico  -----  -->
+    <p class="express-page__intro-text" data-express-cjs-status>Esperando express-page.cjs.js…</p>
+
+
+    <!--  -----  Formulario de creación  -----  -->
+    <section class="express-page__features">
+
+        <h3 class="express-page__features-title">Crear tarea</h3>
+
+        <form class="express-page__form" data-express-form>
+
+            <label class="express-page__label" for="expressTaskTitle">Título de la tarea</label>
+
+            <input
+                id="expressTaskTitle"
+                class="express-page__input"
+                name="title"
+                type="text"
+                autocomplete="off"
+                required
+            />
+
+            <p class="express-page__field-error" data-error-for="title" role="alert"></p>
+
+            <button class="express-page__submit" type="submit">Crear tarea</button>
+
+        </form>
+
+    </section>
+
+
+    <!--  -----  Listado de tareas  -----  -->
+    <section class="express-page__features">
+
+        <h3 class="express-page__features-title">Tareas en memoria</h3>
+
+        <div class="express-page__toolbar">
+            <button class="express-page__refresh" type="button" data-express-refresh>Actualizar</button>
+        </div>
+
+        <p class="express-page__status" data-express-status role="status"></p>
+
+        <div class="express-page__badges">
+            <span class="express-page__badge" data-express-http>HTTP —</span>
+            <span class="express-page__badge" data-express-latency>X-Response-Time —</span>
+        </div>
+
+        <ul class="express-page__list" data-express-list></ul>
+
+        <p class="express-page__intro-text">
+            Los datos viven en la memoria del proceso Node: si el servidor se reinicia,
+            la lista vuelve a las 3 tareas semilla. No hay base de datos detrás de este CRUD.
+            En <code>pnpm preview</code> no hay proxy <code>/api</code>: la demo necesita
+            <code>pnpm dev</code> o el despliegue con nginx.
+        </p>
+
+    </section>
+
+</div>

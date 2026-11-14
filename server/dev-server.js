@@ -13,6 +13,9 @@ import { findAvailablePort } from './find-available-port.js';
 /** - `router compartido con el runtime de producción` */
 import { createApiRouter } from '../api/src/mysql-query.js';
 
+/** - `router del crud de tareas en memoria` */
+import { createTasksRouter } from '../api/src/tasks-router.js';
+
 import browserSync from 'browser-sync';
 import express from 'express';
 import { spawn } from 'node:child_process';
@@ -391,6 +394,9 @@ app.use(makePhpHandler(PROJECT_ROOT, devServerPort));
 
 //  -----  montar el api en la raíz para que la página use /api/...  -----
 app.use('/api', createApiRouter());
+
+//  -----  montar el crud de tareas en memoria bajo /api  -----
+app.use('/api', createTasksRouter());
 
 //  -----  registrar el middleware que sirve archivos estáticos desde la raíz del proyecto con el prefijo de ruta  -----
 app.use(DEV_ROUTE_BASE, express.static(PROJECT_ROOT, { index: false }));

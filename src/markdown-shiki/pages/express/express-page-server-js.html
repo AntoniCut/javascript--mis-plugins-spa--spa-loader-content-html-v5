@@ -1,0 +1,418 @@
+<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#C586C0">import</span><span style="color:#9CDCFE"> express</span><span style="color:#C586C0"> from</span><span style="color:#CE9178"> 'express'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/** - `mínimo de caracteres del título` */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> MIN_TITLE_LENGTH</span><span style="color:#D4D4D4"> = </span><span style="color:#B5CEA8">3</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/** - `máximo de caracteres del título` */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> MAX_TITLE_LENGTH</span><span style="color:#D4D4D4"> = </span><span style="color:#B5CEA8">80</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `tasks {}`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - `tareas guardadas en memoria: se pierden al reiniciar el proceso`</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {Array&#x3C;{ id: number, title: string, createdAt: string }>}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> tasks</span><span style="color:#D4D4D4"> = [</span></span>
+<span class="line"><span style="color:#6A9955">    /** - `primera tarea semilla` */</span></span>
+<span class="line"><span style="color:#D4D4D4">    { </span><span style="color:#9CDCFE">id:</span><span style="color:#B5CEA8"> 1</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">title:</span><span style="color:#CE9178"> 'Revisar el router de Express'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">createdAt:</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> Date</span><span style="color:#D4D4D4">().</span><span style="color:#DCDCAA">toISOString</span><span style="color:#D4D4D4">() },</span></span>
+<span class="line"><span style="color:#6A9955">    /** - `segunda tarea semilla` */</span></span>
+<span class="line"><span style="color:#D4D4D4">    { </span><span style="color:#9CDCFE">id:</span><span style="color:#B5CEA8"> 2</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">title:</span><span style="color:#CE9178"> 'Probar el CRUD en memoria'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">createdAt:</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> Date</span><span style="color:#D4D4D4">().</span><span style="color:#DCDCAA">toISOString</span><span style="color:#D4D4D4">() },</span></span>
+<span class="line"><span style="color:#6A9955">    /** - `tercera tarea semilla` */</span></span>
+<span class="line"><span style="color:#D4D4D4">    { </span><span style="color:#9CDCFE">id:</span><span style="color:#B5CEA8"> 3</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">title:</span><span style="color:#CE9178"> 'Documentar los códigos HTTP'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">createdAt:</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> Date</span><span style="color:#D4D4D4">().</span><span style="color:#DCDCAA">toISOString</span><span style="color:#D4D4D4">() },</span></span>
+<span class="line"><span style="color:#D4D4D4">];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/** - `próximo identificador autoincremental` */</span></span>
+<span class="line"><span style="color:#569CD6">let</span><span style="color:#9CDCFE"> nextId</span><span style="color:#D4D4D4"> = </span><span style="color:#B5CEA8">4</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `sendJson(res, status, body)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Responde JSON y añade la cabecera con el tiempo transcurrido.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Response}</span><span style="color:#9CDCFE"> res</span><span style="color:#6A9955"> - Respuesta HTTP.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {number}</span><span style="color:#9CDCFE"> status</span><span style="color:#6A9955"> - Código HTTP de la respuesta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Record&#x3C;string, unknown>}</span><span style="color:#9CDCFE"> body</span><span style="color:#6A9955"> - Cuerpo serializable.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> sendJson</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {bigint|undefined}</span><span style="color:#6A9955"> - `inicio anotado por el middleware` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> startedAt</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">locals</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">tasksStartedAt</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `milisegundos desde el inicio, 0 si no se anotó` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> elapsedMs</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">typeof</span><span style="color:#9CDCFE"> startedAt</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'bigint'</span></span>
+<span class="line"><span style="color:#D4D4D4">        ? </span><span style="color:#DCDCAA">Number</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">process</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">hrtime</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">bigint</span><span style="color:#D4D4D4">() - </span><span style="color:#9CDCFE">startedAt</span><span style="color:#D4D4D4">) / </span><span style="color:#B5CEA8">1e6</span></span>
+<span class="line"><span style="color:#D4D4D4">        : </span><span style="color:#B5CEA8">0</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  publicar el tiempo de la respuesta  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    res</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">set</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'X-Response-Time'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">elapsedMs</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">toFixed</span><span style="color:#D4D4D4">(</span><span style="color:#B5CEA8">1</span><span style="color:#D4D4D4">)</span><span style="color:#569CD6">}</span><span style="color:#CE9178">ms`</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  enviar el estado y el json  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    res</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">status</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">).</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `timingMiddleware(req, res, next)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Anota el inicio y registra una línea cuando la respuesta termina.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Request}</span><span style="color:#9CDCFE"> req</span><span style="color:#6A9955"> - Petición recibida.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Response}</span><span style="color:#9CDCFE"> res</span><span style="color:#6A9955"> - Respuesta en curso.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').NextFunction}</span><span style="color:#9CDCFE"> next</span><span style="color:#6A9955"> - Siguiente middleware.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> timingMiddleware</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">next</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {bigint}</span><span style="color:#6A9955"> - `instante de inicio en nanosegundos` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> startedAt</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">process</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">hrtime</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">bigint</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  guardar el inicio para el helper de respuesta  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    res</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">locals</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">tasksStartedAt</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">startedAt</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  escuchar el final de la respuesta  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    res</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">on</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'finish'</span><span style="color:#D4D4D4">, () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `milisegundos que tardó la respuesta` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> elapsedMs</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">Number</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">process</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">hrtime</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">bigint</span><span style="color:#D4D4D4">() - </span><span style="color:#9CDCFE">startedAt</span><span style="color:#D4D4D4">) / </span><span style="color:#B5CEA8">1e6</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir método, url, estado y duración  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        console</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">log</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">`[tasks] </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">method</span><span style="color:#569CD6">}</span><span style="color:#569CD6"> ${</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">originalUrl</span><span style="color:#569CD6">}</span><span style="color:#569CD6"> ${</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">statusCode</span><span style="color:#569CD6">}</span><span style="color:#569CD6"> ${</span><span style="color:#9CDCFE">elapsedMs</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">toFixed</span><span style="color:#D4D4D4">(</span><span style="color:#B5CEA8">1</span><span style="color:#D4D4D4">)</span><span style="color:#569CD6">}</span><span style="color:#CE9178">ms`</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  continuar con la cadena del router  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    next</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `normalizeTitle(rawTitle)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Recorta el título y colapsa los espacios internos.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {string}</span><span style="color:#9CDCFE"> rawTitle</span><span style="color:#6A9955"> - Texto enviado por el formulario.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {string}</span><span style="color:#6A9955"> - Título normalizado.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> normalizeTitle</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">rawTitle</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  quitar espacios laterales y repetidos  -----</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#9CDCFE"> rawTitle</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">trim</span><span style="color:#D4D4D4">().</span><span style="color:#DCDCAA">replace</span><span style="color:#D4D4D4">(</span><span style="color:#D16969">/\s</span><span style="color:#D7BA7D">+</span><span style="color:#D16969">/</span><span style="color:#569CD6">g</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">' '</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `validateTitle(rawTitle, title)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Devuelve el error del título, o cadena vacía si es válido.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {string|null}</span><span style="color:#9CDCFE"> rawTitle</span><span style="color:#6A9955"> - Título original, null si no es texto.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {string}</span><span style="color:#9CDCFE"> title</span><span style="color:#6A9955"> - Título ya normalizado.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {string}</span><span style="color:#6A9955"> - Mensaje de validación.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> validateTitle</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">rawTitle</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  exigir que el título sea texto  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">rawTitle</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  avisar de que el tipo no es válido  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#CE9178"> 'El título no es válido.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  exigir contenido después de normalizar  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  avisar de que el título está vacío  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#CE9178"> 'El título es obligatorio.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  limitar el largo del título  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">length</span><span style="color:#D4D4D4"> &#x3C; </span><span style="color:#4FC1FF">MIN_TITLE_LENGTH</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">length</span><span style="color:#D4D4D4"> > </span><span style="color:#4FC1FF">MAX_TITLE_LENGTH</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  avisar del rango permitido  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#CE9178"> `El título debe tener entre </span><span style="color:#569CD6">${</span><span style="color:#4FC1FF">MIN_TITLE_LENGTH</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> y </span><span style="color:#569CD6">${</span><span style="color:#4FC1FF">MAX_TITLE_LENGTH</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> caracteres.`</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  el título es válido  -----</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#CE9178"> ''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `parseTaskId(rawId)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Convierte el parámetro de ruta en un identificador numérico.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {string}</span><span style="color:#9CDCFE"> rawId</span><span style="color:#6A9955"> - Identificador recibido en la url.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {number|null}</span><span style="color:#6A9955"> - Número válido, o null si no lo es.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> parseTaskId</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">rawId</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  admitir solo dígitos  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!</span><span style="color:#D16969">/</span><span style="color:#DCDCAA">^</span><span style="color:#D16969">\d</span><span style="color:#D7BA7D">+</span><span style="color:#DCDCAA">$</span><span style="color:#D16969">/</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">test</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">rawId</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  marcar el identificador como inválido  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#569CD6"> null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  devolver el número ya convertido  -----</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#DCDCAA"> Number</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">rawId</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `methodNotAllowed(allowed)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Responde 405 con los métodos admitidos en la cabecera Allow.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {string}</span><span style="color:#9CDCFE"> allowed</span><span style="color:#6A9955"> - Métodos HTTP que admite la ruta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {import('express').RequestHandler}</span><span style="color:#6A9955"> - Manejador que responde el rechazo.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> methodNotAllowed</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">allowed</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  anunciar los métodos admitidos  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    res</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">set</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Allow'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">allowed</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder el rechazo en json  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">405</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">        ok:</span><span style="color:#569CD6"> false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        message:</span><span style="color:#CE9178"> 'Método no permitido.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `listTasks(req, res)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Devuelve todas las tareas en memoria.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Request}</span><span style="color:#9CDCFE"> req</span><span style="color:#6A9955"> - Petición recibida.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Response}</span><span style="color:#9CDCFE"> res</span><span style="color:#6A9955"> - Respuesta JSON.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> listTasks</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `cantidad de tareas guardadas` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> count</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">tasks</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">length</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `sustantivo concordante con la cantidad` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> noun</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">count</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">1</span><span style="color:#D4D4D4"> ? </span><span style="color:#CE9178">'tarea'</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'tareas'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder el listado con su recuento  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">200</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">        ok:</span><span style="color:#569CD6"> true</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        tasks</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        count</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        message:</span><span style="color:#CE9178"> `</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">count</span><span style="color:#569CD6">}</span><span style="color:#569CD6"> ${</span><span style="color:#9CDCFE">noun</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> en memoria.`</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `createTask(req, res)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Valida el título, crea la tarea y la responde.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Request}</span><span style="color:#9CDCFE"> req</span><span style="color:#6A9955"> - Petición con el json del formulario.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Response}</span><span style="color:#9CDCFE"> res</span><span style="color:#6A9955"> - Respuesta JSON.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> createTask</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {string|null}</span><span style="color:#6A9955"> - `título recibido, null si no es texto` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> rawTitle</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">typeof</span><span style="color:#9CDCFE"> req</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'string'</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4"> : </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `título normalizado` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> title</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">rawTitle</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4"> ? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4"> : </span><span style="color:#DCDCAA">normalizeTitle</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">rawTitle</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `error de validación, o cadena vacía` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> error</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">validateTitle</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">rawTitle</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder los campos marcados  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  enviar el error de validación  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">422</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            ok:</span><span style="color:#569CD6"> false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            message:</span><span style="color:#CE9178"> 'Revisá los campos marcados.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            errors:</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#9CDCFE">                title:</span><span style="color:#9CDCFE"> error</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            },</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no crear la tarea  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {{ id: number, title: string, createdAt: string }}</span><span style="color:#6A9955"> - `tarea nueva` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> task</span><span style="color:#D4D4D4"> = {</span></span>
+<span class="line"><span style="color:#9CDCFE">        id:</span><span style="color:#9CDCFE"> nextId</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        title</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        createdAt:</span><span style="color:#569CD6"> new</span><span style="color:#DCDCAA"> Date</span><span style="color:#D4D4D4">().</span><span style="color:#DCDCAA">toISOString</span><span style="color:#D4D4D4">(),</span></span>
+<span class="line"><span style="color:#D4D4D4">    };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  avanzar el identificador autoincremental  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    nextId</span><span style="color:#D4D4D4"> += </span><span style="color:#B5CEA8">1</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  guardar la tarea en memoria  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    tasks</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">push</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">task</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder la tarea creada  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">201</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">        ok:</span><span style="color:#569CD6"> true</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        task</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        message:</span><span style="color:#CE9178"> 'Tarea creada.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `deleteTask(req, res)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Elimina una tarea por su identificador.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Request}</span><span style="color:#9CDCFE"> req</span><span style="color:#6A9955"> - Petición con el id de ruta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Response}</span><span style="color:#9CDCFE"> res</span><span style="color:#6A9955"> - Respuesta JSON.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> deleteTask</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `identificador ya convertido, o null si no es numérico` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> id</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">parseTaskId</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">params</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  rechazar un identificador no numérico  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  responder el identificador inválido  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">400</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            ok:</span><span style="color:#569CD6"> false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            message:</span><span style="color:#CE9178"> 'El identificador no es válido.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no buscar la tarea  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `posición de la tarea en el array` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> index</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">tasks</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">findIndex</span><span style="color:#D4D4D4">((</span><span style="color:#9CDCFE">task</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#9CDCFE"> task</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4"> === </span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  rechazar una tarea inexistente  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">index</span><span style="color:#D4D4D4"> === -</span><span style="color:#B5CEA8">1</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  responder que la tarea no existe  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">404</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            ok:</span><span style="color:#569CD6"> false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            message:</span><span style="color:#CE9178"> 'La tarea no existe.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no eliminar nada  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `tarea quitada del array` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#D4D4D4"> [</span><span style="color:#4FC1FF">deleted</span><span style="color:#D4D4D4">] = </span><span style="color:#9CDCFE">tasks</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">splice</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">index</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">1</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder la tarea eliminada  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">200</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">        ok:</span><span style="color:#569CD6"> true</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        deletedId:</span><span style="color:#9CDCFE"> deleted</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        message:</span><span style="color:#CE9178"> 'Tarea eliminada.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `handleRouterError(error, req, res, next)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Responde en JSON los errores de parseo sin exponer la pila.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {unknown}</span><span style="color:#9CDCFE"> error</span><span style="color:#6A9955"> - Error lanzado por express o body-parser.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Request}</span><span style="color:#9CDCFE"> req</span><span style="color:#6A9955"> - Petición recibida.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').Response}</span><span style="color:#9CDCFE"> res</span><span style="color:#6A9955"> - Respuesta JSON.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {import('express').NextFunction}</span><span style="color:#9CDCFE"> next</span><span style="color:#6A9955"> - Siguiente middleware.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> handleRouterError</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">req</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">next</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `código http del error, 500 si no viene` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> status</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">typeof</span><span style="color:#9CDCFE"> error</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'object'</span><span style="color:#D4D4D4"> &#x26;&#x26; </span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4"> !== </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4"> &#x26;&#x26; </span><span style="color:#CE9178">'status'</span><span style="color:#569CD6"> in</span><span style="color:#9CDCFE"> error</span></span>
+<span class="line"><span style="color:#D4D4D4">        ? </span><span style="color:#DCDCAA">Number</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        : </span><span style="color:#B5CEA8">500</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `código acotado a los casos que atiende el router` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> responseStatus</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">413</span><span style="color:#D4D4D4"> ? </span><span style="color:#B5CEA8">413</span><span style="color:#D4D4D4"> : </span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">400</span><span style="color:#D4D4D4"> ? </span><span style="color:#B5CEA8">400</span><span style="color:#D4D4D4"> : </span><span style="color:#B5CEA8">500</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `mensaje estable para el cliente` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> message</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">responseStatus</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">413</span></span>
+<span class="line"><span style="color:#D4D4D4">        ? </span><span style="color:#CE9178">'El cuerpo supera los 4 KB.'</span></span>
+<span class="line"><span style="color:#D4D4D4">        : </span><span style="color:#9CDCFE">responseStatus</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">400</span></span>
+<span class="line"><span style="color:#D4D4D4">            ? </span><span style="color:#CE9178">'La petición no es un JSON válido.'</span></span>
+<span class="line"><span style="color:#D4D4D4">            : </span><span style="color:#CE9178">'Error interno del API de tareas.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder el error sin la pila  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    sendJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">res</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">responseStatus</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">        ok:</span><span style="color:#569CD6"> false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">        message</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `createTasksRouter()`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Crea el router del CRUD de tareas para el runtime Node.</span></span>
+<span class="line"><span style="color:#6A9955"> * - Publica GET y POST /tasks, DELETE /tasks/:id y el 405 del resto de métodos.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {import('express').Router}</span><span style="color:#6A9955"> - Router con las rutas de tareas.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#C586C0">export</span><span style="color:#569CD6"> const</span><span style="color:#DCDCAA"> createTasksRouter</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `router propio del api de tareas` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> router</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">express</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">Router</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  medir y registrar cada petición  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">use</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">timingMiddleware</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  listar las tareas en memoria  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">get</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/tasks'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">listTasks</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  crear una tarea con el json del formulario  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">post</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/tasks'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">express</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">({ </span><span style="color:#9CDCFE">limit:</span><span style="color:#CE9178"> '4kb'</span><span style="color:#D4D4D4"> }), </span><span style="color:#9CDCFE">createTask</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  rechazar métodos distintos de get y post en la colección  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">all</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/tasks'</span><span style="color:#D4D4D4">, </span><span style="color:#DCDCAA">methodNotAllowed</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'GET, POST'</span><span style="color:#D4D4D4">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  eliminar una tarea por su identificador  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">delete</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/tasks/:id'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">deleteTask</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  rechazar métodos distintos de delete en el detalle  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">all</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/tasks/:id'</span><span style="color:#D4D4D4">, </span><span style="color:#DCDCAA">methodNotAllowed</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'DELETE'</span><span style="color:#D4D4D4">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  responder en json los errores de parseo  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    router</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">use</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">handleRouterError</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  devolver el router montable  -----</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#9CDCFE"> router</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span></code></pre>

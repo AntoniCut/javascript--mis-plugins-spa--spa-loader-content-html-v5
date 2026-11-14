@@ -30,5 +30,6 @@ export const paths = {
     scripts: `${base}/app/js`,
     scssPages: `${base}/src/scss/pages`,
     services: `${base}/src/services`,
+    apiSource: `${base}/api/src`,
     pluginsSource: `${base}/src/plugins`,
 }
