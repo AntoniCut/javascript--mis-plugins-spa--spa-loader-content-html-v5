@@ -80,6 +80,13 @@ export const routeManifest = [
         file: 'route-node-page'
     },
 
+    //  -----  demos backend (php / express)  -----
+    {
+        id: 'phpPage',
+        path: 'php-page',
+        file: 'route-php-page'
+    },
+
     //  -----  404 - not found  -----
     {
         id: '404NotFoundPage',

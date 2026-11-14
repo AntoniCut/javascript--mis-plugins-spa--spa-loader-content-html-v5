@@ -1,0 +1,169 @@
+<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#D4D4D4">&#x3C;?php</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `tamano maximo del cuerpo json en bytes` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#D4D4D4"> PHP_VALIDATE_MAX_BODY = </span><span style="color:#B5CEA8">16384</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `longitud minima del nombre` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#D4D4D4"> PHP_VALIDATE_NAME_MIN = </span><span style="color:#B5CEA8">2</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `longitud maxima del nombre` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#D4D4D4"> PHP_VALIDATE_NAME_MAX = </span><span style="color:#B5CEA8">60</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `longitud minima del mensaje` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#D4D4D4"> PHP_VALIDATE_MESSAGE_MIN = </span><span style="color:#B5CEA8">10</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `longitud maxima del mensaje` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#D4D4D4"> PHP_VALIDATE_MESSAGE_MAX = </span><span style="color:#B5CEA8">500</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /**</span></span>
+<span class="line"><span style="color:#6A9955">     * ----------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * -----  `php_validate_json($status, $payload)`  -----</span></span>
+<span class="line"><span style="color:#6A9955">     * ----------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * - Envia JSON y termina.</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#569CD6"> int</span><span style="color:#6A9955"> $status</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#569CD6"> array</span><span style="color:#6A9955">&#x3C;</span><span style="color:#569CD6">string</span><span style="color:#6A9955">, mixed> $payload</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> never</span></span>
+<span class="line"><span style="color:#6A9955">     */</span></span>
+<span class="line"><span style="color:#569CD6">    function</span><span style="color:#DCDCAA"> php_validate_json</span><span style="color:#D4D4D4">(</span><span style="color:#569CD6">int</span><span style="color:#9CDCFE"> $status</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">array</span><span style="color:#9CDCFE"> $payload</span><span style="color:#D4D4D4">): </span><span style="color:#569CD6">void</span></span>
+<span class="line"><span style="color:#D4D4D4">    {</span></span>
+<span class="line"><span style="color:#DCDCAA">        http_response_code</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$status</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#DCDCAA">        header</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Content-Type: application/json; charset=utf-8'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#DCDCAA">        echo</span><span style="color:#DCDCAA"> json_encode</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$payload</span><span style="color:#D4D4D4">, JSON_UNESCAPED_UNICODE);</span></span>
+<span class="line"><span style="color:#C586C0">        exit</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /**</span></span>
+<span class="line"><span style="color:#6A9955">     * --------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * -----  `php_validate_value($payload, $key)`  -----</span></span>
+<span class="line"><span style="color:#6A9955">     * --------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * - Devuelve el valor de texto de un campo, o cadena vacia.</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#569CD6"> array</span><span style="color:#6A9955">&#x3C;</span><span style="color:#569CD6">string</span><span style="color:#6A9955">, mixed> $payload</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#569CD6"> string</span><span style="color:#6A9955"> $key</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@return</span><span style="color:#569CD6"> string</span></span>
+<span class="line"><span style="color:#6A9955">     */</span></span>
+<span class="line"><span style="color:#569CD6">    function</span><span style="color:#DCDCAA"> php_validate_value</span><span style="color:#D4D4D4">(</span><span style="color:#569CD6">array</span><span style="color:#9CDCFE"> $payload</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">string</span><span style="color:#9CDCFE"> $key</span><span style="color:#D4D4D4">): </span><span style="color:#569CD6">string</span></span>
+<span class="line"><span style="color:#D4D4D4">    {</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#DCDCAA">isset</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$payload</span><span style="color:#D4D4D4">[</span><span style="color:#9CDCFE">$key</span><span style="color:#D4D4D4">]) || !</span><span style="color:#DCDCAA">is_string</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$payload</span><span style="color:#D4D4D4">[</span><span style="color:#9CDCFE">$key</span><span style="color:#D4D4D4">])) {</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#CE9178"> ''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#9CDCFE"> $payload</span><span style="color:#D4D4D4">[</span><span style="color:#9CDCFE">$key</span><span style="color:#D4D4D4">];</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /**</span></span>
+<span class="line"><span style="color:#6A9955">     * ----------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * -----  `php_validate_normalize($value)`  -----</span></span>
+<span class="line"><span style="color:#6A9955">     * ----------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * - Recorta, colapsa espacios internos y quita caracteres de control.</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#569CD6"> string</span><span style="color:#6A9955"> $value</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@return</span><span style="color:#569CD6"> string</span></span>
+<span class="line"><span style="color:#6A9955">     */</span></span>
+<span class="line"><span style="color:#569CD6">    function</span><span style="color:#DCDCAA"> php_validate_normalize</span><span style="color:#D4D4D4">(</span><span style="color:#569CD6">string</span><span style="color:#9CDCFE"> $value</span><span style="color:#D4D4D4">): </span><span style="color:#569CD6">string</span></span>
+<span class="line"><span style="color:#D4D4D4">    {</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  quitar los espacios de los extremos  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        $text</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">trim</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$value</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  colapsar cualquier espacio interno en un solo espacio  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        $text</span><span style="color:#D4D4D4"> = (</span><span style="color:#569CD6">string</span><span style="color:#D4D4D4">) </span><span style="color:#DCDCAA">preg_replace</span><span style="color:#D4D4D4">(</span><span style="color:#D16969">'/</span><span style="color:#D7BA7D">\s</span><span style="color:#D4D4D4">+</span><span style="color:#D16969">/u'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">' '</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">$text</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  eliminar caracteres de control que no son espacios  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        $text</span><span style="color:#D4D4D4"> = (</span><span style="color:#569CD6">string</span><span style="color:#D4D4D4">) </span><span style="color:#DCDCAA">preg_replace</span><span style="color:#D4D4D4">(</span><span style="color:#D16969">'/[\x00-\x1F\x7F]/u'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">$text</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#DCDCAA"> trim</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$text</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /**</span></span>
+<span class="line"><span style="color:#6A9955">     * ------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * -----  `php_validate_length($text)`  -----</span></span>
+<span class="line"><span style="color:#6A9955">     * ------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955">     * - Cuenta caracteres utf-8; usa strlen si la extension no responde.</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@param</span><span style="color:#569CD6"> string</span><span style="color:#6A9955"> $text</span></span>
+<span class="line"><span style="color:#6A9955">     * </span><span style="color:#569CD6">@return</span><span style="color:#569CD6"> int</span></span>
+<span class="line"><span style="color:#6A9955">     */</span></span>
+<span class="line"><span style="color:#569CD6">    function</span><span style="color:#DCDCAA"> php_validate_length</span><span style="color:#D4D4D4">(</span><span style="color:#569CD6">string</span><span style="color:#9CDCFE"> $text</span><span style="color:#D4D4D4">): </span><span style="color:#569CD6">int</span></span>
+<span class="line"><span style="color:#D4D4D4">    {</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  contar caracteres completos, no bytes  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        $count</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">preg_match_all</span><span style="color:#D4D4D4">(</span><span style="color:#D16969">'/./us'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">$text</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">$matches</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#DCDCAA">is_int</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$count</span><span style="color:#D4D4D4">)) {</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#9CDCFE"> $count</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  respaldo cuando la expresion regular falla  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#DCDCAA"> strlen</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$text</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> ((</span><span style="color:#9CDCFE">$_SERVER</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'REQUEST_METHOD'</span><span style="color:#D4D4D4">] ?? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">) !== </span><span style="color:#CE9178">'POST'</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#DCDCAA">        header</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'Allow: POST'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#DCDCAA">        php_validate_json</span><span style="color:#D4D4D4">(</span><span style="color:#B5CEA8">405</span><span style="color:#D4D4D4">, [</span></span>
+<span class="line"><span style="color:#CE9178">            'ok'</span><span style="color:#D4D4D4"> => </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">            'message'</span><span style="color:#D4D4D4"> => </span><span style="color:#CE9178">'Solo se admite POST.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        ]);</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9CDCFE">    $rawBody</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">file_get_contents</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'php://input'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">, </span><span style="color:#B5CEA8">0</span><span style="color:#D4D4D4">, PHP_VALIDATE_MAX_BODY);</span></span>
+<span class="line"><span style="color:#9CDCFE">    $decoded</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">json_decode</span><span style="color:#D4D4D4">(</span><span style="color:#DCDCAA">is_string</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$rawBody</span><span style="color:#D4D4D4">) ? </span><span style="color:#9CDCFE">$rawBody</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">$decoded</span><span style="color:#D4D4D4"> instanceof </span><span style="color:#4EC9B0">stdClass</span><span style="color:#D4D4D4">)) {</span></span>
+<span class="line"><span style="color:#DCDCAA">        php_validate_json</span><span style="color:#D4D4D4">(</span><span style="color:#B5CEA8">400</span><span style="color:#D4D4D4">, [</span></span>
+<span class="line"><span style="color:#CE9178">            'ok'</span><span style="color:#D4D4D4"> => </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">            'message'</span><span style="color:#D4D4D4"> => </span><span style="color:#CE9178">'La petición no es un JSON válido.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        ]);</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@var</span><span style="color:#569CD6"> array</span><span style="color:#6A9955">&#x3C;</span><span style="color:#569CD6">string</span><span style="color:#6A9955">, mixed> $payload - `cuerpo json ya decodificado` */</span></span>
+<span class="line"><span style="color:#9CDCFE">    $payload</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">get_object_vars</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$decoded</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9CDCFE">    $name</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">php_validate_normalize</span><span style="color:#D4D4D4">(</span><span style="color:#DCDCAA">php_validate_value</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$payload</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'name'</span><span style="color:#D4D4D4">));</span></span>
+<span class="line"><span style="color:#9CDCFE">    $email</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">php_validate_normalize</span><span style="color:#D4D4D4">(</span><span style="color:#DCDCAA">php_validate_value</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$payload</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'email'</span><span style="color:#D4D4D4">));</span></span>
+<span class="line"><span style="color:#9CDCFE">    $message</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">php_validate_normalize</span><span style="color:#D4D4D4">(</span><span style="color:#DCDCAA">php_validate_value</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$payload</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'message'</span><span style="color:#D4D4D4">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#9CDCFE">    $nameLength</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">php_validate_length</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$name</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#9CDCFE">    $messageLength</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">php_validate_length</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$message</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@var</span><span style="color:#569CD6"> array</span><span style="color:#6A9955">&#x3C;</span><span style="color:#569CD6">string</span><span style="color:#6A9955">, string> $errors - `errores por campo` */</span></span>
+<span class="line"><span style="color:#9CDCFE">    $errors</span><span style="color:#D4D4D4"> = [];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">$name</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#9CDCFE">        $errors</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'name'</span><span style="color:#D4D4D4">] = </span><span style="color:#CE9178">'Escribe tu nombre.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    } </span><span style="color:#C586C0">elseif</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">$nameLength</span><span style="color:#D4D4D4"> &#x3C; PHP_VALIDATE_NAME_MIN || </span><span style="color:#9CDCFE">$nameLength</span><span style="color:#D4D4D4"> > PHP_VALIDATE_NAME_MAX) {</span></span>
+<span class="line"><span style="color:#9CDCFE">        $errors</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'name'</span><span style="color:#D4D4D4">] = </span><span style="color:#CE9178">'El nombre debe tener entre 2 y 60 caracteres.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">$email</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#9CDCFE">        $errors</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'email'</span><span style="color:#D4D4D4">] = </span><span style="color:#CE9178">'Escribe tu correo.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    } </span><span style="color:#C586C0">elseif</span><span style="color:#D4D4D4"> (</span><span style="color:#DCDCAA">filter_var</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">$email</span><span style="color:#D4D4D4">, FILTER_VALIDATE_EMAIL) === </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#9CDCFE">        $errors</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'email'</span><span style="color:#D4D4D4">] = </span><span style="color:#CE9178">'El correo no tiene un formato válido.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">$message</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"><span style="color:#9CDCFE">        $errors</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'message'</span><span style="color:#D4D4D4">] = </span><span style="color:#CE9178">'Escribe tu mensaje.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    } </span><span style="color:#C586C0">elseif</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">$messageLength</span><span style="color:#D4D4D4"> &#x3C; PHP_VALIDATE_MESSAGE_MIN || </span><span style="color:#9CDCFE">$messageLength</span><span style="color:#D4D4D4"> > PHP_VALIDATE_MESSAGE_MAX) {</span></span>
+<span class="line"><span style="color:#9CDCFE">        $errors</span><span style="color:#D4D4D4">[</span><span style="color:#CE9178">'message'</span><span style="color:#D4D4D4">] = </span><span style="color:#CE9178">'El mensaje debe tener entre 10 y 500 caracteres.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">$errors</span><span style="color:#D4D4D4"> !== []) {</span></span>
+<span class="line"><span style="color:#DCDCAA">        php_validate_json</span><span style="color:#D4D4D4">(</span><span style="color:#B5CEA8">422</span><span style="color:#D4D4D4">, [</span></span>
+<span class="line"><span style="color:#CE9178">            'ok'</span><span style="color:#D4D4D4"> => </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">            'message'</span><span style="color:#D4D4D4"> => </span><span style="color:#CE9178">'Revisá los campos marcados.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">            'errors'</span><span style="color:#D4D4D4"> => </span><span style="color:#9CDCFE">$errors</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        ]);</span></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#DCDCAA">    php_validate_json</span><span style="color:#D4D4D4">(</span><span style="color:#B5CEA8">200</span><span style="color:#D4D4D4">, [</span></span>
+<span class="line"><span style="color:#CE9178">        'ok'</span><span style="color:#D4D4D4"> => </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">        'message'</span><span style="color:#D4D4D4"> => </span><span style="color:#CE9178">'El servidor validó y normalizó los datos.'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">        'data'</span><span style="color:#D4D4D4"> => [</span></span>
+<span class="line"><span style="color:#CE9178">            'name'</span><span style="color:#D4D4D4"> => </span><span style="color:#9CDCFE">$name</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">            'email'</span><span style="color:#D4D4D4"> => </span><span style="color:#9CDCFE">$email</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#CE9178">            'message'</span><span style="color:#D4D4D4"> => </span><span style="color:#9CDCFE">$message</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        ],</span></span>
+<span class="line"><span style="color:#CE9178">        'serverTime'</span><span style="color:#D4D4D4"> => </span><span style="color:#DCDCAA">gmdate</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'c'</span><span style="color:#D4D4D4">),</span></span>
+<span class="line"><span style="color:#CE9178">        'runtime'</span><span style="color:#D4D4D4"> => </span><span style="color:#CE9178">'PHP '</span><span style="color:#D4D4D4"> .</span><span style="color:#D4D4D4"> PHP_VERSION,</span></span>
+<span class="line"><span style="color:#D4D4D4">    ]);</span></span>
+<span class="line"></span></code></pre>
