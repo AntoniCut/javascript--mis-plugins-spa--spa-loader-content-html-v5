@@ -1,0 +1,91 @@
+<!--
+    *  --------------------------------------------------------------------------------------------------  *
+    *  -----  express-description.html  --  /src/pages-components/express/express-description.html  -----  *
+    *  --------------------------------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="express-page">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="express-page__hero">
+        <div class="express-page__hero-badge">
+            <span class="express-page__hero-tag" aria-hidden="true">Ex</span>
+            <h3 class="express-page__hero-title">Express</h3>
+            <p class="express-page__hero-subtitle">CRUD REST en memoria sobre Node</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Intro  -----  -->
+    <section class="express-page__intro">
+        <p class="express-page__intro-text">
+            <strong>Express</strong> corre el API en un proceso Node aparte del servidor del SPA.
+            En desarrollo el dev server monta el router en <strong>/api</strong>; en producción el
+            proceso lo gestiona <strong>systemd</strong> y nginx publica el mismo prefijo.
+        </p>
+        <p class="express-page__intro-text">
+            El <strong>router</strong> es dueño de las rutas y del contrato JSON, mientras que el
+            <strong>middleware</strong> en cadena mide la latencia, responde la cabecera
+            <strong>X-Response-Time</strong> y registra una línea por petición.
+        </p>
+        <p class="express-page__intro-text">
+            Las tareas viven <strong>solo en memoria</strong>: no hay base de datos. Si el proceso
+            Node se reinicia, la lista vuelve a las <strong>3 tareas semilla</strong> originales.
+        </p>
+    </section>
+
+
+    <!--  -----  Features  -----  -->
+    <section class="express-page__features">
+
+        <h3 class="express-page__features-title">Qué aporta este router</h3>
+
+        <div class="express-page__features-grid">
+
+            <article class="express-page__feature">
+                <h4 class="express-page__feature-title">Router propio</h4>
+                <p class="express-page__feature-text">
+                    createTasksRouter() devuelve un express.Router montable, separado del router de MySQL.
+                </p>
+            </article>
+
+            <article class="express-page__feature">
+                <h4 class="express-page__feature-title">Middleware en cadena</h4>
+                <p class="express-page__feature-text">
+                    Un primer middleware cronometra cada petición y un handler final responde los errores de body-parser.
+                </p>
+            </article>
+
+            <article class="express-page__feature">
+                <h4 class="express-page__feature-title">Códigos HTTP explícitos</h4>
+                <p class="express-page__feature-text">
+                    200, 201, 400, 404, 405, 413 y 422: cada caso tiene su respuesta JSON y su cabecera Allow.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!--  -----  Concepts  -----  -->
+    <section class="express-page__concepts-section">
+
+        <h3 class="express-page__concepts-title">Rutas del API</h3>
+
+        <ul class="express-page__concepts">
+            <li class="express-page__concept">GET /api/tasks</li>
+            <li class="express-page__concept">POST /api/tasks</li>
+            <li class="express-page__concept">DELETE /api/tasks/:id</li>
+            <li class="express-page__concept">express.Router</li>
+            <li class="express-page__concept">express.json 4 KB</li>
+            <li class="express-page__concept">X-Response-Time</li>
+            <li class="express-page__concept">405 Allow</li>
+        </ul>
+
+    </section>
+
+</div>

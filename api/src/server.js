@@ -11,6 +11,9 @@ import './load-env.js';
 /** - `router compartido con el servidor de desarrollo` */
 import { createApiRouter } from './mysql-query.js';
 
+/** - `router del crud de tareas en memoria` */
+import { createTasksRouter } from './tasks-router.js';
+
 import express from 'express';
 
 
@@ -29,6 +32,9 @@ app.disable('x-powered-by');
 
 //  -----  montar health y la consulta mysql  -----
 app.use(createApiRouter());
+
+//  -----  montar el crud de tareas en memoria  -----
+app.use(createTasksRouter());
 
 
 /**

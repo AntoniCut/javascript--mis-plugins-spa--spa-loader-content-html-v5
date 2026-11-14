@@ -1,0 +1,382 @@
+<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> setStatus</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">isError</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  escribir el aviso  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    status</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  marcar el aviso como error o como resultado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    status</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">classList</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">toggle</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'is-error'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">isError</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `setHttpBadge(badge, status)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Escribe el código HTTP en la insignia.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#9CDCFE"> badge</span><span style="color:#6A9955"> - Insignia del código HTTP.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {number|null}</span><span style="color:#9CDCFE"> status</span><span style="color:#6A9955"> - Código devuelto, o null sin respuesta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> setHttpBadge</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">badge</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  mostrar el código o un guion mientras no hay respuesta  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    badge</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4"> === </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4"> ? </span><span style="color:#CE9178">'HTTP —'</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">`HTTP </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ---------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `clearErrors(form)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ---------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Vacía los errores por campo y el estado inválido de los controles.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLFormElement}</span><span style="color:#9CDCFE"> form</span><span style="color:#6A9955"> - Formulario de la demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> clearErrors</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {NodeListOf&#x3C;Element>}</span><span style="color:#6A9955"> - `avisos por campo` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> errorNodes</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelectorAll</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-error-for]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  vaciar cada aviso  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> errorNode</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> errorNodes</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  quitar el texto del error  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        errorNode</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {NodeListOf&#x3C;Element>}</span><span style="color:#6A9955"> - `controles del formulario` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> controls</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelectorAll</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[name]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  quitar la marca de inválido de cada control  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> control</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> controls</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  dejar el control como válido  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        control</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">removeAttribute</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'aria-invalid'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `renderErrors(form, errors)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Pinta el error de cada campo devuelto por PHP.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLFormElement}</span><span style="color:#9CDCFE"> form</span><span style="color:#6A9955"> - Formulario de la demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Record&#x3C;string, string>}</span><span style="color:#9CDCFE"> errors</span><span style="color:#6A9955"> - Errores por campo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> renderErrors</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">errors</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  recorrer cada campo con error  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#D4D4D4"> [</span><span style="color:#4FC1FF">key</span><span style="color:#D4D4D4">, </span><span style="color:#4FC1FF">message</span><span style="color:#D4D4D4">] </span><span style="color:#569CD6">of</span><span style="color:#9CDCFE"> Object</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">entries</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">errors</span><span style="color:#D4D4D4">)) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `aviso del campo` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> errorNode</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">`[data-error-for="</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">key</span><span style="color:#569CD6">}</span><span style="color:#CE9178">"]`</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `control del campo, si existe` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> control</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">elements</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">namedItem</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">key</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {Element|null}</span><span style="color:#6A9955"> - `control del campo como elemento` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> field</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">control</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Element</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">control</span><span style="color:#D4D4D4"> : </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el mensaje si existe el aviso  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">errorNode</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el error del campo  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            errorNode</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  marcar el control como inválido  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">field</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLInputElement</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">field</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLTextAreaElement</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  avisar al lector de pantalla  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            field</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">setAttribute</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'aria-invalid'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `renderSuccess(result, body)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Pinta los datos normalizados en una lista de definiciones.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#9CDCFE"> result</span><span style="color:#6A9955"> - Contenedor del resultado.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {PhpValidationResponse}</span><span style="color:#9CDCFE"> body</span><span style="color:#6A9955"> - Respuesta correcta del servidor.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> renderSuccess</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLDListElement}</span><span style="color:#6A9955"> - `lista de datos normalizados` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> list</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'dl'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  asignar la clase de la lista  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    list</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'php-page__result-list'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {Array&#x3C;[string, string]>}</span><span style="color:#6A9955"> - `pares de etiqueta y valor` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> rows</span><span style="color:#D4D4D4"> = [</span></span>
+<span class="line"><span style="color:#D4D4D4">        [</span><span style="color:#CE9178">'Nombre'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">data</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">name</span><span style="color:#D4D4D4"> ?? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">],</span></span>
+<span class="line"><span style="color:#D4D4D4">        [</span><span style="color:#CE9178">'Correo'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">data</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">email</span><span style="color:#D4D4D4"> ?? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">],</span></span>
+<span class="line"><span style="color:#D4D4D4">        [</span><span style="color:#CE9178">'Mensaje'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">data</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> ?? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">],</span></span>
+<span class="line"><span style="color:#D4D4D4">        [</span><span style="color:#CE9178">'serverTime'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">serverTime</span><span style="color:#D4D4D4"> ?? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">],</span></span>
+<span class="line"><span style="color:#D4D4D4">        [</span><span style="color:#CE9178">'runtime'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">runtime</span><span style="color:#D4D4D4"> ?? </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">],</span></span>
+<span class="line"><span style="color:#D4D4D4">    ];</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  crear cada par de la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#D4D4D4"> [</span><span style="color:#4FC1FF">label</span><span style="color:#D4D4D4">, </span><span style="color:#4FC1FF">value</span><span style="color:#D4D4D4">] </span><span style="color:#569CD6">of</span><span style="color:#9CDCFE"> rows</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#6A9955"> - `término de la lista` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> term</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'dt'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir la etiqueta  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        term</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">label</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#6A9955"> - `valor de la lista` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> description</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'dd'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el valor normalizado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        description</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir la etiqueta y el valor  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        list</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">term</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#9CDCFE">        list</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">description</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  mostrar la lista  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    result</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">list</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `submitForm(form)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Envía el formulario a PHP y pinta la respuesta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLFormElement}</span><span style="color:#9CDCFE"> form</span><span style="color:#6A9955"> - Formulario de la demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;void>}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> submitForm</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `aviso del formulario` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> status</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">parentElement</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-php-status]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `contenedor del resultado` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> result</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">parentElement</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-php-result]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `insignia del código http` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> httpBadge</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">parentElement</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-php-http]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `insignia del runtime` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> runtimeBadge</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">parentElement</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-php-runtime]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLInputElement|null}</span><span style="color:#6A9955"> - `campo del nombre` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> nameField</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[name="name"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLInputElement|null}</span><span style="color:#6A9955"> - `campo del correo` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> emailField</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[name="email"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLTextAreaElement|null}</span><span style="color:#6A9955"> - `campo del mensaje` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> messageField</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[name="message"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLButtonElement|null}</span><span style="color:#6A9955"> - `botón de envío` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> button</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[type="submit"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si falta alguna pieza del formulario  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4"> || !</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4"> || !</span><span style="color:#9CDCFE">httpBadge</span><span style="color:#D4D4D4"> || !</span><span style="color:#9CDCFE">runtimeBadge</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay destino para el resultado  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si falta algún campo o el botón  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">nameField</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLInputElement</span><span style="color:#D4D4D4">) || !(</span><span style="color:#9CDCFE">emailField</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLInputElement</span><span style="color:#D4D4D4">) || !(</span><span style="color:#9CDCFE">messageField</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLTextAreaElement</span><span style="color:#D4D4D4">) || !(</span><span style="color:#9CDCFE">button</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLButtonElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  el formulario está incompleto  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  vaciar los errores anteriores  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    clearErrors</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  vaciar el resultado anterior  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    result</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">replaceChildren</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  avisar de que el envío está en curso  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">'Enviando…'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  reiniciar las insignias  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">    setHttpBadge</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">httpBadge</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"><span style="color:#9CDCFE">    runtimeBadge</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'runtime —'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  bloquear el botón mientras responde el servidor  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  intentar la petición  -----</span></span>
+<span class="line"><span style="color:#C586C0">    try</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `respuesta php, la misma en desarrollo y en nginx` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'app/services/php/validate.php'</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            method:</span><span style="color:#CE9178"> 'POST'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            headers:</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#CE9178">                'Content-Type'</span><span style="color:#9CDCFE">:</span><span style="color:#CE9178"> 'application/json'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            },</span></span>
+<span class="line"><span style="color:#9CDCFE">            body:</span><span style="color:#4FC1FF"> JSON</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">stringify</span><span style="color:#D4D4D4">({</span></span>
+<span class="line"><span style="color:#9CDCFE">                name:</span><span style="color:#9CDCFE"> nameField</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">                email:</span><span style="color:#9CDCFE"> emailField</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">                message:</span><span style="color:#9CDCFE"> messageField</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            }),</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el código http en la página  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setHttpBadge</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">httpBadge</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `tipo declarado por el servidor` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> contentType</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">headers</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">get</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'content-type'</span><span style="color:#D4D4D4">) || </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  si nginx devolvió html, no leerlo como json  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">contentType</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">includes</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'application/json'</span><span style="color:#D4D4D4">)) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el código http en la página  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`El servidor respondió </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> sin JSON. La validación no llegó a PHP.`</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no pintar un resultado  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {PhpValidationResponse}</span><span style="color:#6A9955"> - `cuerpo json de la validación` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> body</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#9CDCFE"> response</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar los errores devueltos por el servidor  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">ok</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  escribir el motivo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'No se pudo validar el formulario.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  pintar el error de cada campo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            renderErrors</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">errors</span><span style="color:#D4D4D4"> || {});</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no pintar un resultado  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el mensaje de éxito  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  pintar los datos normalizados  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        renderSuccess</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">result</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el runtime que atendió la petición  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        runtimeBadge</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">runtime</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'PHP'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  si la petición no llega, avisar en la página  -----</span></span>
+<span class="line"><span style="color:#C586C0">    catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `texto del fallo de red` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> message</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">error</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Error</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'No se pudo contactar con el servidor.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo de red  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  volver a permitir el envío  -----</span></span>
+<span class="line"><span style="color:#C586C0">    finally</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  activar el botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `mount()`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Enlaza el formulario cuando la ruta ya está en el DOM.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#C586C0">export</span><span style="color:#569CD6"> const</span><span style="color:#DCDCAA"> mount</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLFormElement|null}</span><span style="color:#6A9955"> - `formulario de la validación` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> form</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-php-form]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si esta ruta no está montada  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">form</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLFormElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay formulario  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  no volver a enlazar el mismo formulario  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">bound</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  el envío ya está enlazado  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  marcar el formulario como enlazado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    form</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">bound</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  enviar el formulario sin recargar la SPA  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'submit'</span><span style="color:#D4D4D4">, (</span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  evitar el envío nativo del formulario  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        event</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">preventDefault</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  lanzar la validación  -----</span></span>
+<span class="line"><span style="color:#569CD6">        void</span><span style="color:#DCDCAA"> submitForm</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  limpiar el error del campo que se está editando  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'input'</span><span style="color:#D4D4D4">, (</span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `control que disparó el evento` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> target</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">target</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  ignorar lo que no sea un control de texto  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">target</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLInputElement</span><span style="color:#D4D4D4">) &#x26;&#x26; !(</span><span style="color:#9CDCFE">target</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLTextAreaElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no hay campo que limpiar  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `nombre del campo editado` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> key</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">target</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">name</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  ignorar controles sin nombre  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">key</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no hay error asociado  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `aviso del campo editado` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> errorNode</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">`[data-error-for="</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">key</span><span style="color:#569CD6">}</span><span style="color:#CE9178">"]`</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  vaciar el error del campo  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">errorNode</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  quitar el mensaje anterior  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            errorNode</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  retirar la marca de inválido  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        target</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">removeAttribute</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'aria-invalid'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span></code></pre>

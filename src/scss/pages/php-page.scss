@@ -1,0 +1,361 @@
+/*
+    *  --------------------------------------------------------------  *
+    *  -----  php-page.scss  --  /src/scss/pages/php-page.scss  -----  *
+    *  --------------------------------------------------------------  *
+*/
+
+@use '../base/variables' as var;
+@use '../base/mixins' as mx;
+
+
+//  -----  variables  -----
+$php-primary:          #777bb4;
+$php-secondary:        #4f5b93;
+$php-hero-end:         #2b2f55;
+$php-accent-bg:        #f0f0fb;
+$php-text:             #2c3e50;
+$php-text-light:       #5d6d7e;
+$php-card-bg:          var.$color-white;
+$php-card-border:      rgba($php-primary, 0.2);
+$php-card-shadow:      0 4px 16px rgba($php-primary, 0.1);
+$php-tag-bg:           rgba($php-primary, 0.08);
+$php-tag-color:        $php-primary;
+$php-tag-border:       rgba($php-primary, 0.3);
+$php-error:            #9b2335;
+$color-white:          var.$color-white;
+$shadow-hero-title:    var.$shadow-text;
+
+
+//  -----  título del header  -----
+.header__dynamic-title {
+    color: $php-primary;
+}
+
+
+//  -----  títulos de sección  -----
+.main__title {
+    color: $php-primary;
+}
+
+
+//  -----  la columna no crece con el formulario  -----
+.php-page__panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+
+//  -----  php-page  -----
+.php-page,
+.php-demo {
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+
+
+    //  -----  hero  -----
+    &__hero {
+        width: 100%;
+        min-height: 18rem;
+        background: linear-gradient(135deg, $php-primary 0%, $php-secondary 60%, $php-hero-end 100%);
+        border-radius: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 2rem;
+
+        @include mx.tablet {
+            min-height: 24rem;
+            padding: 4rem 3rem;
+        }
+    }
+
+    &__hero-badge {
+        text-align: center;
+        color: $color-white;
+    }
+
+    &__hero-tag {
+        display: block;
+        font-size: 4rem;
+        font-weight: 800;
+        font-family: monospace;
+        letter-spacing: 0.3rem;
+    }
+
+    &__hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0.6rem 0 0.4rem;
+        text-shadow: $shadow-hero-title;
+
+        @include mx.tablet {
+            font-size: 4.5rem;
+        }
+    }
+
+    &__hero-subtitle {
+        font-size: 1.4rem;
+        opacity: 0.9;
+
+        @include mx.tablet {
+            font-size: 1.8rem;
+        }
+    }
+
+
+    //  -----  intro  -----
+    &__intro {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+        background-color: $php-accent-bg;
+        border-left: 5px solid $php-primary;
+        border-radius: 0 0.8rem 0.8rem 0;
+        padding: 2.5rem;
+    }
+
+    &__intro-text {
+        width: 100%;
+        font-size: 1.5rem;
+        line-height: 1.8;
+        color: $php-text;
+
+        strong {
+            color: $php-primary;
+            font-weight: 600;
+        }
+    }
+
+
+    //  -----  features  -----
+    &__features {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+    }
+
+    &__features-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: $php-primary;
+        text-align: center;
+
+        &::after {
+            content: '';
+            display: block;
+            width: 6rem;
+            height: 3px;
+            background-color: $php-primary;
+            margin: 0.8rem auto 0;
+            border-radius: 2px;
+        }
+    }
+
+    &__features-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+
+        @include mx.tablet {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    &__feature {
+        background-color: $php-card-bg;
+        border: 1px solid $php-card-border;
+        border-radius: 1rem;
+        padding: 2.5rem;
+        box-shadow: $php-card-shadow;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__feature-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: $php-primary;
+    }
+
+    &__feature-text {
+        font-size: 1.4rem;
+        line-height: 1.75;
+        color: $php-text-light;
+    }
+
+
+    //  -----  concepts  -----
+    &__concepts-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    &__concepts-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: $php-primary;
+        text-align: center;
+    }
+
+    &__concepts {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__concept {
+        background-color: $php-tag-bg;
+        color: $php-tag-color;
+        border: 1px solid $php-tag-border;
+        border-radius: 2rem;
+        padding: 0.6rem 1.4rem;
+        font-size: 1.3rem;
+        font-family: monospace;
+        font-weight: 500;
+    }
+
+
+    //  -----  formulario  -----
+    &__form {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    &__label {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: $php-primary;
+    }
+
+    &__input,
+    &__textarea {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding: 1.2rem 1.4rem;
+        border: 1px solid $php-card-border;
+        border-radius: 0.8rem;
+        background-color: $php-card-bg;
+        color: $php-text;
+        font-family: var.$font-primary;
+        font-size: 1.4rem;
+        line-height: 1.6;
+
+        &:focus {
+            outline: 2px solid $php-primary;
+            outline-offset: 2px;
+            border-color: $php-primary;
+        }
+    }
+
+    &__textarea {
+        min-height: 12rem;
+        resize: vertical;
+    }
+
+    &__field-error {
+        font-size: 1.3rem;
+        line-height: 1.5;
+        color: $php-error;
+
+        &:empty {
+            display: none;
+        }
+    }
+
+    &__submit {
+        align-self: flex-start;
+        border: 0;
+        border-radius: 0.8rem;
+        padding: 1rem 1.8rem;
+        background-color: $php-primary;
+        color: $color-white;
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+    }
+
+
+    //  -----  resultado  -----
+    &__status {
+        min-height: 1.6rem;
+        font-size: 1.4rem;
+        color: $php-text;
+
+        &.is-error {
+            color: $php-error;
+        }
+    }
+
+    &__badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    &__badge {
+        background-color: $php-tag-bg;
+        color: $php-primary;
+        border: 1px solid $php-tag-border;
+        border-radius: 2rem;
+        padding: 0.5rem 1.2rem;
+        font-size: 1.2rem;
+        font-family: monospace;
+    }
+
+    &__result {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    &__result-list {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: 0.8rem 1.6rem;
+        background-color: $php-card-bg;
+        border: 1px solid $php-card-border;
+        border-radius: 1rem;
+        padding: 2rem;
+        font-size: 1.4rem;
+
+        dt {
+            font-weight: 600;
+            color: $php-primary;
+        }
+
+        dd {
+            margin: 0;
+            color: $php-text;
+            word-break: break-word;
+        }
+    }
+
+}

@@ -1,0 +1,89 @@
+<!--
+    *  --------------------------------------------------------------------------------------  *
+    *  -----  php-description.html  --  /src/pages-components/php/php-description.html  -----  *
+    *  --------------------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="php-page">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="php-page__hero">
+        <div class="php-page__hero-badge">
+            <span class="php-page__hero-tag" aria-hidden="true">PHP</span>
+            <h3 class="php-page__hero-title">PHP</h3>
+            <p class="php-page__hero-subtitle">Validación de formulario en el servidor</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Intro  -----  -->
+    <section class="php-page__intro">
+        <p class="php-page__intro-text">
+            <strong>PHP</strong> se ejecuta en el servidor: <strong>PHP-FPM</strong> en producción
+            y <strong>php-cgi</strong> en el servidor de desarrollo. El navegador solo envía el
+            formulario y muestra la respuesta.
+        </p>
+        <p class="php-page__intro-text">
+            El endpoint <strong>app/services/php/validate.php</strong> no confía en el navegador:
+            recibe JSON, valida nombre, correo y mensaje, y devuelve los errores por campo junto
+            con los datos ya normalizados. Todo el contrato es JSON con códigos HTTP.
+        </p>
+    </section>
+
+
+    <!--  -----  Features  -----  -->
+    <section class="php-page__features">
+
+        <h3 class="php-page__features-title">Qué aporta este endpoint</h3>
+
+        <div class="php-page__features-grid">
+
+            <article class="php-page__feature">
+                <h4 class="php-page__feature-title">El servidor decide</h4>
+                <p class="php-page__feature-text">
+                    Las reglas viven en PHP: el navegador puede enviar cualquier cosa y el servidor
+                    responde con el error exacto de cada campo.
+                </p>
+            </article>
+
+            <article class="php-page__feature">
+                <h4 class="php-page__feature-title">Contrato JSON + códigos HTTP</h4>
+                <p class="php-page__feature-text">
+                    200 en éxito, 400 con JSON inválido, 405 para otro método y 422 con errores por
+                    campo. La respuesta incluye serverTime y el runtime.
+                </p>
+            </article>
+
+            <article class="php-page__feature">
+                <h4 class="php-page__feature-title">Sin base de datos ni dependencias</h4>
+                <p class="php-page__feature-text">
+                    No usa MySQL, .env ni Composer: es un único archivo compatible con PHP-FPM,
+                    php-cgi y cualquier hosting con PHP.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!--  -----  Concepts  -----  -->
+    <section class="php-page__concepts-section">
+
+        <h3 class="php-page__concepts-title">Conceptos de la demo</h3>
+
+        <ul class="php-page__concepts">
+            <li class="php-page__concept">POST validate.php</li>
+            <li class="php-page__concept">422 errores por campo</li>
+            <li class="php-page__concept">filter_var</li>
+            <li class="php-page__concept">textContent</li>
+            <li class="php-page__concept">PHP-FPM</li>
+            <li class="php-page__concept">php-cgi</li>
+        </ul>
+
+    </section>
+
+</div>

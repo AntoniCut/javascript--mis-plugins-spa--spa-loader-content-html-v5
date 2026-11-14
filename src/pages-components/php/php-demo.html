@@ -1,0 +1,91 @@
+<!--
+    *  ------------------------------------------------------------------------  *
+    *  -----  php-demo.html  --  /src/pages-components/php/php-demo.html  -----  *
+    *  ------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="php-demo">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="php-page__hero">
+        <div class="php-page__hero-badge">
+            <span class="php-page__hero-tag" aria-hidden="true">POST</span>
+            <h3 class="php-page__hero-title">Validación</h3>
+            <p class="php-page__hero-subtitle">Demo contra app/services/php/validate.php</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Estado del script clásico  -----  -->
+    <p class="php-page__intro-text" data-php-cjs-status>
+        Esperando php-page.cjs.js…
+    </p>
+
+
+    <!--  -----  Formulario de validación  -----  -->
+    <section class="php-page__features">
+
+        <h3 class="php-page__features-title">Enviar formulario</h3>
+
+        <form class="php-page__form" data-php-form>
+
+            <label class="php-page__label" for="phpName">Nombre</label>
+
+            <input
+                id="phpName"
+                class="php-page__input"
+                name="name"
+                type="text"
+                autocomplete="name"
+                required
+            >
+
+            <p class="php-page__field-error" data-error-for="name" role="alert"></p>
+
+
+            <label class="php-page__label" for="phpEmail">Correo</label>
+
+            <input
+                id="phpEmail"
+                class="php-page__input"
+                name="email"
+                type="email"
+                autocomplete="email"
+                required
+            >
+
+            <p class="php-page__field-error" data-error-for="email" role="alert"></p>
+
+
+            <label class="php-page__label" for="phpMessage">Mensaje</label>
+
+            <textarea
+                id="phpMessage"
+                class="php-page__textarea"
+                name="message"
+                rows="5"
+                required
+            ></textarea>
+
+            <p class="php-page__field-error" data-error-for="message" role="alert"></p>
+
+
+            <button class="php-page__submit" type="submit">Validar en el servidor</button>
+
+        </form>
+
+        <p class="php-page__status" data-php-status role="status"></p>
+
+        <div class="php-page__badges">
+            <span class="php-page__badge" data-php-http>HTTP —</span>
+            <span class="php-page__badge" data-php-runtime>runtime —</span>
+        </div>
+
+        <div class="php-page__result" data-php-result></div>
+
+    </section>
+
+</div>

@@ -1,0 +1,576 @@
+<pre class="shiki dark-plus" style="background-color:#1E1E1E;color:#D4D4D4" tabindex="0"><code><span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> setStatus</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">isError</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  escribir el aviso  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  marcar el aviso como error o como resultado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">classList</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">toggle</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'is-error'</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">isError</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ---------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `setBadges(ui, response)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ---------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Muestra el código HTTP y la cabecera del tiempo de respuesta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {ExpressUi}</span><span style="color:#9CDCFE"> ui</span><span style="color:#6A9955"> - Referencias del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Response}</span><span style="color:#9CDCFE"> response</span><span style="color:#6A9955"> - Respuesta de fetch.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> setBadges</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  mostrar el código http de la respuesta  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">httpBadge</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">`HTTP </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `latencia declarada por el servidor` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> latency</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">headers</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">get</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'x-response-time'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  mostrar la latencia o un guion si no vino  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">latencyBadge</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">latency</span><span style="color:#D4D4D4"> ? </span><span style="color:#CE9178">`X-Response-Time </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">latency</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'X-Response-Time —'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `readJson(response)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Lee el cuerpo solo cuando el servidor declara JSON.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@template</span><span style="color:#9CDCFE"> T</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Response}</span><span style="color:#9CDCFE"> response</span><span style="color:#6A9955"> - Respuesta de fetch.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;T|null>}</span><span style="color:#6A9955"> - Cuerpo JSON o null.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> readJson</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** - `tipo declarado por el servidor` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> contentType</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">headers</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">get</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'content-type'</span><span style="color:#D4D4D4">) || </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  si el servidor no declara json, no intentar parsearlo  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">contentType</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">includes</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'application/json'</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay cuerpo json que leer  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#569CD6"> null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  devolver el cuerpo ya parseado  -----</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#6A9955"> /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {T}</span><span style="color:#6A9955"> */</span><span style="color:#D4D4D4"> (</span><span style="color:#C586C0">await</span><span style="color:#9CDCFE"> response</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">());</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `renderTasks(ui, tasks)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * --------------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Pinta la lista de tareas con nodos del DOM.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {ExpressUi}</span><span style="color:#9CDCFE"> ui</span><span style="color:#6A9955"> - Referencias del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {ExpressTask[]}</span><span style="color:#9CDCFE"> tasks</span><span style="color:#6A9955"> - Tareas devueltas por el API.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> renderTasks</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">tasks</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  vaciar la lista anterior  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">list</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">replaceChildren</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  avisar cuando no hay tareas  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">tasks</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">length</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">0</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLLIElement}</span><span style="color:#6A9955"> - `fila del estado vacío` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> empty</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'li'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  asignar la clase del estado vacío  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        empty</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'express-page__empty'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el aviso  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        empty</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'No hay tareas todavía.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el estado vacío  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">list</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">empty</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no pintar filas  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  crear una fila por tarea  -----</span></span>
+<span class="line"><span style="color:#C586C0">    for</span><span style="color:#D4D4D4"> (</span><span style="color:#569CD6">const</span><span style="color:#4FC1FF"> task</span><span style="color:#569CD6"> of</span><span style="color:#9CDCFE"> tasks</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLLIElement}</span><span style="color:#6A9955"> - `fila de la tarea` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> item</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'li'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  asignar la clase de la fila  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        item</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'express-page__item'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLSpanElement}</span><span style="color:#6A9955"> - `título de la tarea` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> title</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'span'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  asignar la clase del título  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        title</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'express-page__item-title'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el título  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        title</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">task</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLSpanElement}</span><span style="color:#6A9955"> - `identificador de la tarea` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> identifier</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'span'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  asignar la clase del identificador  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        identifier</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'express-page__item-id'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el identificador  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        identifier</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">`#</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">task</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">id</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLButtonElement}</span><span style="color:#6A9955"> - `botón para eliminar la tarea` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> button</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">createElement</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'button'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  evitar que el botón envíe formularios  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">type</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'button'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  asignar la clase del botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">className</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'express-page__delete'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  guardar el id en el botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">taskDelete</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">String</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">task</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  describir el botón para lectores de pantalla  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">setAttribute</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'aria-label'</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`Eliminar la tarea «</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">task</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">title</span><span style="color:#569CD6">}</span><span style="color:#CE9178">»`</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir la etiqueta del botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'Eliminar'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir el título a la fila  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        item</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir el identificador a la fila  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        item</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">identifier</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir el botón a la fila  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        item</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">button</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  añadir la fila a la lista  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">list</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">appendChild</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">item</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `loadTasks(ui)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Pide la lista al API y la pinta.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {ExpressUi}</span><span style="color:#9CDCFE"> ui</span><span style="color:#6A9955"> - Referencias del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;void>}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> loadTasks</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  bloquear el envío mientras dura la petición  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  intentar leer la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">    try</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `respuesta del listado` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/api/tasks'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el código y la latencia  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setBadges</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {TasksListResponse|null}</span><span style="color:#6A9955"> - `cuerpo del listado` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> body</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> readJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  avisar si la respuesta no trajo json  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el código sin cuerpo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`El servidor respondió </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> sin JSON.`</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no pintar la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo devuelto por el servidor  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">ok</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  escribir el motivo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'No se pudo cargar la lista.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no pintar una lista vacía  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  pintar las tareas recibidas  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        renderTasks</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">tasks</span><span style="color:#D4D4D4"> || []);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  escribir el recuento  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'Lista actualizada.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  si la petición no llega, avisar en la página  -----</span></span>
+<span class="line"><span style="color:#C586C0">    catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `texto del fallo de red` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> message</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">error</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Error</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'No se pudo contactar con el servidor.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo de red  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  volver a permitir el envío  -----</span></span>
+<span class="line"><span style="color:#C586C0">    finally</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  activar el botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `createTask(ui)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Envía el título al API y recarga la lista.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {ExpressUi}</span><span style="color:#9CDCFE"> ui</span><span style="color:#6A9955"> - Referencias del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;void>}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> createTask</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  limpiar el error anterior del campo  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">fieldError</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  bloquear el envío mientras dura la petición  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  intentar crear la tarea  -----</span></span>
+<span class="line"><span style="color:#C586C0">    try</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `respuesta de la creación` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/api/tasks'</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            method:</span><span style="color:#CE9178"> 'POST'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#9CDCFE">            headers:</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"><span style="color:#CE9178">                'Content-Type'</span><span style="color:#9CDCFE">:</span><span style="color:#CE9178"> 'application/json'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            },</span></span>
+<span class="line"><span style="color:#9CDCFE">            body:</span><span style="color:#4FC1FF"> JSON</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">stringify</span><span style="color:#D4D4D4">({</span></span>
+<span class="line"><span style="color:#9CDCFE">                title:</span><span style="color:#9CDCFE"> ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">titleField</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">            }),</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el código y la latencia  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setBadges</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {TaskMutationResponse|null}</span><span style="color:#6A9955"> - `cuerpo de la creación` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> body</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> readJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  avisar si la respuesta no trajo json  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el código sin cuerpo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`El servidor respondió </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> sin JSON.`</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no recargar la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  pintar el error de validación del campo  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4"> === </span><span style="color:#B5CEA8">422</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  escribir el error junto al campo  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">            ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">fieldError</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">textContent</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">errors</span><span style="color:#D4D4D4">?.</span><span style="color:#9CDCFE">title</span><span style="color:#D4D4D4"> || </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'Revisá el título.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  avisar del rechazo en el estado  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'Revisá los campos marcados.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no recargar la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo devuelto por el servidor  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">ok</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  escribir el motivo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'No se pudo crear la tarea.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no recargar la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  vaciar el campo después de crear  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">titleField</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">value</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  recargar la lista con la tarea nueva  -----</span></span>
+<span class="line"><span style="color:#C586C0">        await</span><span style="color:#DCDCAA"> loadTasks</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  recuperar el código y la latencia de la creación  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setBadges</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el mensaje de la creación, no el del listado  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'Tarea creada.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  si la petición no llega, avisar en la página  -----</span></span>
+<span class="line"><span style="color:#C586C0">    catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `texto del fallo de red` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> message</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">error</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Error</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'No se pudo contactar con el servidor.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo de red  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  volver a permitir el envío  -----</span></span>
+<span class="line"><span style="color:#C586C0">    finally</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  activar el botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `deleteTask(ui, id)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Elimina una tarea y recarga la lista.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {ExpressUi}</span><span style="color:#9CDCFE"> ui</span><span style="color:#6A9955"> - Referencias del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {number}</span><span style="color:#9CDCFE"> id</span><span style="color:#6A9955"> - Identificador de la tarea.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;void>}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> deleteTask</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">id</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  bloquear el envío mientras dura la petición  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  intentar eliminar la tarea  -----</span></span>
+<span class="line"><span style="color:#C586C0">    try</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `respuesta de la eliminación` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">`/api/tasks/</span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">id</span><span style="color:#569CD6">}</span><span style="color:#CE9178">`</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#9CDCFE">            method:</span><span style="color:#CE9178"> 'DELETE'</span><span style="color:#D4D4D4">,</span></span>
+<span class="line"><span style="color:#D4D4D4">        });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el código y la latencia  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setBadges</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {TaskMutationResponse|null}</span><span style="color:#6A9955"> - `cuerpo de la eliminación` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> body</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> readJson</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  avisar si la respuesta no trajo json  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  mostrar el código sin cuerpo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#CE9178">`El servidor respondió </span><span style="color:#569CD6">${</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6">}</span><span style="color:#CE9178"> sin JSON.`</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no recargar la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo devuelto por el servidor  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">ok</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  escribir el motivo  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">            setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'No se pudo eliminar la tarea.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no recargar la lista  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">        }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  recargar la lista sin la tarea eliminada  -----</span></span>
+<span class="line"><span style="color:#C586C0">        await</span><span style="color:#DCDCAA"> loadTasks</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  recuperar el código y la latencia de la eliminación  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setBadges</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el mensaje de la eliminación, no el del listado  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">body</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">'Tarea eliminada.'</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  si la petición no llega, avisar en la página  -----</span></span>
+<span class="line"><span style="color:#C586C0">    catch</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">) {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `texto del fallo de red` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> message</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">error</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> Error</span><span style="color:#D4D4D4"> ? </span><span style="color:#9CDCFE">error</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4"> : </span><span style="color:#CE9178">'No se pudo contactar con el servidor.'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  mostrar el fallo de red  -----</span></span>
+<span class="line"><span style="color:#DCDCAA">        setStatus</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">message</span><span style="color:#D4D4D4">, </span><span style="color:#569CD6">true</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  volver a permitir el envío  -----</span></span>
+<span class="line"><span style="color:#C586C0">    finally</span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  activar el botón  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">disabled</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">false</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    }</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `collectUi(demo)`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -------------------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Reúne las referencias del demo, o null si falta alguna pieza.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {HTMLElement}</span><span style="color:#9CDCFE"> demo</span><span style="color:#6A9955"> - Wrapper del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {ExpressUi|null}</span><span style="color:#6A9955"> - Referencias tipadas del demo.</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> collectUi</span><span style="color:#D4D4D4"> = (</span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLFormElement|null}</span><span style="color:#6A9955"> - `formulario de creación` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> form</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-express-form]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLInputElement|null}</span><span style="color:#6A9955"> - `campo del título` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> titleField</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[name="title"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLButtonElement|null}</span><span style="color:#6A9955"> - `botón de envío` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> submitButton</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">?.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[type="submit"]'</span><span style="color:#D4D4D4">) ?? </span><span style="color:#569CD6">null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLButtonElement|null}</span><span style="color:#6A9955"> - `botón de recarga` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> refreshButton</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-express-refresh]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `error del campo título` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> fieldError</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-error-for="title"]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `aviso de estado` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> status</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-express-status]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `insignia del código http` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> httpBadge</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-express-http]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `insignia de la latencia` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> latencyBadge</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-express-latency]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLUListElement|null}</span><span style="color:#6A9955"> - `contenedor de la lista` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> list</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-express-list]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si falta alguna pieza del demo  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">form</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLFormElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">titleField</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLInputElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">submitButton</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLButtonElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">refreshButton</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLButtonElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">fieldError</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">status</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">httpBadge</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">latencyBadge</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLElement</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#D4D4D4">        || !(</span><span style="color:#9CDCFE">list</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLUListElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay demo completo que enlazar  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#569CD6"> null</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  devolver las referencias reunidas  -----</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#D4D4D4"> { </span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">titleField</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">submitButton</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">refreshButton</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">fieldError</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">status</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">httpBadge</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">latencyBadge</span><span style="color:#D4D4D4">, </span><span style="color:#9CDCFE">list</span><span style="color:#D4D4D4"> };</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">/**</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * -----  `mount()`  -----</span></span>
+<span class="line"><span style="color:#6A9955"> * -----------------------</span></span>
+<span class="line"><span style="color:#6A9955"> * - Enlaza el demo cuando la ruta ya está en el DOM.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {void}</span></span>
+<span class="line"><span style="color:#6A9955"> */</span></span>
+<span class="line"><span style="color:#C586C0">export</span><span style="color:#569CD6"> const</span><span style="color:#DCDCAA"> mount</span><span style="color:#D4D4D4"> = () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {HTMLElement|null}</span><span style="color:#6A9955"> - `wrapper del demo` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> demo</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">document</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">querySelector</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'.express-demo'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si esta ruta no está montada  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">demo</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay demo en el dom  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  no volver a enlazar el mismo demo  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">bound</span><span style="color:#D4D4D4"> === </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  los eventos ya están enlazados  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {ExpressUi|null}</span><span style="color:#6A9955"> - `piezas del demo` */</span></span>
+<span class="line"><span style="color:#569CD6">    const</span><span style="color:#4FC1FF"> ui</span><span style="color:#D4D4D4"> = </span><span style="color:#DCDCAA">collectUi</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">demo</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  salir si falta alguna pieza  -----</span></span>
+<span class="line"><span style="color:#C586C0">    if</span><span style="color:#D4D4D4"> (!</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">)</span></span>
+<span class="line"><span style="color:#6A9955">        //  -----  no hay formulario que enlazar  -----</span></span>
+<span class="line"><span style="color:#C586C0">        return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  marcar el demo como enlazado  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    demo</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">bound</span><span style="color:#D4D4D4"> = </span><span style="color:#CE9178">'true'</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  crear tareas sin recargar la spa  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">form</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'submit'</span><span style="color:#D4D4D4">, (</span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  evitar el envío nativo del formulario  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">        event</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">preventDefault</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  lanzar la creación de la tarea  -----</span></span>
+<span class="line"><span style="color:#569CD6">        void</span><span style="color:#DCDCAA"> createTask</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  recargar la lista a pedido  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">refreshButton</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'click'</span><span style="color:#D4D4D4">, () </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  pedir la lista al api  -----</span></span>
+<span class="line"><span style="color:#569CD6">        void</span><span style="color:#DCDCAA"> loadTasks</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  borrar la tarea marcada con un solo listener  -----</span></span>
+<span class="line"><span style="color:#9CDCFE">    ui</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">list</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">addEventListener</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'click'</span><span style="color:#D4D4D4">, (</span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `elemento que recibió el click` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> target</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">event</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">target</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  ignorar clicks que no vienen de un elemento  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">target</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no hay botón que buscar  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {Element|null}</span><span style="color:#6A9955"> - `botón de borrar más cercano` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> button</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">target</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">closest</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'[data-task-delete]'</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  ignorar clicks fuera del botón  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!(</span><span style="color:#9CDCFE">button</span><span style="color:#569CD6"> instanceof</span><span style="color:#4EC9B0"> HTMLButtonElement</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  no hay tarea que borrar  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        /** - `identificador guardado en el botón` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> rawId</span><span style="color:#D4D4D4"> = </span><span style="color:#9CDCFE">button</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">dataset</span><span style="color:#D4D4D4">.</span><span style="color:#9CDCFE">taskDelete</span><span style="color:#D4D4D4"> || </span><span style="color:#CE9178">''</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  ignorar un identificador que no sea numérico  -----</span></span>
+<span class="line"><span style="color:#C586C0">        if</span><span style="color:#D4D4D4"> (!</span><span style="color:#D16969">/</span><span style="color:#DCDCAA">^</span><span style="color:#D16969">\d</span><span style="color:#D7BA7D">+</span><span style="color:#DCDCAA">$</span><span style="color:#D16969">/</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">test</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">rawId</span><span style="color:#D4D4D4">))</span></span>
+<span class="line"><span style="color:#6A9955">            //  -----  el botón no apunta a una tarea válida  -----</span></span>
+<span class="line"><span style="color:#C586C0">            return</span><span style="color:#D4D4D4">;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">        //  -----  eliminar la tarea del api  -----</span></span>
+<span class="line"><span style="color:#569CD6">        void</span><span style="color:#DCDCAA"> deleteTask</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">, </span><span style="color:#DCDCAA">Number</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">rawId</span><span style="color:#D4D4D4">));</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">    });</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A9955">    //  -----  cargar la lista al entrar en la ruta  -----</span></span>
+<span class="line"><span style="color:#569CD6">    void</span><span style="color:#DCDCAA"> loadTasks</span><span style="color:#D4D4D4">(</span><span style="color:#9CDCFE">ui</span><span style="color:#D4D4D4">);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D4D4D4">};</span></span>
+<span class="line"></span></code></pre>
