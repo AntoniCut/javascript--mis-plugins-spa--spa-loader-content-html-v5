@@ -10,7 +10,8 @@ import 'dotenv/config';
 import { base } from '../src/config/site-base.js';
 import { findAvailablePort } from './find-available-port.js';
 
-import { registerMysqlQueryRoute } from './mysql-query.js';
+/** - `registra la ruta mysql compartida entre dev y produccion` */
+import { registerMysqlQueryRoute } from '../api/src/mysql-query.js';
 
 import browserSync from 'browser-sync';
 import express from 'express';

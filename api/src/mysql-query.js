@@ -1,11 +1,11 @@
 /*
-    *  --------------------------------------------------------  *
-    *  -----  mysql-query.js  --  /server/mysql-query.js  -----  *
-    *  --------------------------------------------------------  *
+    *  ---------------------------------------------------------  *
+    *  -----  mysql-query.js  --  /api/src/mysql-query.js  -----  *
+    *  ---------------------------------------------------------  *
 */
 
 
-//  -----  cuerpo json de la petición  -----
+//  -----  framework express para el router  -----
 import express from 'express';
 
 //  -----  cliente mysql del contenedor local  -----
