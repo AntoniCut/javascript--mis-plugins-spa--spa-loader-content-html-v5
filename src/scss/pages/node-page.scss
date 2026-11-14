@@ -1,0 +1,329 @@
+/*
+    *  ----------------------------------------------------------------  *
+    *  -----  node-page.scss  --  /src/scss/pages/node-page.scss  -----  *
+    *  ----------------------------------------------------------------  *
+*/
+
+@use '../base/variables' as var;
+@use '../base/mixins' as mx;
+
+
+//  -----  variables  -----
+$node-primary:         #3c873a;
+$node-secondary:       #68a063;
+$node-hero-end:        #1c3d1c;
+$node-accent-bg:       #eef7ee;
+$node-row-alt:         rgba($node-primary, 0.06);
+$node-text:            #2c3e50;
+$node-text-light:      #5d6d7e;
+$node-card-bg:         var.$color-white;
+$node-card-border:     rgba($node-primary, 0.2);
+$node-card-shadow:     0 4px 16px rgba($node-primary, 0.1);
+$node-tag-bg:          rgba($node-primary, 0.08);
+$node-tag-color:       $node-primary;
+$node-tag-border:      rgba($node-primary, 0.3);
+$color-white:          var.$color-white;
+$shadow-hero-title:    var.$shadow-text;
+
+
+//  -----  título del header  -----
+.header__dynamic-title {
+    color: $node-primary;
+}
+
+
+//  -----  títulos de sección  -----
+.main__title {
+    color: $node-primary;
+}
+
+
+//  -----  la columna no crece con la tabla  -----
+.node-page__panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+
+//  -----  node-page  -----
+.node-page,
+.node-demo {
+
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4rem;
+
+
+    //  -----  hero  -----
+    &__hero {
+        width: 100%;
+        min-height: 18rem;
+        background: linear-gradient(135deg, $node-primary 0%, $node-secondary 60%, $node-hero-end 100%);
+        border-radius: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 3rem 2rem;
+
+        @include mx.tablet {
+            min-height: 24rem;
+            padding: 4rem 3rem;
+        }
+    }
+
+    &__hero-badge {
+        text-align: center;
+        color: $color-white;
+    }
+
+    &__hero-tag {
+        display: block;
+        font-size: 4rem;
+        font-weight: 800;
+        font-family: monospace;
+        letter-spacing: 0.3rem;
+    }
+
+    &__hero-title {
+        font-size: 3rem;
+        font-weight: 700;
+        margin: 0.6rem 0 0.4rem;
+        text-shadow: $shadow-hero-title;
+
+        @include mx.tablet {
+            font-size: 4.5rem;
+        }
+    }
+
+    &__hero-subtitle {
+        font-size: 1.4rem;
+        opacity: 0.9;
+
+        @include mx.tablet {
+            font-size: 1.8rem;
+        }
+    }
+
+
+    //  -----  intro  -----
+    &__intro {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+        background-color: $node-accent-bg;
+        border-left: 5px solid $node-primary;
+        border-radius: 0 0.8rem 0.8rem 0;
+        padding: 2.5rem;
+    }
+
+    &__intro-text {
+        width: 100%;
+        font-size: 1.5rem;
+        line-height: 1.8;
+        color: $node-text;
+
+        strong {
+            color: $node-primary;
+            font-weight: 600;
+        }
+    }
+
+
+    //  -----  features  -----
+    &__features {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+    }
+
+    &__features-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: $node-primary;
+        text-align: center;
+
+        &::after {
+            content: '';
+            display: block;
+            width: 6rem;
+            height: 3px;
+            background-color: $node-primary;
+            margin: 0.8rem auto 0;
+            border-radius: 2px;
+        }
+    }
+
+    &__features-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+
+        @include mx.tablet {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    &__feature {
+        background-color: $node-card-bg;
+        border: 1px solid $node-card-border;
+        border-radius: 1rem;
+        padding: 2.5rem;
+        box-shadow: $node-card-shadow;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    &__feature-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: $node-primary;
+    }
+
+    &__feature-text {
+        font-size: 1.4rem;
+        line-height: 1.75;
+        color: $node-text-light;
+    }
+
+
+    //  -----  concepts  -----
+    &__concepts-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    &__concepts-title {
+        font-size: 2.2rem;
+        font-weight: 600;
+        color: $node-primary;
+        text-align: center;
+    }
+
+    &__concepts {
+        list-style: none;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+    }
+
+    &__concept {
+        background-color: $node-tag-bg;
+        color: $node-tag-color;
+        border: 1px solid $node-tag-border;
+        border-radius: 2rem;
+        padding: 0.6rem 1.4rem;
+        font-size: 1.3rem;
+        font-family: monospace;
+        font-weight: 500;
+    }
+
+
+    //  -----  formulario  -----
+    &__form {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    &__label {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: $node-primary;
+    }
+
+    &__sql {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        min-height: 14rem;
+        padding: 1.4rem;
+        border: 1px solid $node-card-border;
+        border-radius: 0.8rem;
+        background-color: $node-card-bg;
+        color: $node-text;
+        font-family: monospace;
+        font-size: 1.4rem;
+        line-height: 1.6;
+        resize: none;
+    }
+
+    &__submit {
+        align-self: flex-start;
+        border: 0;
+        border-radius: 0.8rem;
+        padding: 1rem 1.8rem;
+        background-color: $node-primary;
+        color: $color-white;
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+    }
+
+
+    //  -----  resultado  -----
+    &__status {
+        min-height: 1.6rem;
+        font-size: 1.4rem;
+        color: $node-text;
+
+        &.is-error {
+            color: #9b2335;
+        }
+    }
+
+    &__result {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        height: 40rem;
+        overflow: auto;
+    }
+
+    &__table {
+        width: max-content;
+        min-width: 100%;
+        border-collapse: collapse;
+        font-size: 1.3rem;
+
+        th,
+        td {
+            border: 1px solid $node-card-border;
+            padding: 0.8rem 1rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: $node-accent-bg;
+            color: $node-primary;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: $node-row-alt;
+        }
+    }
+
+}

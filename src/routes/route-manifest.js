@@ -73,6 +73,13 @@ export const routeManifest = [
         file: 'route-mysql-page'
     },
 
+    //  -----  runtime Node (api)  -----
+    {
+        id: 'nodePage',
+        path: 'node-page',
+        file: 'route-node-page'
+    },
+
     //  -----  404 - not found  -----
     {
         id: '404NotFoundPage',

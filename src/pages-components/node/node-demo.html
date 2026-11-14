@@ -1,0 +1,58 @@
+<!--
+    *  ---------------------------------------------------------------------------  *
+    *  -----  node-demo.html  --  /src/pages-components/node/node-demo.html  -----  *
+    *  ---------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="node-demo">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="node-page__hero">
+        <div class="node-page__hero-badge">
+            <span class="node-page__hero-tag" aria-hidden="true">API</span>
+            <h3 class="node-page__hero-title">Consulta</h3>
+            <p class="node-page__hero-subtitle">Demo contra /api/mysql/query</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Estado del script clásico  -----  -->
+    <p class="node-page__intro-text" data-node-cjs-status>
+        Esperando node-page.cjs.js…
+    </p>
+
+
+    <!--  -----  Formulario de consulta  -----  -->
+    <section class="node-page__features">
+
+        <h3 class="node-page__features-title">Ejecutar consulta</h3>
+
+        <form class="node-page__form" data-node-query-form>
+
+            <label class="node-page__label" for="nodeQuerySql">Consulta SQL</label>
+
+            <textarea
+                id="nodeQuerySql"
+                class="node-page__sql"
+                name="sql"
+                rows="6"
+                spellcheck="false"
+                required
+            >SELECT id, slug, title, path, sort_order
+FROM stacks
+ORDER BY sort_order;</textarea>
+
+            <button class="node-page__submit" type="submit">Ejecutar consulta</button>
+
+        </form>
+
+        <p class="node-page__status" data-node-status role="status"></p>
+
+        <div class="node-page__result" data-node-result></div>
+
+    </section>
+
+</div>

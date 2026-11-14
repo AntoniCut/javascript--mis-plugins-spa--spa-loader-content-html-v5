@@ -1,0 +1,87 @@
+<!--
+    *  -----------------------------------------------------------------------------------------  *
+    *  -----  node-description.html  --  /src/pages-components/node/node-description.html  -----  *
+    *  -----------------------------------------------------------------------------------------  *
+-->
+
+
+
+<div class="node-page">
+
+
+    <!--  -----  Hero  -----  -->
+    <div class="node-page__hero">
+        <div class="node-page__hero-badge">
+            <span class="node-page__hero-tag" aria-hidden="true">JS</span>
+            <h3 class="node-page__hero-title">Node</h3>
+            <p class="node-page__hero-subtitle">API MySQL sobre Express en producción</p>
+        </div>
+    </div>
+
+
+    <!--  -----  Intro  -----  -->
+    <section class="node-page__intro">
+        <p class="node-page__intro-text">
+            <strong>Node 24</strong> corre el mismo router en el servidor de desarrollo y en
+            producción, detrás de nginx en <strong>/api</strong>. El proceso lo gestiona
+            <strong>systemd</strong> como <strong>javascript-node</strong>.
+        </p>
+        <p class="node-page__intro-text">
+            Esta página envía la sentencia a <strong>/api/mysql/query</strong> con una URL
+            absoluta desde la raíz del dominio, así que funciona igual en local y en el VPS.
+            En producción no hay CORS: mismo origen.
+        </p>
+    </section>
+
+
+    <!--  -----  Features  -----  -->
+    <section class="node-page__features">
+
+        <h3 class="node-page__features-title">Qué aporta este runtime</h3>
+
+        <div class="node-page__features-grid">
+
+            <article class="node-page__feature">
+                <h4 class="node-page__feature-title">Una sola implementación</h4>
+                <p class="node-page__feature-text">
+                    El handler de MySQL vive en api/ y lo comparten el dev server y el API de producción.
+                </p>
+            </article>
+
+            <article class="node-page__feature">
+                <h4 class="node-page__feature-title">Solo lectura</h4>
+                <p class="node-page__feature-text">
+                    SELECT, SHOW, DESCRIBE y EXPLAIN. Las escrituras se rechazan con 400 y otro método con 405.
+                </p>
+            </article>
+
+            <article class="node-page__feature">
+                <h4 class="node-page__feature-title">Health sin MySQL</h4>
+                <p class="node-page__feature-text">
+                    GET /api/health confirma que el proceso responde, aunque la base esté caída.
+                </p>
+            </article>
+
+        </div>
+
+    </section>
+
+
+    <!--  -----  Concepts  -----  -->
+    <section class="node-page__concepts-section">
+
+        <h3 class="node-page__concepts-title">Rutas del API</h3>
+
+        <ul class="node-page__concepts">
+            <li class="node-page__concept">GET /api/health</li>
+            <li class="node-page__concept">POST /api/mysql/query</li>
+            <li class="node-page__concept">express.json 16 KB</li>
+            <li class="node-page__concept">405 método</li>
+            <li class="node-page__concept">200 filas</li>
+            <li class="node-page__concept">systemd</li>
+            <li class="node-page__concept">nginx /api/</li>
+        </ul>
+
+    </section>
+
+</div>
