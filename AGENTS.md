@@ -7,7 +7,8 @@ Si algo de acá contradice al código, gana el código: corregí este archivo en
 
 Plugin SPA en Vanilla JS (ES Modules) que carga contenido HTML dinámicamente y
 renderiza código fuente resaltado con Shiki (tema `dark-plus`).
-Se publica como sitio estático en `javascript.antonydev.tech`.
+Se publica como sitio estático en `javascript.antonydev.tech` y, desde la zona
+`api/`, expone un API Node de solo lectura en `/api` (Express + mysql2).
 
 - Package manager: **pnpm** (hay `pnpm-lock.yaml` y `pnpm-workspace.yaml`).
 - Entorno de referencia: Node 24 / pnpm 11.
@@ -33,8 +34,9 @@ Si un cambio desaparece al correr `pnpm dev` o `pnpm build`, estabas editando
 | `src/scripts/` | Código de ejemplo que se muestra resaltado en el sitio. Sus `*.cjs.js` llevan `// @ts-nocheck`; respetalo |
 | `src/markdown-shiki/` | HTML pre-compilado por Shiki (generado, pero versionado) |
 | `src/services/` | Endpoints PHP que viajan en el build; en dev los sirve `server/`, en prod PHP-FPM |
+| `api/` | Runtime Node compartido por dev y prod: router (`mysql-query.js`), servidor standalone y dependencias propias. Se despliega aparte, no pasa por Gulp |
 | `types/` | Tipos globales y JSDoc compartidos (`*.d.js`, `*.d.ts`) |
-| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, espejos de API, preview |
+| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, montaje de `/api`, preview |
 | `infra/` | Configuración del servidor de **producción**. No se ejecuta en local y **no** se despliega automáticamente |
 | `docker/mysql/` | MySQL local para desarrollo (`docker-compose.yml`) |
 | `specs/` | Specs numeradas del proyecto; `specs/arquitectura/` guarda las decisiones de arquitectura |
@@ -53,6 +55,7 @@ Si un cambio desaparece al correr `pnpm dev` o `pnpm build`, estabas editando
 | `pnpm build` | Generar `dist/` de producción |
 | `pnpm preview` | Servir `dist/` y abrir navegador |
 | `pnpm code-highlight` | Compilar SCSS y regenerar los bloques Shiki |
+| `node api/src/server.js` | Levantar el API Node standalone (lee `api/.env` o el `.env` raíz) |
 | `pnpm stop:dev` / `pnpm stop:preview` | Cerrar servidores |
 | `pnpm test` | **Placeholder**: no hay tests, falla a propósito |
 
@@ -66,6 +69,8 @@ No hay suite de tests. Antes de dar un cambio por terminado:
 1. `pnpm build` termina sin errores.
 2. `pnpm preview` sirve `dist/` y la vista tocada carga sin errores de consola.
 3. Si tocaste un archivo fuente referenciado por una ruta de Shiki: `pnpm code-highlight`.
+4. Si tocaste `api/` o el dev server: `node --check` de los JS y `curl` a
+   `/api/health` y `/api/mysql/query` en el puerto que imprima `pnpm dev`.
 
 No inventes resultados de tests que no existen. Reportá `pnpm test` como
 no disponible en vez de presentarlo como verde.
@@ -90,6 +95,7 @@ no disponible en vez de presentarlo como verde.
 | Archivo | Motivo |
 |---|---|
 | `.env`, `.env.*` | Credenciales locales. La plantilla versionada es `.env.example` |
+| `api/.env` | Credenciales locales del API Node. La plantilla versionada es `api/.env.example` |
 | `.env.production` | Credenciales MySQL de producción |
 | `deploy.sh` | Contiene host/IP del VPS. La plantilla versionada es `deploy.sh.example` |
 | `app/`, `dist/`, `node_modules/` | Generados |
@@ -97,8 +103,11 @@ no disponible en vez de presentarlo como verde.
 
 ## Producción
 
-`deploy.sh` hace `pnpm build` y sube **solo** `dist/` y `.env.production`
-(como `.env` remoto, `F640 root:www-data`). No toca nginx, PHP-FPM ni la base:
+`deploy.sh` hace `pnpm build`, sube `dist/` y `.env.production` (como `.env`
+remoto, `F640 root:www-data`) y además despliega el API Node: `api/` →
+`/opt/javascript-node-api`, `pnpm install --prod`, `.env.production` →
+`/opt/javascript-node-api/.env` y `systemctl restart javascript-node`.
+No toca nginx, PHP-FPM ni la base:
 
 - `infra/` se aplica **a mano** en el VPS. Cambiar un archivo de `infra/` no
   cambia nada en producción hasta copiarlo y recargar nginx.
@@ -111,6 +120,9 @@ no disponible en vez de presentarlo como verde.
   `--filter 'P .env'` protegen el `.env`; no los quites.
 - El `.env` remoto debe quedar `root:www-data` 640. Si no, PHP responde
   `Access denied`.
+- `api/` no va al web root ni a `dist/`: el proceso Node vive en `/opt`.
+- El prefijo `/api` está reservado por nginx para el API Node; no lo uses para
+  assets estáticos.
 
 ## Specs, tareas y skills del proyecto
 
@@ -137,3 +149,8 @@ no disponible en vez de presentarlo como verde.
 4. `index.html` y `.htaccess` viven en la raíz y llevan `%SITE_BASE%`.
 5. `src/plugins/spa-loader-content-html/v5/` es la versión activa del plugin.
    No hay que tocar versiones anteriores.
+6. `api/` no se copia a `dist/`: el runtime Node se despliega a
+   `/opt/javascript-node-api` y arranca como `javascript-node`.
+7. `/api` está reservado por nginx para el API Node; no lo uses para assets.
+8. `api/src/load-env.js` carga `api/.env` y, en dev, el `.env` raíz; no pisa
+   variables ya definidas.

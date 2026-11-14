@@ -7,37 +7,46 @@
 ## Resumen
 
 - **Objetivo**: separar desarrollo y producción por AMBIENTE (no por runtime),
-  con un contrato HTTP único que implementan PHP (prod) y Node (dev).
-- **Estado**: implementado en la rama `feat/servicios-backend-php-mysql`.
-- **Contrato de ejemplo**: `POST {sql}` → JSON de solo lectura.
+  con un contrato HTTP único que implementan PHP (prod) y Node (dev y prod).
+- **Estado**: PHP en producción desde la spec 06; API Node en producción bajo
+  `/api` desde la spec 10.
+- **Contrato de ejemplo**: `POST /api/mysql/query` → JSON de solo lectura.
 
-## Las tres zonas
+## Las cuatro zonas
 
 | Carpeta | Qué contiene | Corre en |
 |---|---|---|
-| `server/` | runtime dev: dev/preview servers, php-cgi, espejos Node de la API | solo local |
+| `api/` | runtime Node: router compartido (health + MySQL), servidor standalone, `package.json` y `.env.example` | dev (dev server) y prod (systemd `javascript-node`) |
+| `server/` | runtime dev: dev/preview servers, php-cgi, montaje del router compartido | solo local |
 | `src/services/` | código de los endpoints (`.php`, `.js`, `.json`, `.sql`, `.html`) que Gulp copia al build | dev (php-cgi) y prod (PHP-FPM) |
-| `infra/` | configuración del servidor de producción: nginx, php-fpm, provision | solo VPS |
+| `infra/` | configuración del servidor de producción: nginx, php-fpm, systemd, provision | solo VPS |
 
 Principio: cada carpeta responde "¿dónde corre esto?", no "¿qué lenguaje es?".
 
-## El contrato dual (un contrato, dos implementaciones)
+## Un contrato, dos runtimes
 
-- **Dev**: `server/mysql-query.js` (Express + mysql2) en `POST {base}/api/mysql/query`, contra MySQL de Docker.
-- **Prod**: `dist/services/mysql/query.php` (mysqli) vía PHP-FPM, contra MariaDB del VPS.
-- El frontend no distingue: hace `fetch()` y nginx/PHP-FPM o el dev-server deciden quién contesta.
+- **Node (dev y prod)**: `api/src/mysql-query.js` (Express + mysql2) expone
+  `GET /health` y `POST /mysql/query`. En dev lo monta `server/dev-server.js`
+  en `/api`; en prod lo ejecuta `javascript-node` (systemd) detrás de nginx con
+  `location ^~ /api/`. La página usa siempre `POST /api/mysql/query`.
+- **PHP (prod)**: `src/services/mysql/query.php` (mysqli) vía PHP-FPM sigue
+  sirviendo la página `mysql-page`; Node no reemplaza ese endpoint.
+- Ambas implementaciones comparten reglas, mensajes y formato de respuesta.
 
 Reglas del contrato (idénticas en ambas implementaciones):
 
-1. Solo `POST`; body JSON `{ "sql": "..." }` (máx 16 KB).
+1. Solo `POST` en `/mysql/query`; body JSON `{ "sql": "..." }` (máx 16 KB).
 2. Solo lectura: `SELECT|SHOW|DESCRIBE|DESC|EXPLAIN|WITH`.
 3. Sin `;` intermedio; sin `INTO OUTFILE/DUMPFILE`, `LOAD_FILE`, `LOAD DATA`.
 4. Límites: 200 filas, 8000 bytes de SQL.
 5. Errores de sentencia responden en el JSON (`ok: false`), no rompen el HTTP salvo rechazos 400/405.
+6. `GET /health` no toca MySQL: solo confirma que el proceso Node responde.
 
 ## Regla de ubicación de servicios
 
-- **Un proyecto** usa el servicio → colocalizado en `src/services/` de ese proyecto.
+- **Un proyecto** usa el servicio → colocalizado: `src/services/` para PHP y
+  `api/` para Node. Se extraen a un repo de dominio cuando aparezca el segundo
+  consumidor.
 - **Dos o más proyectos** → repo `services/` a nivel dominio, con su propio `server/`, `src/` e `infra/`.
 - El plugin npm (`spa-loader-content-html`) es agnóstico: consume URLs, nunca sabe qué runtime responde.
 
@@ -52,11 +61,16 @@ Reglas del contrato (idénticas en ambas implementaciones):
 
 - `gulpfile.js`: `paths.src.services`, `paths.app.php`, `copyServices`, `phpMinifyTransform`, `minifyServices`, exclusión PHP en `copyStaticAssetsToDist`.
 - `src/services/load-env.php`: `env_get`/`env_set`/`load_dotenv` (gotcha PHP-FPM: `getenv`/`putenv` no se ven entre sí).
-- `src/services/mysql/query.php`: endpoint prod.
-- `server/mysql-query.js`: espejo dev + `registerMysqlQueryRoute` en `dev-server.js`.
+- `src/services/mysql/query.php`: endpoint prod PHP.
+- `api/src/mysql-query.js`: router compartido: `GET /health`, `POST /mysql/query` y 405.
+- `api/src/server.js` + `api/src/load-env.js`: runtime standalone para producción.
+- `server/dev-server.js`: monta el router compartido en `/api` (raíz del dev server).
+- `infra/systemd/javascript-node.service`: unit `www-data`, `Restart=on-failure`.
+- `infra/nginx/javascript.antonydev.tech-api.conf`: `location ^~ /api/` con `proxy_pass` a `127.0.0.1:3100`.
+- `deploy.sh`: sube `api/` a `/opt/javascript-node-api`, instala deps de producción y reinicia `javascript-node`.
 - `docker-compose.yml` + `docker/mysql/init/01-stacks.sql`: MySQL local (puerto `3308`, base `javascript_mis_plugins_spa`).
 - `deploy.sh`: hardening de `.env`.
-- `infra/`: nginx, php-fpm, provision.
+- `infra/`: nginx, php-fpm, systemd, provision.
 - `.htaccess`: bloqueo HTTP de `.env`.
 
 ## Adaptaciones locales vs la referencia jQuery
@@ -74,5 +88,7 @@ Reglas del contrato (idénticas en ambas implementaciones):
 2. `pnpm run refresh` — `app/services/` poblado.
 3. `pnpm run build` — `dist/services/*.php` minificado, sin `.env` en dist.
 4. `docker compose up -d` + POST de lectura → filas; POST de escritura → rechazo.
-5. Dev-server: `POST {base}/api/mysql/query` → mismas reglas vía Node.
+5. Dev-server: `GET /api/health` y `POST /api/mysql/query` en la raíz → mismas reglas vía Node.
 6. `bash -n deploy.sh` + `nginx -t` del bloque de `infra/nginx/`.
+7. Producción: `curl https://javascript.antonydev.tech/api/health`, consulta de lectura,
+   escritura rechazada con 400, `GET /api/mysql/query` con 405 y `/api/.env` con 404.
