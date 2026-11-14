@@ -123,6 +123,10 @@ No toca nginx, PHP-FPM ni la base:
 - `api/` no va al web root ni a `dist/`: el proceso Node vive en `/opt`.
 - El prefijo `/api` está reservado por nginx para el API Node; no lo uses para
   assets estáticos.
+- `infra/provision/provision-vps.sh` **no** instala ni reemplaza el motor
+  MySQL/MariaDB: la base y el usuario se configuran a mano. Instalar
+  `mariadb-server` sobre un MySQL existente hace que apt lo elimine y mueva el
+  datadir.
 
 ## Specs, tareas y skills del proyecto
 

@@ -12,6 +12,9 @@
 #  - RUTA_NGINX: dónde vive la config del sitio.
 #  - La versión de PHP (php8.3-fpm en este VPS).
 #  - El script lee infra/systemd/ e infra/nginx/ del repo.
+#  - NO instala ni reemplaza el motor de base de datos: en un VPS con
+#    bases existentes, instalar mariadb-server puede eliminar MySQL y
+#    mover el datadir. Ese paso se hace a mano.
 # ==============================================================
 set -euo pipefail
 
@@ -26,12 +29,21 @@ INFRA_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 echo "==> Actualizando índices de apt..."
 apt-get update -y
 
-echo "==> Instalando PHP-FPM, extensión MySQL, MariaDB y curl (si no están)..."
-apt-get install -y php8.3-fpm php8.3-mysql mariadb-server curl
+echo "==> Instalando PHP-FPM, extensión MySQL y curl (si no están)..."
+apt-get install -y php8.3-fpm php8.3-mysql curl
 
-echo "==> Habilitando y arrancando servicios..."
+echo "==> Habilitando y arrancando PHP-FPM..."
 systemctl enable --now php8.3-fpm
-systemctl enable --now mariadb
+
+echo "==> Verificando el motor de base de datos (no se instala ni se reemplaza)..."
+if command -v mysqld >/dev/null 2>&1; then
+  systemctl enable --now mysql
+elif command -v mariadbd >/dev/null 2>&1; then
+  systemctl enable --now mariadb
+else
+  echo "AVISO: no hay MySQL ni MariaDB instalado. Instalá y configurá la base a mano;"
+  echo "       este script no reemplaza motores ni inicializa datadirs."
+fi
 
 echo "==> Verificando el socket de PHP-FPM..."
 if [ ! -S /run/php/php8.3-fpm.sock ]; then

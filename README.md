@@ -190,6 +190,8 @@ Lo que **no** hace:
   ejecutan a mano; ver `infra/README.md`.
 - No instala Node ni la unit de systemd: eso lo hace
   `infra/provision/provision-vps.sh`.
+- El provision no instala ni reemplaza el motor MySQL/MariaDB; la base y el
+  usuario se configuran a mano.
 - No crea ni migra la base MySQL.
 - No reinicia PHP-FPM.
 

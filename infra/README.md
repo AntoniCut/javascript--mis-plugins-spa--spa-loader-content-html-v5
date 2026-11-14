@@ -32,6 +32,16 @@ infra/
 - La provisión instala Node 24 + corepack/pnpm, crea `/opt/javascript-node-api` y
   **habilita** la unit; el arranque lo hace el deploy.
 
+## Base de datos
+
+El provision **no** instala ni reemplaza el motor. Si el VPS ya tiene MySQL o
+MariaDB, se respeta el que esté corriendo; la base y el usuario se crean a mano
+con las `MYSQL_*` del `.env` de producción.
+
+> Instalar `mariadb-server` sobre un VPS con MySQL existente hace que apt
+> elimine MySQL y mueva el datadir (`/var/lib/mysql-8.0`). No lo hagas desde
+> el provision.
+
 ## Regla de ubicación de un servicio
 
 - Lo usa UN proyecto → colocalizado: `src/services/` para PHP y `api/` para Node.

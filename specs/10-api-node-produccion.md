@@ -1,6 +1,6 @@
 # SPEC 10 — API Node en producción bajo /api
 
-> **Estado:** Aprovado
+> **Estado:** Implementado
 > **Depende de:** SPEC 06 (deploy del VPS)
 > **Fecha:** 2026-11-13
 > **Objetivo:** Añadir un runtime Node de producción en `https://javascript.antonydev.tech/api` (same-origin) con el endpoint MySQL de solo lectura y un health, gestionado por systemd, desplegado desde `deploy.sh` y demostrado con una página `node-page` en el SPA.
@@ -122,19 +122,19 @@ Se reutilizan las `MYSQL_*` del `.env.production` existente. `API_HOST` y `API_P
 
 ## Acceptance criteria
 
-- [ ] `pnpm dev` arranca y `GET http://localhost:9876/api/health` responde 200 con `ok: true`.
-- [ ] `POST http://localhost:9876/api/mysql/query` con `{"sql":"SELECT 1 AS ok"}` responde `ok: true`, `rows: [{ "ok": 1 }]` y `ok` numérico.
-- [ ] Una consulta de escritura (`DELETE FROM stacks`) responde 400 con `ok: false` y mensaje; `GET /api/mysql/query` responde 405.
-- [ ] `node api/src/server.js` con Docker MySQL responde en `http://127.0.0.1:3100/health` y `/mysql/query` con las mismas reglas.
-- [ ] `pnpm build` termina con código 0; `dist/services/mysql/query.php` sigue existiendo y ningún archivo de `api/` aparece en `dist/`.
-- [ ] `node --check` sobre `api/src/server.js`, `api/src/mysql-query.js`, `api/src/load-env.js` y `server/dev-server.js` termina con código 0.
-- [ ] `curl https://javascript.antonydev.tech/api/health` responde 200 con `ok: true`.
-- [ ] `POST https://javascript.antonydev.tech/api/mysql/query` con `SELECT * FROM stacks` devuelve las filas actuales; `DELETE FROM stacks` responde 400; `GET /api/mysql/query` responde 405.
-- [ ] `curl -i https://javascript.antonydev.tech/api/.env` y `curl -i https://javascript.antonydev.tech/api/src/server.js` responden 404 o 403; no se expone código ni secretos.
-- [ ] `systemctl is-active javascript-node` responde `active` y `journalctl -u javascript-node` no muestra un bucle de reinicios.
-- [ ] La página `node-page` carga, muestra los datos devueltos por Node y rechaza una escritura; `mysql-page` sigue funcionando contra PHP.
-- [ ] `./deploy.sh` termina sin errores, reinicia el servicio y el health sigue respondiendo después del deploy.
-- [ ] `git status` solo muestra los archivos previstos en esta spec (más los generados por `pnpm code-highlight`/`pnpm build`).
+- [x] `pnpm dev` arranca y `GET http://localhost:9876/api/health` responde 200 con `ok: true`.
+- [x] `POST http://localhost:9876/api/mysql/query` con `{"sql":"SELECT 1 AS ok"}` responde `ok: true`, `rows: [{ "ok": 1 }]` y `ok` numérico.
+- [x] Una consulta de escritura (`DELETE FROM stacks`) responde 400 con `ok: false` y mensaje; `GET /api/mysql/query` responde 405.
+- [x] `node api/src/server.js` con Docker MySQL responde en `http://127.0.0.1:3100/health` y `/mysql/query` con las mismas reglas.
+- [x] `pnpm build` termina con código 0; `dist/app/services/mysql/query.php` sigue existiendo y ningún archivo de `api/` aparece en `dist/`.
+- [x] `node --check` sobre `api/src/server.js`, `api/src/mysql-query.js`, `api/src/load-env.js` y `server/dev-server.js` termina con código 0.
+- [x] `curl https://javascript.antonydev.tech/api/health` responde 200 con `ok: true`.
+- [x] `POST https://javascript.antonydev.tech/api/mysql/query` con `SELECT * FROM stacks` devuelve las filas actuales; `DELETE FROM stacks` responde 400; `GET /api/mysql/query` responde 405.
+- [x] `curl -i https://javascript.antonydev.tech/api/.env` y `curl -i https://javascript.antonydev.tech/api/src/server.js` responden 404 o 403; no se expone código ni secretos.
+- [x] `systemctl is-active javascript-node` responde `active` y `journalctl -u javascript-node` no muestra un bucle de reinicios.
+- [x] La página `node-page` carga, muestra los datos devueltos por Node y rechaza una escritura; `mysql-page` sigue funcionando contra PHP.
+- [x] `./deploy.sh` termina sin errores, reinicia el servicio y el health sigue respondiendo después del deploy.
+- [x] `git status` solo muestra los archivos previstos en esta spec (más los generados por `pnpm code-highlight`/`pnpm build`).
 
 ## Decisions
 
