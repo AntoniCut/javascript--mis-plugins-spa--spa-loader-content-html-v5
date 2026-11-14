@@ -12,6 +12,8 @@ VPS_USER="TU_USUARIO"             # p. ej. root
 VPS_HOST="TU_IP_O_DOMINIO"        # IP pública del VPS o dominio
 VPS_PORT="22"                     # cambia si usas otro puerto SSH
 REMOTE_PATH="/var/www/TU_DOMINIO/mis-plugins-spa/spa-loader-content-html-v5"  # ruta en el VPS servida por nginx
+REMOTE_API_PATH="/opt/javascript-node-api"  # runtime Node fuera del web root
+API_SERVICE="javascript-node"     # unit systemd del API
 LOCAL_BUILD_DIR="dist"            # carpeta que genera Gulp/tu build
 
 # ==== Build ====
@@ -50,5 +52,33 @@ if [ -f .env.production ]; then
 else
   echo "Aviso: no existe .env.production; el .env remoto no se actualiza."
 fi
+
+# ==== Deploy del API Node ====
+echo "==> Subiendo api/ a $REMOTE_API_PATH..."
+# --delete borra en remoto lo que no está en api/. Se protegen node_modules
+# y el .env del API, que se sube aparte con permisos root:www-data.
+rsync -avz --delete \
+  -e "ssh -p $VPS_PORT" \
+  --exclude 'node_modules' \
+  --exclude '.env' \
+  --filter 'P .env' \
+  api/ \
+  "$VPS_USER@$VPS_HOST:$REMOTE_API_PATH"
+
+echo "==> Instalando dependencias de producción del API..."
+ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" "node -v && cd $REMOTE_API_PATH && pnpm install --prod"
+
+if [ -f .env.production ]; then
+  echo "==> Subiendo .env del API..."
+  rsync -avz --chmod=F640 --chown=root:www-data \
+    -e "ssh -p $VPS_PORT" \
+    .env.production \
+    "$VPS_USER@$VPS_HOST:$REMOTE_API_PATH/.env"
+else
+  echo "Aviso: no existe .env.production; el .env del API no se actualiza."
+fi
+
+echo "==> Reiniciando el API Node..."
+ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" "systemctl restart $API_SERVICE"
 
 echo "==> Deploy completado."
