@@ -404,22 +404,3 @@ export const createApiRouter = () => {
     return router;
 
 };
-
-
-
-/**
- * -------------------------------------------------------
- * -----  `registerMysqlQueryRoute(app, routeBase)`  -----
- * -------------------------------------------------------
- * - Publica el router compartido bajo {base}/api en el dev server.
- * - Se retira cuando el dev server monte /api en la raíz.
- * @param {import('express').Express} app - Aplicación Express.
- * @param {string} routeBase - Prefijo de la SPA.
- * @return {void}
- */
-export const registerMysqlQueryRoute = (app, routeBase) => {
-
-    //  -----  montar el router compartido bajo el prefijo de la spa  -----
-    app.use(`${routeBase}/api`, createApiRouter());
-
-};
