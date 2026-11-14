@@ -28,7 +28,8 @@ infra/
 - `nginx/javascript.antonydev.tech-api.conf`: `location ^~ /api/` con
   `proxy_pass http://127.0.0.1:3100/`; la barra final quita el prefijo `/api/`.
 - El `.env` del API vive en `/opt/javascript-node-api/.env`, `root:www-data 640`,
-  y reutiliza las `MYSQL_*` de `.env.production`.
+  y reutiliza las `MYSQL_*` de `.env.production`. La plantilla versionada es
+  `.env.production.example`.
 - La provisión instala Node 24 + corepack/pnpm, crea `/opt/javascript-node-api` y
   **habilita** la unit; el arranque lo hace el deploy.
 
