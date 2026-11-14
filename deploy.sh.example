@@ -6,6 +6,7 @@ set -euo pipefail
 #   chmod +x deploy.sh
 #
 # deploy.sh está en .gitignore (contiene IP/rutas de tu VPS).
+# La plantilla del .env de producción es .env.production.example.
 
 # ==== Configuración ====
 VPS_USER="TU_USUARIO"             # p. ej. root
