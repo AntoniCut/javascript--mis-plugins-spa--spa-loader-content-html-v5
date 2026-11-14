@@ -196,7 +196,9 @@ Lo que **no** hace:
 - No reinicia PHP-FPM.
 
 La plantilla versionada es `deploy.sh.example`: copiala, completá host y rutas, y
-no commitees el `deploy.sh` real.
+no commitees el `deploy.sh` real. La plantilla del entorno de producción es
+`.env.production.example`: copiala a `.env.production`, completá las credenciales
+y no commitees el archivo real.
 
 ## Documentación para agentes
 
