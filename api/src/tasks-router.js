@@ -299,8 +299,11 @@ const createTask = (req, res) => {
  */
 const deleteTask = (req, res) => {
 
+    /** - `identificador recibido en la url` */
+    const rawId = req.params.id;
+
     /** - `identificador ya convertido, o null si no es numérico` */
-    const id = parseTaskId(req.params.id);
+    const id = typeof rawId === 'string' ? parseTaskId(rawId) : null;
 
     //  -----  rechazar un identificador no numérico  -----
     if (id === null) {

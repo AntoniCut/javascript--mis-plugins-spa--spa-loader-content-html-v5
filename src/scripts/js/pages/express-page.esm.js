@@ -103,8 +103,9 @@ const setBadges = (ui, response) => {
  * -----  `readJson(response)`  -----
  * ----------------------------------
  * - Lee el cuerpo solo cuando el servidor declara JSON.
+ * @template T
  * @param {Response} response - Respuesta de fetch.
- * @return {Promise<Record<string, any>|null>} - Cuerpo JSON o null.
+ * @return {Promise<T|null>} - Cuerpo JSON o null.
  */
 const readJson = async (response) => {
 
@@ -117,7 +118,7 @@ const readJson = async (response) => {
         return null;
 
     //  -----  devolver el cuerpo ya parseado  -----
-    return response.json();
+    return /** @type {T} */ (await response.json());
 
 };
 

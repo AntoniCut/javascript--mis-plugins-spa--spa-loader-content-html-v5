@@ -111,8 +111,11 @@ const renderErrors = (form, errors) => {
         /** @type {HTMLElement|null} - `aviso del campo` */
         const errorNode = form.querySelector(`[data-error-for="${key}"]`);
 
-        /** @type {Element|null} - `control del campo` */
-        const field = form.elements.namedItem(key);
+        /** - `control del campo, si existe` */
+        const control = form.elements.namedItem(key);
+
+        /** @type {Element|null} - `control del campo como elemento` */
+        const field = control instanceof Element ? control : null;
 
         //  -----  escribir el mensaje si existe el aviso  -----
         if (errorNode) {

@@ -39,8 +39,9 @@
 <span class="line"><span style="color:#6A9955"> * -----  `readJson(response)`  -----</span></span>
 <span class="line"><span style="color:#6A9955"> * ----------------------------------</span></span>
 <span class="line"><span style="color:#6A9955"> * - Lee el cuerpo solo cuando el servidor declara JSON.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@template</span><span style="color:#9CDCFE"> T</span></span>
 <span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@param</span><span style="color:#4EC9B0"> {Response}</span><span style="color:#9CDCFE"> response</span><span style="color:#6A9955"> - Respuesta de fetch.</span></span>
-<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;Record&#x3C;string, any>|null>}</span><span style="color:#6A9955"> - Cuerpo JSON o null.</span></span>
+<span class="line"><span style="color:#6A9955"> * </span><span style="color:#569CD6">@return</span><span style="color:#4EC9B0"> {Promise&#x3C;T|null>}</span><span style="color:#6A9955"> - Cuerpo JSON o null.</span></span>
 <span class="line"><span style="color:#6A9955"> */</span></span>
 <span class="line"><span style="color:#569CD6">const</span><span style="color:#DCDCAA"> readJson</span><span style="color:#D4D4D4"> = </span><span style="color:#569CD6">async</span><span style="color:#D4D4D4"> (</span><span style="color:#9CDCFE">response</span><span style="color:#D4D4D4">) </span><span style="color:#569CD6">=></span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
@@ -53,7 +54,7 @@
 <span class="line"><span style="color:#C586C0">        return</span><span style="color:#569CD6"> null</span><span style="color:#D4D4D4">;</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#6A9955">    //  -----  devolver el cuerpo ya parseado  -----</span></span>
-<span class="line"><span style="color:#C586C0">    return</span><span style="color:#9CDCFE"> response</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">();</span></span>
+<span class="line"><span style="color:#C586C0">    return</span><span style="color:#6A9955"> /** </span><span style="color:#569CD6">@type</span><span style="color:#4EC9B0"> {T}</span><span style="color:#6A9955"> */</span><span style="color:#D4D4D4"> (</span><span style="color:#C586C0">await</span><span style="color:#9CDCFE"> response</span><span style="color:#D4D4D4">.</span><span style="color:#DCDCAA">json</span><span style="color:#D4D4D4">());</span></span>
 <span class="line"></span>
 <span class="line"><span style="color:#D4D4D4">};</span></span>
 <span class="line"></span>
