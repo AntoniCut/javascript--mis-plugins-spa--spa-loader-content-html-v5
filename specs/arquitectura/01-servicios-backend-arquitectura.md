@@ -29,6 +29,9 @@ Principio: cada carpeta responde "¿dónde corre esto?", no "¿qué lenguaje es?
   `GET /health` y `POST /mysql/query`. En dev lo monta `server/dev-server.js`
   en `/api`; en prod lo ejecuta `javascript-node` (systemd) detrás de nginx con
   `location ^~ /api/`. La página usa siempre `POST /api/mysql/query`.
+- **Node en memoria**: `api/src/tasks-router.js` (Express) expone
+  `GET /tasks`, `POST /tasks` y `DELETE /tasks/:id` con los mismos dos montajes.
+  Es la demo de Express: no toca MySQL y pierde los datos al reiniciar el proceso.
 - **PHP (prod)**: `src/services/mysql/query.php` (mysqli) vía PHP-FPM sigue
   sirviendo la página `mysql-page`; Node no reemplaza ese endpoint.
 - Ambas implementaciones comparten reglas, mensajes y formato de respuesta.
@@ -62,9 +65,11 @@ Reglas del contrato (idénticas en ambas implementaciones):
 - `gulpfile.js`: `paths.src.services`, `paths.app.php`, `copyServices`, `phpMinifyTransform`, `minifyServices`, exclusión PHP en `copyStaticAssetsToDist`.
 - `src/services/load-env.php`: `env_get`/`env_set`/`load_dotenv` (gotcha PHP-FPM: `getenv`/`putenv` no se ven entre sí).
 - `src/services/mysql/query.php`: endpoint prod PHP.
+- `src/services/php/validate.php`: endpoint PHP de validación de formulario (demo `php-page`), sin base de datos.
 - `api/src/mysql-query.js`: router compartido: `GET /health`, `POST /mysql/query` y 405.
+- `api/src/tasks-router.js`: CRUD en memoria (`GET/POST /tasks`, `DELETE /tasks/:id`) de la demo `express-page`.
 - `api/src/server.js` + `api/src/load-env.js`: runtime standalone para producción.
-- `server/dev-server.js`: monta el router compartido en `/api` (raíz del dev server).
+- `server/dev-server.js`: monta los routers compartidos en `/api` (raíz del dev server).
 - `infra/systemd/javascript-node.service`: unit `www-data`, `Restart=on-failure`.
 - `infra/nginx/javascript.antonydev.tech-api.conf`: `location ^~ /api/` con `proxy_pass` a `127.0.0.1:3100`.
 - `deploy.sh`: sube `api/` a `/opt/javascript-node-api`, instala deps de producción y reinicia `javascript-node`.

@@ -58,6 +58,12 @@ El runtime Node vive en `api/` y es el mismo en desarrollo y producción:
 |---|---|
 | `GET /api/health` | Confirma que el proceso responde; no toca MySQL. |
 | `POST /api/mysql/query` | Ejecuta una consulta de solo lectura (`{ "sql": "..." }`, máx 16 KB). |
+| `GET /api/tasks` | Lista las tareas en memoria de la demo de Express. |
+| `POST /api/tasks` | Crea una tarea (`{ "title": "..." }`, 3–80 caracteres). |
+| `DELETE /api/tasks/:id` | Elimina una tarea en memoria. |
+
+Las tareas de `/api/tasks` viven en la memoria del proceso: se reinician con
+`javascript-node` y no usan MySQL.
 
 - En dev lo monta `server/dev-server.js` en la raíz del origen: `http://localhost:<puerto>/api`.
 - En prod corre como `javascript-node` (systemd) detrás de nginx, con el código en
