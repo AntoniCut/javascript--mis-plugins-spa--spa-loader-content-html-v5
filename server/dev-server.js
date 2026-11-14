@@ -10,7 +10,8 @@ import 'dotenv/config';
 import { base } from '../src/config/site-base.js';
 import { findAvailablePort } from './find-available-port.js';
 
-import { registerMysqlQueryRoute } from './mysql-query.js';
+/** - `router compartido con el runtime de producción` */
+import { createApiRouter } from '../api/src/mysql-query.js';
 
 import browserSync from 'browser-sync';
 import express from 'express';
@@ -388,8 +389,8 @@ app.use(redirectRootToBase);
 //  -----  registrar el middleware que ejecuta archivos php via php-cgi  -----
 app.use(makePhpHandler(PROJECT_ROOT, devServerPort));
 
-//  -----  aceptar consultas de solo lectura de la página mysql  -----
-registerMysqlQueryRoute(app, DEV_ROUTE_BASE);
+//  -----  montar el api en la raíz para que la página use /api/...  -----
+app.use('/api', createApiRouter());
 
 //  -----  registrar el middleware que sirve archivos estáticos desde la raíz del proyecto con el prefijo de ruta  -----
 app.use(DEV_ROUTE_BASE, express.static(PROJECT_ROOT, { index: false }));
