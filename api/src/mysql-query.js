@@ -325,27 +325,101 @@ const handleMysqlQuery = async (req, res) => {
 
 
 /**
+ * -----------------------------------------
+ * -----  `methodNotAllowed(allowed)`  -----
+ * -----------------------------------------
+ * - Responde 405 con el método admitido en la cabecera Allow.
+ * @param {string} allowed - Método HTTP que admite la ruta.
+ * @return {import('express').RequestHandler} - Manejador que responde el rechazo.
+ */
+const methodNotAllowed = (allowed) => (req, res) => {
+
+    //  -----  anunciar el método admitido  -----
+    res.set('Allow', allowed);
+
+    //  -----  responder el rechazo en json  -----
+    res.status(405).json({
+        ok: false,
+        message: `Solo se admite ${allowed}.`,
+    });
+
+};
+
+
+
+/**
+ * --------------------------------------
+ * -----  `handleHealth(req, res)`  -----
+ * --------------------------------------
+ * - Confirma que el proceso Node responde, sin tocar MySQL.
+ * @param {import('express').Request} req - Petición recibida.
+ * @param {import('express').Response} res - Respuesta JSON.
+ * @return {void}
+ */
+const handleHealth = (req, res) => {
+
+    //  -----  responder estado, uptime y fecha actual  -----
+    res.json({
+        ok: true,
+        service: 'javascript-node-api',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+    });
+
+};
+
+
+
+/**
+ * ---------------------------------
+ * -----  `createApiRouter()`  -----
+ * ---------------------------------
+ * - Crea el router compartido por el runtime standalone y el dev server.
+ * - Publica GET /health y POST /mysql/query; el resto de métodos responde 405.
+ * @return {import('express').Router} - Router con las rutas del API.
+ */
+export const createApiRouter = () => {
+
+    /** - `router compartido del api` */
+    const router = express.Router();
+
+    //  -----  responder el health sin tocar mysql  -----
+    router.get('/health', handleHealth);
+
+    //  -----  rechazar métodos distintos de GET en health  -----
+    router.all('/health', methodNotAllowed('GET'));
+
+    //  -----  aceptar el json de la página y ejecutar la consulta  -----
+    router.post('/mysql/query', express.json({ limit: '16kb' }), (req, res) => {
+
+        //  -----  no esperar aquí: el manejador responde solo  -----
+        void handleMysqlQuery(req, res);
+
+    });
+
+    //  -----  rechazar métodos distintos de POST en la consulta  -----
+    router.all('/mysql/query', methodNotAllowed('POST'));
+
+    //  -----  devolver el router montable  -----
+    return router;
+
+};
+
+
+
+/**
  * -------------------------------------------------------
  * -----  `registerMysqlQueryRoute(app, routeBase)`  -----
  * -------------------------------------------------------
- * - Publica POST {base}/api/mysql/query en el servidor Node local.
- * - En Nginx la página usa app/services/mysql/query.php.
+ * - Publica el router compartido bajo {base}/api en el dev server.
+ * - Se retira cuando el dev server monte /api en la raíz.
  * @param {import('express').Express} app - Aplicación Express.
  * @param {string} routeBase - Prefijo de la SPA.
  * @return {void}
  */
 export const registerMysqlQueryRoute = (app, routeBase) => {
 
-    //  -----  aceptar el json de la página y ejecutar la consulta  -----
-    app.post(
-        `${routeBase}/api/mysql/query`,
-        express.json({ limit: '16kb' }),
-        (req, res) => {
-
-            //  -----  no esperar aquí: el manejador responde solo  -----
-            void handleMysqlQuery(req, res);
-
-        }
-    );
+    //  -----  montar el router compartido bajo el prefijo de la spa  -----
+    app.use(`${routeBase}/api`, createApiRouter());
 
 };
