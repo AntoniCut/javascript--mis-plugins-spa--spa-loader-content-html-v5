@@ -96,7 +96,7 @@ no disponible en vez de presentarlo como verde.
 |---|---|
 | `.env`, `.env.*` | Credenciales locales. La plantilla versionada es `.env.example` |
 | `api/.env` | Credenciales locales del API Node. La plantilla versionada es `api/.env.example` |
-| `.env.production` | Credenciales MySQL de producción |
+| `.env.production` | Credenciales MySQL de producción. La plantilla versionada es `.env.production.example` |
 | `deploy.sh` | Contiene host/IP del VPS. La plantilla versionada es `deploy.sh.example` |
 | `app/`, `dist/`, `node_modules/` | Generados |
 | `workflows/`, `.atl/`, `.playwright-mcp/` | Estado local de herramientas |
