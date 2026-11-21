@@ -104,9 +104,11 @@ no disponible en vez de presentarlo como verde.
 ## Producción
 
 `deploy.sh` hace `pnpm build`, sube `dist/` y `.env.production` (como `.env`
-remoto, `F640 root:www-data`) y además despliega el API Node: `api/` →
-`/opt/javascript-node-api`, `pnpm install --prod`, `.env.production` →
-`/opt/javascript-node-api/.env` y `systemctl restart javascript-node`.
+remoto, `F640 root:www-data`) y además despliega el API Node: genera el
+artefacto con `pnpm --filter javascript-node-api deploy .deploy-api --prod`,
+lo sube a `/opt/javascript-node-api` (con `node_modules`), sube
+`.env.production` como `.env` y reinicia `javascript-node`. El VPS no ejecuta
+`pnpm install`: lo que corre es el artefacto probado en local.
 No toca nginx, PHP-FPM ni la base:
 
 - `infra/` se aplica **a mano** en el VPS. Cambiar un archivo de `infra/` no

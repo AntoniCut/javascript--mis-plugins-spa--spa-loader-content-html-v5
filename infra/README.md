@@ -22,7 +22,9 @@ infra/
 
 ## API Node en producción
 
-- Código en `/opt/javascript-node-api`, fuera del web root, desplegado por `deploy.sh`.
+- Código en `/opt/javascript-node-api`, fuera del web root. `deploy.sh` genera el
+  artefacto con `pnpm --filter javascript-node-api deploy .deploy-api --prod` y lo
+  sube con su `node_modules`; el VPS no ejecuta `pnpm install`.
 - `systemd/javascript-node.service`: corre como `www-data`, `Restart=on-failure`,
   logs a journald (`journalctl -u javascript-node`).
 - `nginx/javascript.antonydev.tech-api.conf`: `location ^~ /api/` con

@@ -186,9 +186,10 @@ La verificación mínima de un cambio es:
   con `--delete`. El `.env` remoto queda protegido por `--exclude` y
   `--filter 'P .env'`.
 - `.env.production` → `.env` remoto, con permisos `F640 root:www-data`.
-- `api/` → `/opt/javascript-node-api` (sin `node_modules` y sin pisar su `.env`),
-  `pnpm install --prod`, `.env.production` → `/opt/javascript-node-api/.env` y
-  `systemctl restart javascript-node`.
+- el artefacto de `pnpm --filter javascript-node-api deploy .deploy-api --prod`
+  → `/opt/javascript-node-api` (con `node_modules`, sin pisar su `.env`),
+  `.env.production` → `/opt/javascript-node-api/.env` y
+  `systemctl restart javascript-node`. El VPS no ejecuta `pnpm install`.
 
 Lo que **no** hace:
 

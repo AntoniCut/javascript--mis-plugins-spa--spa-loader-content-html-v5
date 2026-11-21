@@ -15,7 +15,9 @@ VPS_PORT="22"                     # cambia si usas otro puerto SSH
 REMOTE_PATH="/var/www/TU_DOMINIO/mis-plugins-spa/spa-loader-content-html-v5"  # ruta en el VPS servida por nginx
 REMOTE_API_PATH="/opt/javascript-node-api"  # runtime Node fuera del web root
 API_SERVICE="javascript-node"     # unit systemd del API
+API_PACKAGE_NAME="javascript-node-api" # nombre del paquete en api/package.json
 LOCAL_BUILD_DIR="dist"            # carpeta que genera Gulp/tu build
+LOCAL_API_ARTIFACT_DIR=".deploy-api" # artefacto de pnpm deploy para el API
 
 # ==== Build ====
 echo "==> Generando build..."
@@ -23,6 +25,19 @@ pnpm run build
 
 if [ ! -d "$LOCAL_BUILD_DIR" ]; then
   echo "Error: no existe la carpeta '$LOCAL_BUILD_DIR'. Revisa LOCAL_BUILD_DIR."
+  exit 1
+fi
+
+# ==== Artefacto del API Node ====
+# El runtime se empaqueta aquí, con sus dependencias ya resueltas desde el
+# pnpm-lock.yaml del workspace. El VPS recibe el artefacto y no instala nada:
+# lo que se probó en local es exactamente lo que corre en producción.
+echo "==> Generando el artefacto del API Node..."
+rm -rf "$LOCAL_API_ARTIFACT_DIR"
+CI=true pnpm --filter "$API_PACKAGE_NAME" deploy "$LOCAL_API_ARTIFACT_DIR" --prod
+
+if [ ! -d "$LOCAL_API_ARTIFACT_DIR/node_modules" ]; then
+  echo "Error: el artefacto no tiene node_modules. Revisa LOCAL_API_ARTIFACT_DIR."
   exit 1
 fi
 
@@ -55,19 +70,16 @@ else
 fi
 
 # ==== Deploy del API Node ====
-echo "==> Subiendo api/ a $REMOTE_API_PATH..."
-# --delete borra en remoto lo que no está en api/. Se protegen node_modules
-# y el .env del API, que se sube aparte con permisos root:www-data.
+echo "==> Subiendo el artefacto del API a $REMOTE_API_PATH..."
+# --delete borra en remoto lo que no está en el artefacto. Se protege el .env
+# del API, que se sube aparte con permisos root:www-data.
+# node_modules viaja dentro del artefacto: el VPS no ejecuta pnpm.
 rsync -avz --delete \
   -e "ssh -p $VPS_PORT" \
-  --exclude 'node_modules' \
   --exclude '.env' \
   --filter 'P .env' \
-  api/ \
+  "$LOCAL_API_ARTIFACT_DIR"/ \
   "$VPS_USER@$VPS_HOST:$REMOTE_API_PATH"
-
-echo "==> Instalando dependencias de producción del API..."
-ssh -p "$VPS_PORT" "$VPS_USER@$VPS_HOST" "node -v && cd $REMOTE_API_PATH && pnpm install --prod"
 
 if [ -f .env.production ]; then
   echo "==> Subiendo .env del API..."
