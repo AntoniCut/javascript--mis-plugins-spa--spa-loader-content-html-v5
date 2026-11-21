@@ -2,8 +2,9 @@
 
 # Node y dependencias
 node_modules/
-pnpm-lock.yaml
-pnpm-workspace.yaml
+
+# Workspace pnpm: pnpm-workspace.yaml (api/ + catalog) y pnpm-lock.yaml se
+# versionan a propósito para que dev y el deploy del API resuelvan lo mismo
 .env
 .env.*
 !.env.example
