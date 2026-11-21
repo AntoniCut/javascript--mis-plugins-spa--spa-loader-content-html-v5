@@ -20,7 +20,7 @@ const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShi
 export const routeMysqlPage = {
     id: 'mysqlPage',
     favicon: `${favicon}/mysql-icon.svg`,
-    pageTitle: 'MySQL — Consultas a la base de datos',
+    pageTitle: 'PHP con MySQL',
     path: 'mysql-page',
     components: {
         "layoutHeader": `${layoutHeader}`,
@@ -69,7 +69,7 @@ export const routeMysqlPage = {
             target: '[data-shiki="codeEsmJs"]',
         },
     ],
-    headerTitle: 'MySQL — Consultas a la base de datos',
+    headerTitle: 'PHP con MySQL',
     styles: [
         { href: `${styles}/mysql-page.css` }
     ],

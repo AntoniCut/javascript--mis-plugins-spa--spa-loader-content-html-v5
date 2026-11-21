@@ -20,7 +20,7 @@ const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShi
 export const routeNodePage = {
     id: 'nodePage',
     favicon: `${favicon}/nodejs-icon.svg`,
-    pageTitle: 'Node — API MySQL en producción',
+    pageTitle: 'Node con MySQL',
     path: 'node-page',
     components: {
         "layoutHeader": `${layoutHeader}`,
@@ -69,7 +69,7 @@ export const routeNodePage = {
             target: '[data-shiki="codeEsmJs"]',
         },
     ],
-    headerTitle: 'Node — API MySQL en producción',
+    headerTitle: 'Node con MySQL',
     styles: [
         { href: `${styles}/node-page.css` }
     ],

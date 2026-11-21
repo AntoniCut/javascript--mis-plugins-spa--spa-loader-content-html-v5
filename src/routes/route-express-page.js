@@ -20,7 +20,7 @@ const { favicon, layoutHeader, layoutNavbar, pages, pagesComponents, MarkdownShi
 export const routeExpressPage = {
     id: 'expressPage',
     favicon: `${favicon}/express-icon.svg`,
-    pageTitle: 'Express — API de tareas en memoria',
+    pageTitle: 'Node con Express',
     path: 'express-page',
     components: {
         "layoutHeader": `${layoutHeader}`,
@@ -76,7 +76,7 @@ export const routeExpressPage = {
             target: '[data-shiki="codeServerJs"]',
         },
     ],
-    headerTitle: 'Express — API de tareas en memoria',
+    headerTitle: 'Node con Express',
     styles: [
         { href: `${styles}/express-page.css` }
     ],
