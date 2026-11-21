@@ -2,8 +2,8 @@
 
 Plugin SPA en Vanilla JS (ES Modules) para cargar contenido HTML dinámicamente,
 con renderizado de código fuente resaltado mediante Shiki (tema `dark-plus`).
-Incluye un API Node de producción en `/api` (Express + mysql2) para consultas
-MySQL de solo lectura.
+Incluye un API Node de producción bajo la base del sitio (`{SITE_BASE}/api`,
+Express + mysql2) para consultas MySQL de solo lectura.
 
 ## Inicio rápido
 
@@ -50,22 +50,24 @@ Copia `.env.example` a `.env` antes de arrancar. `SITE_BASE` es obligatoria.
 
 `index.html` y `.htaccess` llevan el marcador `%SITE_BASE%`. El servidor de desarrollo lo sustituye al servir y `pnpm build` lo sustituye en `dist/index.html` y `dist/.htaccess`. En el navegador, `src/config/site-base.js` deduce la base de `<base href>`.
 
-## API Node (`/api`)
+## API Node (`{SITE_BASE}/api`)
 
-El runtime Node vive en `api/` y es el mismo en desarrollo y producción:
+El runtime Node vive en `api/`, es miembro del workspace pnpm y comparte el
+`catalog` de versiones con la raíz. Es el mismo en desarrollo y producción:
 
 | Endpoint | Qué hace |
 |---|---|
-| `GET /api/health` | Confirma que el proceso responde; no toca MySQL. |
-| `POST /api/mysql/query` | Ejecuta una consulta de solo lectura (`{ "sql": "..." }`, máx 16 KB). |
-| `GET /api/tasks` | Lista las tareas en memoria de la demo de Express. |
-| `POST /api/tasks` | Crea una tarea (`{ "title": "..." }`, 3–80 caracteres). |
-| `DELETE /api/tasks/:id` | Elimina una tarea en memoria. |
+| `GET api/health` | Confirma que el proceso responde; no toca MySQL. |
+| `POST api/mysql/query` | Ejecuta una consulta de solo lectura (`{ "sql": "..." }`, máx 16 KB). |
+| `GET api/tasks` | Lista las tareas en memoria de la demo de Express. |
+| `POST api/tasks` | Crea una tarea (`{ "title": "..." }`, 3–80 caracteres). |
+| `DELETE api/tasks/:id` | Elimina una tarea en memoria. |
 
-Las tareas de `/api/tasks` viven en la memoria del proceso: se reinician con
+Las tareas de `api/tasks` viven en la memoria del proceso: se reinician con
 `javascript-node` y no usan MySQL.
 
-- En dev lo monta `server/dev-server.js` en la raíz del origen: `http://localhost:<puerto>/api`.
+- En dev lo monta `server/dev-server.js` bajo la base del sitio, en el puerto que
+  imprima `pnpm dev`.
 - En prod corre como `javascript-node` (systemd) detrás de nginx, con el código en
   `/opt/javascript-node-api` y el `.env` en `/opt/javascript-node-api/.env`
   (`F640 root:www-data`).
@@ -81,7 +83,7 @@ Las tareas de `/api/tasks` viven en la memoria del proceso: se reinician con
 | `app/` | Copia regenerada por Gulp desde `src/` para desarrollo | No |
 | `dist/` | Build minificado para producción | No |
 | `api/` | Runtime Node compartido por dev y prod: router, servidor standalone y dependencias propias | Sí |
-| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, montaje de `/api` y preview | Sí |
+| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, montaje de `{SITE_BASE}/api` y preview | Sí |
 | `infra/` | Configuración del servidor de producción (nginx, PHP-FPM, provision). Se aplica a mano en el VPS | Sí |
 | `types/` | Tipos globales y JSDoc compartidos | Sí |
 | `docker/mysql/` | MySQL local para desarrollo | Sí |
@@ -175,8 +177,8 @@ La verificación mínima de un cambio es:
 1. `pnpm build` termina sin errores.
 2. `pnpm preview` sirve `dist/` y la vista tocada carga sin errores de consola.
 3. Si tocaste una fuente referenciada por una ruta de Shiki: `pnpm code-highlight`.
-4. Si tocaste `api/` o el dev server: `curl http://localhost:<puerto>/api/health` y
-   un `POST` de lectura a `/api/mysql/query` en el puerto que imprima `pnpm dev`.
+4. Si tocaste `api/` o el dev server: `curl http://localhost:<puerto>{SITE_BASE}/api/health`
+   y un `POST` de lectura a `{SITE_BASE}/api/mysql/query` en el puerto que imprima `pnpm dev`.
 
 ## Deploy
 
@@ -186,9 +188,10 @@ La verificación mínima de un cambio es:
   con `--delete`. El `.env` remoto queda protegido por `--exclude` y
   `--filter 'P .env'`.
 - `.env.production` → `.env` remoto, con permisos `F640 root:www-data`.
-- `api/` → `/opt/javascript-node-api` (sin `node_modules` y sin pisar su `.env`),
-  `pnpm install --prod`, `.env.production` → `/opt/javascript-node-api/.env` y
-  `systemctl restart javascript-node`.
+- el artefacto de `pnpm --filter javascript-node-api deploy .deploy-api --prod`
+  → `/opt/javascript-node-api` (con `node_modules`, sin pisar su `.env`),
+  `.env.production` → `/opt/javascript-node-api/.env` y
+  `systemctl restart javascript-node`. El VPS no ejecuta `pnpm install`.
 
 Lo que **no** hace:
 

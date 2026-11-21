@@ -238,7 +238,7 @@ const loadTasks = async (ui) => {
     try {
 
         /** - `respuesta del listado` */
-        const response = await fetch('/api/tasks');
+        const response = await fetch('api/tasks');
 
         //  -----  mostrar el código y la latencia  -----
         setBadges(ui, response);
@@ -319,7 +319,7 @@ const createTask = async (ui) => {
     try {
 
         /** - `respuesta de la creación` */
-        const response = await fetch('/api/tasks', {
+        const response = await fetch('api/tasks', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -426,7 +426,7 @@ const deleteTask = async (ui, id) => {
     try {
 
         /** - `respuesta de la eliminación` */
-        const response = await fetch(`/api/tasks/${id}`, {
+        const response = await fetch(`api/tasks/${id}`, {
             method: 'DELETE',
         });
 

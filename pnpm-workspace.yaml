@@ -1,0 +1,25 @@
+# ==============================================================
+#  pnpm-workspace.yaml
+#  Workspace de la SPA y su runtime Node de producción
+#  --------------------------------------------------------------
+#  - `api/` es miembro del workspace: comparte un único lockfile
+#    con la raíz, así dev y producción resuelven las mismas
+#    versiones y no hay dos listas de dependencias que sincronizar.
+#  - `catalog` es la única fuente de verdad de las versiones
+#    compartidas. Los manifiestos las referencian con `catalog:`.
+#  - `allowBuilds` deja correr los scripts de instalación que
+#    pnpm 10+ bloquea por defecto. Sin ellos falla sharp (lo usa
+#    gulpfile.js para convertir imágenes) y el watch de gulp.
+# ==============================================================
+
+packages:
+  - api
+
+allowBuilds:
+  '@parcel/watcher': true
+  sharp: true
+
+catalog:
+  dotenv: ^16.4.7
+  express: ^5.1.0
+  mysql2: ^3.24.5

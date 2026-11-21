@@ -13,7 +13,7 @@
     <div class="express-page__hero">
         <div class="express-page__hero-badge">
             <span class="express-page__hero-tag" aria-hidden="true">Ex</span>
-            <h3 class="express-page__hero-title">Express</h3>
+            <h3 class="express-page__hero-title">Node con Express</h3>
             <p class="express-page__hero-subtitle">CRUD REST en memoria sobre Node</p>
         </div>
     </div>
@@ -23,8 +23,9 @@
     <section class="express-page__intro">
         <p class="express-page__intro-text">
             <strong>Express</strong> corre el API en un proceso Node aparte del servidor del SPA.
-            En desarrollo el dev server monta el router en <strong>/api</strong>; en producción el
-            proceso lo gestiona <strong>systemd</strong> y nginx publica el mismo prefijo.
+            Las páginas piden <strong>api/tasks</strong> relativo al <code>&lt;base&gt;</code>:
+            en desarrollo lo monta el dev server y en producción lo publica nginx bajo la
+            base del sitio, con el proceso gestionado por <strong>systemd</strong>.
         </p>
         <p class="express-page__intro-text">
             El <strong>router</strong> es dueño de las rutas y del contrato JSON, mientras que el
@@ -77,9 +78,9 @@
         <h3 class="express-page__concepts-title">Rutas del API</h3>
 
         <ul class="express-page__concepts">
-            <li class="express-page__concept">GET /api/tasks</li>
-            <li class="express-page__concept">POST /api/tasks</li>
-            <li class="express-page__concept">DELETE /api/tasks/:id</li>
+            <li class="express-page__concept">GET api/tasks</li>
+            <li class="express-page__concept">POST api/tasks</li>
+            <li class="express-page__concept">DELETE api/tasks/:id</li>
             <li class="express-page__concept">express.Router</li>
             <li class="express-page__concept">express.json 4 KB</li>
             <li class="express-page__concept">X-Response-Time</li>

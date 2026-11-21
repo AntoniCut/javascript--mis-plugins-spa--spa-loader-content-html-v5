@@ -9,8 +9,8 @@
 - **Objetivo**: separar desarrollo y producción por AMBIENTE (no por runtime),
   con un contrato HTTP único que implementan PHP (prod) y Node (dev y prod).
 - **Estado**: PHP en producción desde la spec 06; API Node en producción bajo
-  `/api` desde la spec 10.
-- **Contrato de ejemplo**: `POST /api/mysql/query` → JSON de solo lectura.
+  `{SITE_BASE}/api` desde la spec 10.
+- **Contrato de ejemplo**: `POST {SITE_BASE}/api/mysql/query` → JSON de solo lectura.
 
 ## Las cuatro zonas
 
@@ -27,8 +27,9 @@ Principio: cada carpeta responde "¿dónde corre esto?", no "¿qué lenguaje es?
 
 - **Node (dev y prod)**: `api/src/mysql-query.js` (Express + mysql2) expone
   `GET /health` y `POST /mysql/query`. En dev lo monta `server/dev-server.js`
-  en `/api`; en prod lo ejecuta `javascript-node` (systemd) detrás de nginx con
-  `location ^~ /api/`. La página usa siempre `POST /api/mysql/query`.
+  en `{SITE_BASE}/api`; en prod lo ejecuta `javascript-node` (systemd) detrás de
+  nginx con `location ^~ {SITE_BASE}/api/`. La página usa siempre
+  `POST api/mysql/query` relativo al `<base>`.
 - **Node en memoria**: `api/src/tasks-router.js` (Express) expone
   `GET /tasks`, `POST /tasks` y `DELETE /tasks/:id` con los mismos dos montajes.
   Es la demo de Express: no toca MySQL y pierde los datos al reiniciar el proceso.
@@ -69,10 +70,11 @@ Reglas del contrato (idénticas en ambas implementaciones):
 - `api/src/mysql-query.js`: router compartido: `GET /health`, `POST /mysql/query` y 405.
 - `api/src/tasks-router.js`: CRUD en memoria (`GET/POST /tasks`, `DELETE /tasks/:id`) de la demo `express-page`.
 - `api/src/server.js` + `api/src/load-env.js`: runtime standalone para producción.
-- `server/dev-server.js`: monta los routers compartidos en `/api` (raíz del dev server).
+- `server/dev-server.js`: monta los routers compartidos en `{SITE_BASE}/api`.
+- pnpm: `api/` es miembro del workspace y comparte el `catalog` de versiones con la raíz; el lockfile se versiona.
 - `infra/systemd/javascript-node.service`: unit `www-data`, `Restart=on-failure`.
-- `infra/nginx/javascript.antonydev.tech-api.conf`: `location ^~ /api/` con `proxy_pass` a `127.0.0.1:3100`.
-- `deploy.sh`: sube `api/` a `/opt/javascript-node-api`, instala deps de producción y reinicia `javascript-node`.
+- `infra/nginx/javascript.antonydev.tech-api.conf`: `location ^~ {SITE_BASE}/api/` con `proxy_pass` a `127.0.0.1:3100`.
+- `deploy.sh`: genera el artefacto con `pnpm --filter javascript-node-api deploy .deploy-api --prod`, lo sube a `/opt/javascript-node-api` (con `node_modules`) y reinicia `javascript-node`; el VPS no ejecuta `pnpm install`.
 - `docker-compose.yml` + `docker/mysql/init/01-stacks.sql`: MySQL local (puerto `3308`, base `javascript_mis_plugins_spa`).
 - `deploy.sh`: hardening de `.env`.
 - `infra/`: nginx, php-fpm, systemd, provision.
@@ -93,7 +95,7 @@ Reglas del contrato (idénticas en ambas implementaciones):
 2. `pnpm run refresh` — `app/services/` poblado.
 3. `pnpm run build` — `dist/services/*.php` minificado, sin `.env` en dist.
 4. `docker compose up -d` + POST de lectura → filas; POST de escritura → rechazo.
-5. Dev-server: `GET /api/health` y `POST /api/mysql/query` en la raíz → mismas reglas vía Node.
+5. Dev-server: `GET {SITE_BASE}/api/health` y `POST {SITE_BASE}/api/mysql/query` bajo la base → mismas reglas vía Node.
 6. `bash -n deploy.sh` + `nginx -t` del bloque de `infra/nginx/`.
-7. Producción: `curl https://javascript.antonydev.tech/api/health`, consulta de lectura,
-   escritura rechazada con 400, `GET /api/mysql/query` con 405 y `/api/.env` con 404.
+7. Producción: `curl https://javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5/api/health`, consulta de lectura,
+   escritura rechazada con 400, `GET {SITE_BASE}/api/mysql/query` con 405 y `{SITE_BASE}/.env` con 404.
