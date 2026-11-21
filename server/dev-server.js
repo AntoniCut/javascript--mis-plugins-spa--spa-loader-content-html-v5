@@ -392,11 +392,11 @@ app.use(redirectRootToBase);
 //  -----  registrar el middleware que ejecuta archivos php via php-cgi  -----
 app.use(makePhpHandler(PROJECT_ROOT, devServerPort));
 
-//  -----  montar el api en la raíz para que la página use /api/...  -----
-app.use('/api', createApiRouter());
+//  -----  montar health y la consulta mysql bajo la base del sitio  -----
+app.use(`${DEV_ROUTE_BASE}/api`, createApiRouter());
 
-//  -----  montar el crud de tareas en memoria bajo /api  -----
-app.use('/api', createTasksRouter());
+//  -----  montar el crud de tareas bajo la base del sitio  -----
+app.use(`${DEV_ROUTE_BASE}/api`, createTasksRouter());
 
 //  -----  registrar el middleware que sirve archivos estáticos desde la raíz del proyecto con el prefijo de ruta  -----
 app.use(DEV_ROUTE_BASE, express.static(PROJECT_ROOT, { index: false }));

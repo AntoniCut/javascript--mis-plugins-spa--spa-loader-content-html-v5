@@ -182,8 +182,8 @@ const runQuery = async (form) => {
     //  -----  intentar la petición  -----
     try {
 
-        /** - `url absoluta desde la raíz: nginx en producción, dev server en local` */
-        const response = await fetch('/api/mysql/query', {
+        /** - `url relativa al base href: el dev server y nginx la resuelven bajo la base del sitio` */
+        const response = await fetch('api/mysql/query', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

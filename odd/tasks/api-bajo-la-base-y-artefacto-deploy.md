@@ -24,11 +24,11 @@
 
 ## Tasks
 
-- **T1** (S1, S2, S3, S4, S12) workspace, catálogo y pines — route: inline — commit: C1
-- **T2** (S5, S6, S13-deploy) artefacto de deploy — route: inline — commit: C2
+- **T1** (S1, S2, S3, S4, S12) workspace, catálogo y pines — route: inline — commit: `18890a7` (C1)
+- **T2** (S5, S6, S13-deploy) artefacto de deploy — route: inline — commit: `bcb054c` (C2)
 - **T3** (S7, S8, S10, S11, S13-api) URLs relativas, dev server, nginx, Shiki y docs — route: inline — commit: C3
-- **T4** (S9) `.env.example` de watch — route: inline — commit: C4
-- **T5** verificación funcional y differential — route: inline — evidencia en `## Log`
+- **T4** (S9) `.env.example` de watch — route: inline — **bloqueada**: las reglas de permisos del editor deniegan `**/.env.*` (ver L10)
+- **T5** verificación funcional y differential — route: inline — evidencia en `## Log` (L8); verificador independiente pendiente
 
 ## Log
 
@@ -37,3 +37,9 @@
 - **L3** (2026-11-21, contrato de referencia leído en JQ): `pnpm-workspace.yaml` con `packages: [api]` + `catalog`; `deploy.sh` con `CI=true pnpm --filter jquery-node-api deploy .deploy-api --prod`; dev server monta `${DEV_ROUTE_BASE}/api`; nginx `location ^~ {SITE_BASE}/api/ { proxy_pass http://127.0.0.1:3200/; }`. En JS cambia solo el puerto destino: 3100.
 - **L4** (2026-11-21, decisión derivada S12): versionar `pnpm-workspace.yaml` y `pnpm-lock.yaml`. Sin el workspace versionado, un clon limpio no resuelve `"catalog:"`; no es scope nuevo, es condición de S1/S2.
 - **L5** (2026-11-21, decisión derivada S11): mover el montaje del dev server a `${DEV_ROUTE_BASE}/api`. El pendiente no lo lista, pero sin él S7 rompe `pnpm dev` (el `fetch` relativo apunta a la base del sitio, no a la raíz del origen).
+- **L6** (2026-11-21, T1 verificado): `pnpm install` → `Scope: all 2 workspace projects`; el lockfile declara `catalogs.default` y resuelve dotenv 16.6.1, express 5.2.1, mysql2 3.24.6; `mysql2` salió de las devDependencies de la raíz; `api/node_modules` enlaza los tres paquetes; raíz con `packageManager: pnpm@11.28.12` y ambos con `engines.node >=24.0.0`; `.nvmrc` 24.22.3. `pnpm-workspace.yaml` y `pnpm-lock.yaml` quedaron versionados. Commit `18890a7` (C1).
+- **L7** (2026-11-21, T2 verificado): `bash -n deploy.sh deploy.sh.example` OK. `CI=true pnpm --filter javascript-node-api deploy .deploy-api --prod` genera `src/`, `package.json`, `.env.example` y `node_modules` (dotenv, express, mysql2); sin `.env`. No se ejecutó el deploy remoto (operación no autorizada). Commit `bcb054c` (C2).
+- **L8** (2026-11-21, T3 verificado): cuatro `fetch` relativos; dev server monta `${DEV_ROUTE_BASE}/api`. En dev (9877): `{base}/api/health` 200 JSON; `/api/health` en la raíz 404 (ya no proxea); GET/POST/DELETE tasks 200/201/200; `POST {base}/api/mysql/query` 500 JSON por MySQL apagado (prueba de routing, no HTML); estático y ruta SPA 200. En navegador: `express-page` pinta las 3 semillas y `node-page` muestra el error JSON; único error de consola, el 500 esperado. `pnpm code-highlight` regeneró 58 bloques y solo cambiaron 2 archivos Shiki; `pnpm build` exit 0; `dist/` con los textos y los `fetch` relativos; `node --check` OK. `pnpm preview` (8765): index, ruta y assets 200; `{base}/api/health` cae al `index.html` porque preview no monta el API (documentado). `nginx -t` no aplica: el archivo es un fragmento, no un site file.
+- **L9** (2026-11-21, RDD): assess sobre C1 y C2 → `risk: medium`, `review_due: false`, `review_due_reason: under_budget`. El boundary revisado sigue en `main`; decisión nativa al cierre.
+- **L10** (2026-11-21, T4 bloqueada): la edición de `.env.example` fue denegada por las reglas de permisos del editor (`**/.env.*` → deny, pese al allow de `*.env.production.example`). No se fuerza el bypass. Quedan pendientes `CHOKIDAR_USEPOLLING` y `CHOKIDAR_INTERVAL`; requiere autorización explícita del usuario o que los agregue él.
+- **L11** (2026-11-21, T5 parcial): falta el verificador independiente del cambio (riesgo alto por deploy/dependencias y ausencia de tests) y el cierre del riesgo. Se lanza al terminar el trabajo autorizado.

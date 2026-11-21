@@ -23,12 +23,12 @@
     <section class="node-page__intro">
         <p class="node-page__intro-text">
             <strong>Node 24</strong> corre el mismo router en el servidor de desarrollo y en
-            producción, detrás de nginx en <strong>/api</strong>. El proceso lo gestiona
-            <strong>systemd</strong> como <strong>javascript-node</strong>.
+            producción, detrás de nginx en <strong>api/</strong>, bajo la base del sitio. El
+            proceso lo gestiona <strong>systemd</strong> como <strong>javascript-node</strong>.
         </p>
         <p class="node-page__intro-text">
-            Esta página envía la sentencia a <strong>/api/mysql/query</strong> con una URL
-            absoluta desde la raíz del dominio, así que funciona igual en local y en el VPS.
+            Esta página envía la sentencia a <strong>api/mysql/query</strong>, relativa al
+            <code>&lt;base&gt;</code>, así que funciona igual en local y en el VPS.
             En producción no hay CORS: mismo origen.
         </p>
     </section>
@@ -58,7 +58,7 @@
             <article class="node-page__feature">
                 <h4 class="node-page__feature-title">Health sin MySQL</h4>
                 <p class="node-page__feature-text">
-                    GET /api/health confirma que el proceso responde, aunque la base esté caída.
+                    GET api/health confirma que el proceso responde, aunque la base esté caída.
                 </p>
             </article>
 
@@ -73,13 +73,13 @@
         <h3 class="node-page__concepts-title">Rutas del API</h3>
 
         <ul class="node-page__concepts">
-            <li class="node-page__concept">GET /api/health</li>
-            <li class="node-page__concept">POST /api/mysql/query</li>
+            <li class="node-page__concept">GET api/health</li>
+            <li class="node-page__concept">POST api/mysql/query</li>
             <li class="node-page__concept">express.json 16 KB</li>
             <li class="node-page__concept">405 método</li>
             <li class="node-page__concept">200 filas</li>
             <li class="node-page__concept">systemd</li>
-            <li class="node-page__concept">nginx /api/</li>
+            <li class="node-page__concept">nginx · base del sitio</li>
         </ul>
 
     </section>

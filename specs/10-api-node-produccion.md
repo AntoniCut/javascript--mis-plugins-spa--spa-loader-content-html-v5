@@ -5,6 +5,8 @@
 > **Fecha:** 2026-11-13
 > **Objetivo:** Añadir un runtime Node de producción en `https://javascript.antonydev.tech/api` (same-origin) con el endpoint MySQL de solo lectura y un health, gestionado por systemd, desplegado desde `deploy.sh` y demostrado con una página `node-page` en el SPA.
 
+> **Actualización 2026-11-21:** el API pasó a publicarse en `{SITE_BASE}/api/` (no en la raíz `/api`) y `deploy.sh` sube el artefacto de `pnpm deploy` en vez de ejecutar `pnpm install` en el VPS. Esta spec conserva el registro de la decisión original; el estado vigente está en `specs/arquitectura/01-servicios-backend-arquitectura.md` y `AGENTS.md`.
+
 ## Why this spec exists
 
 Hoy el proyecto tiene dos implementaciones del contrato MySQL: PHP en producción (`src/services/mysql/query.php` → PHP-FPM) y Node solo en desarrollo (`server/mysql-query.js`, montado por `server/dev-server.js`). Node nunca sale de la máquina local: `deploy.sh` solo sube `dist/` y `.env.production`, y `infra/provision/provision-vps.sh` no instala Node.

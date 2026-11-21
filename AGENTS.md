@@ -8,7 +8,7 @@ Si algo de acá contradice al código, gana el código: corregí este archivo en
 Plugin SPA en Vanilla JS (ES Modules) que carga contenido HTML dinámicamente y
 renderiza código fuente resaltado con Shiki (tema `dark-plus`).
 Se publica como sitio estático en `javascript.antonydev.tech` y, desde la zona
-`api/`, expone un API Node de solo lectura en `/api` (Express + mysql2).
+`api/`, expone un API Node de solo lectura en `{SITE_BASE}/api` (Express + mysql2).
 
 - Package manager: **pnpm** (hay `pnpm-lock.yaml` y `pnpm-workspace.yaml`).
 - Entorno de referencia: Node 24 / pnpm 11.
@@ -36,7 +36,7 @@ Si un cambio desaparece al correr `pnpm dev` o `pnpm build`, estabas editando
 | `src/services/` | Endpoints PHP que viajan en el build; en dev los sirve `server/`, en prod PHP-FPM |
 | `api/` | Runtime Node compartido por dev y prod: router (`mysql-query.js`), servidor standalone y dependencias propias. Se despliega aparte, no pasa por Gulp |
 | `types/` | Tipos globales y JSDoc compartidos (`*.d.js`, `*.d.ts`) |
-| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, montaje de `/api`, preview |
+| `server/` | Runtime **solo de desarrollo**: Express 5, php-cgi, montaje de `{SITE_BASE}/api`, preview |
 | `infra/` | Configuración del servidor de **producción**. No se ejecuta en local y **no** se despliega automáticamente |
 | `docker/mysql/` | MySQL local para desarrollo (`docker-compose.yml`) |
 | `specs/` | Specs numeradas del proyecto; `specs/arquitectura/` guarda las decisiones de arquitectura |
@@ -70,7 +70,8 @@ No hay suite de tests. Antes de dar un cambio por terminado:
 2. `pnpm preview` sirve `dist/` y la vista tocada carga sin errores de consola.
 3. Si tocaste un archivo fuente referenciado por una ruta de Shiki: `pnpm code-highlight`.
 4. Si tocaste `api/` o el dev server: `node --check` de los JS y `curl` a
-   `/api/health` y `/api/mysql/query` en el puerto que imprima `pnpm dev`.
+   `{SITE_BASE}/api/health` y `{SITE_BASE}/api/mysql/query` en el puerto que
+   imprima `pnpm dev`.
 
 No inventes resultados de tests que no existen. Reportá `pnpm test` como
 no disponible en vez de presentarlo como verde.
@@ -123,8 +124,8 @@ No toca nginx, PHP-FPM ni la base:
 - El `.env` remoto debe quedar `root:www-data` 640. Si no, PHP responde
   `Access denied`.
 - `api/` no va al web root ni a `dist/`: el proceso Node vive en `/opt`.
-- El prefijo `/api` está reservado por nginx para el API Node; no lo uses para
-  assets estáticos.
+- El prefijo `{SITE_BASE}/api` está reservado por nginx para el API Node; no lo
+  uses para assets estáticos.
 - `infra/provision/provision-vps.sh` **no** instala ni reemplaza el motor
   MySQL/MariaDB: la base y el usuario se configuran a mano. Instalar
   `mariadb-server` sobre un MySQL existente hace que apt lo elimine y mueva el
@@ -157,6 +158,6 @@ No toca nginx, PHP-FPM ni la base:
    No hay que tocar versiones anteriores.
 6. `api/` no se copia a `dist/`: el runtime Node se despliega a
    `/opt/javascript-node-api` y arranca como `javascript-node`.
-7. `/api` está reservado por nginx para el API Node; no lo uses para assets.
+7. `{SITE_BASE}/api` está reservado por nginx para el API Node; no lo uses para assets.
 8. `api/src/load-env.js` carga `api/.env` y, en dev, el `.env` raíz; no pisa
    variables ya definidas.

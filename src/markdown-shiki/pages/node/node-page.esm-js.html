@@ -154,8 +154,8 @@
 <span class="line"><span style="color:#6A9955">    //  -----  intentar la petición  -----</span></span>
 <span class="line"><span style="color:#C586C0">    try</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"></span>
-<span class="line"><span style="color:#6A9955">        /** - `url absoluta desde la raíz: nginx en producción, dev server en local` */</span></span>
-<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'/api/mysql/query'</span><span style="color:#D4D4D4">, {</span></span>
+<span class="line"><span style="color:#6A9955">        /** - `url relativa al base href: el dev server y nginx la resuelven bajo la base del sitio` */</span></span>
+<span class="line"><span style="color:#569CD6">        const</span><span style="color:#4FC1FF"> response</span><span style="color:#D4D4D4"> = </span><span style="color:#C586C0">await</span><span style="color:#DCDCAA"> fetch</span><span style="color:#D4D4D4">(</span><span style="color:#CE9178">'api/mysql/query'</span><span style="color:#D4D4D4">, {</span></span>
 <span class="line"><span style="color:#9CDCFE">            method:</span><span style="color:#CE9178"> 'POST'</span><span style="color:#D4D4D4">,</span></span>
 <span class="line"><span style="color:#9CDCFE">            headers:</span><span style="color:#D4D4D4"> {</span></span>
 <span class="line"><span style="color:#CE9178">                'Content-Type'</span><span style="color:#9CDCFE">:</span><span style="color:#CE9178"> 'application/json'</span><span style="color:#D4D4D4">,</span></span>

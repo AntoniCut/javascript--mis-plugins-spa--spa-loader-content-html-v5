@@ -5,7 +5,7 @@ ejecuta en desarrollo: `server/` sigue siendo la zona dev.
 
 ```
 infra/
-├── nginx/            Fragmentos del sitio: estáticos + deny .env + PHP-FPM y /api Node
+├── nginx/            Fragmentos del sitio: estáticos + deny .env + PHP-FPM y {SITE_BASE}/api Node
 ├── php-fpm/          Notas operativas (dueño/permisos del .env)
 ├── systemd/          Unit del API Node (javascript-node.service)
 └── provision/        Checklist ejecutable de provision del VPS
@@ -16,7 +16,7 @@ infra/
 | Carpeta | Qué es | Cuándo corre |
 |---|---|---|
 | `api/` | runtime Node: router compartido, servidor standalone y dependencias propias | dev (dev server) y prod (systemd `javascript-node`) |
-| `server/` | runtime de desarrollo (Node, php-cgi, montaje de `/api`) | solo local |
+| `server/` | runtime de desarrollo (Node, php-cgi, montaje de `{SITE_BASE}/api`) | solo local |
 | `src/services/` | código de los endpoints (viaja en el build) | dev (php-cgi) y prod (PHP-FPM) |
 | `infra/` | configuración del servidor de producción | solo en el VPS |
 
@@ -27,13 +27,17 @@ infra/
   sube con su `node_modules`; el VPS no ejecuta `pnpm install`.
 - `systemd/javascript-node.service`: corre como `www-data`, `Restart=on-failure`,
   logs a journald (`journalctl -u javascript-node`).
-- `nginx/javascript.antonydev.tech-api.conf`: `location ^~ /api/` con
-  `proxy_pass http://127.0.0.1:3100/`; la barra final quita el prefijo `/api/`.
+- `nginx/javascript.antonydev.tech-api.conf`: `location ^~ {SITE_BASE}/api/` con
+  `proxy_pass http://127.0.0.1:3100/`; la barra final quita el prefijo `{SITE_BASE}/api/`.
+- El location no es `/api/` en la raíz del dominio. Las páginas piden `api/tasks` y
+  `api/mysql/query` relativos al `<base>`.
+- `pnpm dev` monta los mismos routers en `{SITE_BASE}/api`.
 - El `.env` del API vive en `/opt/javascript-node-api/.env`, `root:www-data 640`,
   y reutiliza las `MYSQL_*` de `.env.production`. La plantilla versionada es
   `.env.production.example`.
 - La provisión instala Node 24 + corepack/pnpm, crea `/opt/javascript-node-api` y
-  **habilita** la unit; el arranque lo hace el deploy.
+  **habilita** la unit; el arranque lo hace el deploy. El deploy ya no ejecuta
+  `pnpm` en el VPS: el artefacto viaja con su `node_modules`.
 
 ## Base de datos
 
