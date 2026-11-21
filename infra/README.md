@@ -5,7 +5,7 @@ ejecuta en desarrollo: `server/` sigue siendo la zona dev.
 
 ```
 infra/
-├── nginx/            Fragmentos del sitio: estáticos + deny .env + PHP-FPM y {SITE_BASE}/api Node
+├── nginx/            Site file del dominio + fragmentos: estáticos + deny .env + PHP-FPM y {SITE_BASE}/api Node
 ├── php-fpm/          Notas operativas (dueño/permisos del .env)
 ├── systemd/          Unit del API Node (javascript-node.service)
 └── provision/        Checklist ejecutable de provision del VPS
@@ -19,6 +19,17 @@ infra/
 | `server/` | runtime de desarrollo (Node, php-cgi, montaje de `{SITE_BASE}/api`) | solo local |
 | `src/services/` | código de los endpoints (viaja en el build) | dev (php-cgi) y prod (PHP-FPM) |
 | `infra/` | configuración del servidor de producción | solo en el VPS |
+
+## Site file del dominio
+
+- `nginx/javascript.antonydev.tech.conf` es el site file completo de
+  `javascript.antonydev.tech`: va en `sites-available` con symlink en
+  `sites-enabled`. No es un fragmento; reemplaza al archivo del VPS.
+- El bloque estático del plugin v5 y su `deny` de `.env` también viven como
+  fragmento en `javascript.antonydev.tech-mis-plugins-spa.conf`, y el API Node
+  en `javascript.antonydev.tech-api.conf` (incluido por el site file).
+- Se aplica a mano: backup del site file, reemplazo del contenido, `nginx -t`
+  y `systemctl reload nginx`.
 
 ## API Node en producción
 
