@@ -98,4 +98,4 @@ Reglas del contrato (idénticas en ambas implementaciones):
 5. Dev-server: `GET {SITE_BASE}/api/health` y `POST {SITE_BASE}/api/mysql/query` bajo la base → mismas reglas vía Node.
 6. `bash -n deploy.sh` + `nginx -t` del bloque de `infra/nginx/`.
 7. Producción: `curl https://javascript.antonydev.tech/mis-plugins-spa/spa-loader-content-html-v5/api/health`, consulta de lectura,
-   escritura rechazada con 400, `GET {SITE_BASE}/api/mysql/query` con 405 y `/api/.env` con 404.
+   escritura rechazada con 400, `GET {SITE_BASE}/api/mysql/query` con 405 y `{SITE_BASE}/.env` con 404.

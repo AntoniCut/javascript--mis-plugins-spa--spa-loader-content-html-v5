@@ -26,9 +26,9 @@
 
 - **T1** (S1, S2, S3, S4, S12) workspace, catálogo y pines — route: inline — commit: `18890a7` (C1)
 - **T2** (S5, S6, S13-deploy) artefacto de deploy — route: inline — commit: `bcb054c` (C2)
-- **T3** (S7, S8, S10, S11, S13-api) URLs relativas, dev server, nginx, Shiki y docs — route: inline — commit: C3
+- **T3** (S7, S8, S10, S11, S13-api) URLs relativas, dev server, nginx, Shiki y docs — route: inline — commit: `cb3b088` (C3)
 - **T4** (S9) `.env.example` de watch — route: inline — **bloqueada**: las reglas de permisos del editor deniegan `**/.env.*` (ver L10)
-- **T5** verificación funcional y differential — route: inline — evidencia en `## Log` (L8); verificador independiente pendiente
+- **T5** verificación funcional y differential — route: inline — veredicto del verificador independiente en L14
 
 ## Log
 
@@ -43,3 +43,7 @@
 - **L9** (2026-11-21, RDD): assess sobre C1 y C2 → `risk: medium`, `review_due: false`, `review_due_reason: under_budget`. El boundary revisado sigue en `main`; decisión nativa al cierre.
 - **L10** (2026-11-21, T4 bloqueada): la edición de `.env.example` fue denegada por las reglas de permisos del editor (`**/.env.*` → deny, pese al allow de `*.env.production.example`). No se fuerza el bypass. Quedan pendientes `CHOKIDAR_USEPOLLING` y `CHOKIDAR_INTERVAL`; requiere autorización explícita del usuario o que los agregue él.
 - **L11** (2026-11-21, T5 parcial): falta el verificador independiente del cambio (riesgo alto por deploy/dependencias y ausencia de tests) y el cierre del riesgo. Se lanza al terminar el trabajo autorizado.
+- **L12** (2026-11-21, revisión nativa con consentimiento): el slice completo desde `main` falló con `lens_context_budget_exceeded` por el `pnpm-lock.yaml`; se redujo a C2+C3 (`--base-ref 18890a7`, 19 archivos, 226 líneas). Se admitieron los lentes `review-risk` y `review-readability`. `review-reliability` devolvió `opencode_task_output_empty` tres veces; el STATUS exacto sigue reofreciendo el slot y no hay acknowledgement ni aprobación nativa. Es un fallo del runtime de subagentes (resultado vacío), no un defecto de Gentle AI. Autoridad de revisión sin cerrar; no se inventa PASS ni se reintenta indefinidamente.
+- **L13** (2026-11-21, verificación independiente): se delega al verificador `gentle-ai-verify` el documento completo, con baseline `main` (`dfe5339`) y el método `_shared/verify-method.md`. Debe devolver veredicto por `S#`, incluida S9 como unmet por el bloqueo de permisos, y probes propias en un scratch fuera del worktree.
+- **L14** (2026-11-21, veredicto del verificador): S1-S8 y S10-S13 **met**; S9 **unmet** (único ítem pendiente, bloqueado por permisos). Sin regresiones: static, SPA, PHP, redirect raíz y el layout de 194 archivos de `dist` quedan iguales; el único cambio de comportamiento es el buscado (`/api/health` raíz 200→404, `{base}/api/health` HTML→JSON). `bash -n` OK; `pnpm build` OK; `pnpm code-highlight` 58 bloques y los dos Shiki cambiados coinciden byte a byte; `pnpm deploy` offline con 79 paquetes reusados; dev server `{base}/api/*` 200/JSON y CRUD 200/201/200. `pnpm test` sigue sin existir (exit 1, placeholder). Advisories: Shiki CSS embebe rutas absolutas de source-map (pre-existente) y la línea de verificación de `specs/arquitectura/01` ya se corrigió a `{SITE_BASE}/.env`. No se ejecutó `deploy.sh` ni `nginx -t` (sin autorización remota). Scratch del verificador eliminado por el padre.
+- **L15** (2026-11-21, RDD final): no hay aprobación nativa. El intento del slice completo falló por presupuesto (`lens_context_budget_exceeded`, lockfile); el slice C2+C3 admitió `review-risk` y `review-readability`, pero `review-reliability` quedó sin captura por `opencode_task_output_empty` tres veces y el STATUS sigue reofreciendo el slot. No se inventa PASS, no se reintenta más y no se avanza el boundary revisado. La entrega queda bajo la política ordinaria del repositorio.
